@@ -22,6 +22,12 @@ import pafy
 import plotly.express as px
 import youtube_dl
 
+
+
+
+
+
+
 def fetch_yt_video(link):
     video = pafy.new(link)
     return video.title
