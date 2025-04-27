@@ -1,0 +1,37 @@
+resume-analyzer
+├── src
+│   ├── controllers
+│   │   ├── __init__.py
+│   │   ├── admin_controller.py
+│   │   ├── resume_controller.py
+│   │   └── user_controller.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   ├── database.py
+│   │   ├── resume.py
+│   │   └── user.py
+│   ├── views
+│   │   ├── __init__.py
+│   │   ├── admin_view.py
+│   │   └── user_view.py
+│   ├── services
+│   │   ├── __init__.py
+│   │   ├── pdf_service.py
+│   │   ├── resume_parser.py
+│   │   └── youtube_service.py
+│   ├── utils
+│   │   ├── __init__.py
+│   │   └── helpers.py
+│   ├── config
+│   │   ├── __init__.py
+│   │   └── settings.py
+│   └── app.py
+├── static
+│   └── Logo
+├── tests
+│   ├── __init__.py
+│   ├── test_controllers
+│   ├── test_models
+│   └── test_services
+├── requirements.txt
+└── README.md

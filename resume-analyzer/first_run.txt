@@ -1,0 +1,34 @@
+# Install dependencies
+pip install -r requirements.txt
+
+# Set up the database
+mysql -u root -p
+# Enter your MySQL root password
+CREATE DATABASE sra;
+CREATE USER 'appuser'@'localhost' IDENTIFIED BY 'yourpassword';
+GRANT ALL PRIVILEGES ON sra.* TO 'appuser'@'localhost';
+FLUSH PRIVILEGES;
+
+
+you can use this configuration for database : 
+user : appuser
+password : yourpassword 
+
+then you can run the test script : python3 src/test_db.py // to verifiy the connection
+
+
+run : 
+
+python3 -m venv venv
+source venv/bin/activate
+
+pip install -r requirements.txt
+
+export FLASK_APP=src.app
+export FLASK_ENV=development
+export PYTHONPATH=$PYTHONPATH:$(pwd)
+
+
+
+# Run the application
+flask run
