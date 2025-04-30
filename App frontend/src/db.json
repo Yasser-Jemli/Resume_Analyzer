@@ -1,0 +1,20 @@
+{
+    "jobs": [
+      {
+        "id": 1,
+        "title": "Développeur Frontend",
+        "company": "TechCorp",
+        "location": "Tunis",
+        "description": "Développement d'interfaces utilisateur modernes.",
+        "datePosted": "2023-10-01"
+      },
+      {
+        "id": 2,
+        "title": "Ingénieur Backend",
+        "company": "SoftSolutions",
+        "location": "Sousse",
+        "description": "Conception et maintenance des API.",
+        "datePosted": "2023-10-02"
+      }
+    ]
+  }
