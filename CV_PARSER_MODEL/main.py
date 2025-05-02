@@ -4,28 +4,22 @@
 # @Author  : Yasser JEMLI
 # @File    : main.py
 # @Software: Vscode
-# @Description: This module provides a command-line interface for the Resume Analyzer.
+# @Description: CLI interface for the Resume Analyzer.
 # @License : MIT License
 
-
-# main.py
-
 import argparse
+import os
+import atexit
+import signal
+import sys
 
-# /**
-#  * @author Firstname Lastname
-#  * @version 1.0
-#  * @since 2025-05-02
-#  */
-
-# **** Local Imports ****
 from utilis.watchdog import Watchdog
+from parsers.PDFTextExtractor import PDFTextExtractor
+from parsers.ResumeInfoExtractor import ResumeInfoExtractor
 
-# from parser.cv_parser import parse_cv
-# from recommender.course_recommender import recommend_courses
-# from analyzer.job_matcher import match_job
 
-# *
+TEMP_FILE = "temp_save.txt"
+
 HELP_TEXT = """
 Resume Analyzer CLI
 
@@ -33,7 +27,7 @@ Usage:
     python main.py <action> --path <file_path> [--timeout <seconds>]
 
 Actions:
-    parse_cv     Parse the resume/CV and extract data
+    parse_cv     Parse the resume/CV and extract paragraphs
     recommend    Recommend courses based on the resume
     match        Match resume to job offers
 
@@ -41,6 +35,42 @@ Examples:
     python main.py parse_cv --path resume.pdf
     python main.py recommend --path resume.pdf --timeout 15
 """
+
+def cleanup_temp_file():
+    if os.path.exists(TEMP_FILE):
+        try:
+            os.remove(TEMP_FILE)
+            print(f"[INFO] Deleted temporary file: {TEMP_FILE}")
+        except Exception as e:
+            print(f"[WARNING] Could not delete {TEMP_FILE}: {e}")
+
+# Register cleanup for normal exit
+atexit.register(cleanup_temp_file)
+
+# Handle Ctrl+C and SIGTERM
+def handle_exit(signum, frame):
+    cleanup_temp_file()
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, handle_exit)
+signal.signal(signal.SIGTERM, handle_exit)
+
+def extract_pdf_text(pdf_path):
+    extractor = PDFTextExtractor(pdf_path)
+    paragraphs = extractor.extract_paragraphs(TEMP_FILE)
+    extractor.close()
+
+    output = "\n\n".join([f"--- Paragraph {i+1} ---\n{para}" for i, para in enumerate(paragraphs)])
+    return output or "No paragraphs found."
+
+def CV_parsing_main(pdf_path):
+    extarcted_paragraphs = extract_pdf_text(pdf_path)
+    info_extractor = ResumeInfoExtractor(extarcted_paragraphs)
+    results = info_extractor.extract_all()
+
+    for key, value in results.items():
+        print(f"\n--- {key} ---")
+        print(value if not isinstance(value, list) else ", ".join(value))
 
 def main():
     parser = argparse.ArgumentParser(description="Resume Analyzer CLI", add_help=False)
@@ -56,12 +86,16 @@ def main():
         return
 
     actions = {
-        "parse_cv": parse_cv,
-        "recommend": recommend_courses,
-        "match": match_job
+        "parse_cv": CV_parsing_main,
+        # "recommend": recommend_courses,
+        # "match": match_job
     }
 
     task_function = actions.get(args.action)
+    if not task_function:
+        print(f"Action '{args.action}' is not implemented yet.")
+        return
+
     watchdog = Watchdog(target=task_function, args=(args.path,), timeout=args.timeout)
     result = watchdog.start()
     print(result)
