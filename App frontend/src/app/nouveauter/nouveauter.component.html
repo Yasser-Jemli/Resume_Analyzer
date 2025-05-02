@@ -1,0 +1,23 @@
+<div class="container mt-4">
+  <h2 class="text-center">Latest Job Posts from Upwork</h2>
+  <div *ngIf="jobPosts.length > 0; else noJobs">
+    <div class="row">
+      <div class="col-md-4" *ngFor="let job of jobPosts">
+        <div class="card mb-3">
+          <div class="card-header">
+            <h5 class="card-title">{{ job.title }}</h5>
+          </div>
+          <div class="card-body">
+            <p><strong>Description:</strong> {{ job.description }}</p>
+            <p><strong>Skills:</strong> {{ job.skills.join(', ') }}</p>
+            <p><strong>Budget:</strong> ${{ job.budget }}</p>
+            <p><strong>Date Posted:</strong> {{ job.date_created }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template #noJobs>
+    <p class="text-center">No job posts available at the moment.</p>
+  </ng-template>
+</div>
