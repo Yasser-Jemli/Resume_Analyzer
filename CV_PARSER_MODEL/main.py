@@ -12,10 +12,25 @@ import os
 import atexit
 import signal
 import sys
+import logging
+from pathlib import Path
 
 from utilis.watchdog import Watchdog
 from parsers.PDFTextExtractor import PDFTextExtractor
-from parsers.ResumeInfoExtractor import *
+from parsers.ResumeInfoExtractor import ResumeInfoExtractor
+import sys
+sys.path.append(str(Path(__file__).parent / 'parsers'))
+try:
+    try:
+        from parsers.PyResParserExtractor import PyResParserExtractor
+        HAS_PYRESPARSER = True
+    except ModuleNotFoundError:
+        print("[ERROR] Could not import 'PyResParserExtractor'. Ensure the 'parsers' directory is in the Python path and contains 'PyResParserExtractor.py'.")
+        HAS_PYRESPARSER = False
+except ModuleNotFoundError:
+    print("[ERROR] Could not import 'PyResParserExtractor'. Ensure the 'parsers' directory is in the Python path and contains 'PyResParserExtractor.py'.")
+    HAS_PYRESPARSER = False
+from utilis.logger import ResumeParserLogger
 
 TEMP_FILE = "temp_save.txt"
 
@@ -29,11 +44,24 @@ Actions:
     parse_cv     Parse the resume/CV and extract paragraphs
     recommend    Recommend courses based on the resume
     match        Match resume to job offers
+    compare      Compare parsers for resume extraction
 
 Examples:
     python main.py parse_cv --path resume.pdf
     python main.py recommend --path resume.pdf --timeout 15
+    python main.py compare --path resume.pdf
 """
+
+def setup_logging():
+    log_file = Path(__file__).parent / 'logs' / 'parser_comparison.log'
+    log_file.parent.mkdir(exist_ok=True)
+    
+    logging.basicConfig(
+        filename=str(log_file),
+        level=logging.DEBUG,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    return logging.getLogger('ParserComparison')
 
 def cleanup_temp_file():
     if os.path.exists(TEMP_FILE):
@@ -82,82 +110,70 @@ def extract_pdf_text(pdf_path):
         print(f"[ERROR] Failed to extract text from PDF: {str(e)}")
         return None
 
-def CV_parsing_main(pdf_path):
+def print_parser_results(results):
+    """Pretty print parser results"""
+    if not results:
+        print("No results available")
+        return
+        
+    for key, value in results.items():
+        print(f"\n{key}:")
+        if isinstance(value, list):
+            for item in value:
+                print(f"- {item}")
+        else:
+            print(value)
+
+def compare_parsers(pdf_path):
+    """Compare results from both parsers"""
+    logger = logging.getLogger('ParserComparison')
+    
     try:
+        # Custom parser extraction
+        logger.info("Running custom parser...")
         extracted_text = extract_pdf_text(pdf_path)
-        if not extracted_text:
-            print("[ERROR] No text could be extracted from the PDF")
-            return None
+        custom_parser = ResumeInfoExtractor(extracted_text)
+        custom_results = custom_parser.extract_all()
         
-        print(f"[DEBUG] Raw extracted text length: {len(extracted_text)}")
+        print("\nCustom Parser Results:")
+        print("=====================")
+        print_parser_results(custom_results)
         
-        # Clean the text by removing paragraph markers
-        paragraphs = []
-        for line in extracted_text.split('\n'):
-            if not line.startswith('---'):
-                paragraphs.append(line.strip())
-        
-        cleaned_text = '\n'.join(p for p in paragraphs if p)
-        
-        if not cleaned_text:
-            print("[ERROR] No valid text content after cleaning")
-            return None
+        # PyResParser extraction (if available)
+        if HAS_PYRESPARSER:
+            logger.info("Running PyResParser...")
+            py_parser = PyResParserExtractor(pdf_path)
+            pyres_results = py_parser.extract_all()
             
-        print(f"[DEBUG] Cleaned text length: {len(cleaned_text)}")
-        
-        # Initialize extractor and process text
-        info_extractor = ResumeInfoExtractor(cleaned_text)
-        results = info_extractor.extract_all()
-        
-        if results:
-            print("\nExtracted Information:")
+            print("\nPyResParser Results:")
             print("=====================")
-            for key, value in results.items():
-                print(f"\n{key}:")
-                if isinstance(value, list):
-                    if value:
-                        for item in value:
-                            print(f"- {item}")
-                    else:
-                        print("None found")
-                else:
-                    print(value if value else "None found")
+            print_parser_results(pyres_results)
+        else:
+            logger.warning("PyResParser not available - skipping comparison")
+            
+    except Exception as e:
+        logger.error(f"Parser comparison failed: {str(e)}")
+        raise
+
+def CV_parsing_main(pdf_path):
+    """Main parsing function"""
+    try:
+        # Set up logging
+        logger = logging.getLogger('ResumeParser')
         
-        return results
-                
+        # Run both parsers
+        compare_parsers(pdf_path)
+        return True
+        
     except Exception as e:
         print(f"[ERROR] Exception occurred: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return None
-
-def main():
-    parser = argparse.ArgumentParser(description="Resume Analyzer CLI", add_help=False)
-    parser.add_argument("action", nargs="?", choices=["parse_cv", "recommend", "match"], help="Action to perform")
-    parser.add_argument("--path", help="Path to CV or job file")
-    parser.add_argument("--timeout", type=int, default=10, help="Timeout in seconds for the process")
-    parser.add_argument("-h", "--help", action="store_true", help="Show help menu")
-
-    args = parser.parse_args()
-
-    if args.help or not args.action or not args.path:
-        print(HELP_TEXT)
-        return
-
-    actions = {
-        "parse_cv": CV_parsing_main,
-        # "recommend": recommend_courses,
-        # "match": match_job
-    }
-
-    task_function = actions.get(args.action)
-    if not task_function:
-        print(f"Action '{args.action}' is not implemented yet.")
-        return
-
-    watchdog = Watchdog(target=task_function, args=(args.path,), timeout=args.timeout)
-    result = watchdog.start()
-    print(result)
+        return False
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description=HELP_TEXT)
+    parser.add_argument('action', choices=['parse_cv', 'recommend', 'match', 'compare'])
+    parser.add_argument('--path', required=True, help='Path to the resume PDF file')
+    args = parser.parse_args()
+    
+    if args.action == 'parse_cv':
+        CV_parsing_main(args.path)
