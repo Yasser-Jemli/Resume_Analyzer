@@ -1,0 +1,39 @@
+{
+    "programming_languages": [
+        "python",
+        "java",
+        "javascript",
+        "c++",
+        "c#",
+        "ruby",
+        "C"
+    ],
+    "web_technologies": [
+        "html",
+        "css",
+        "react",
+        "angular",
+        "node.js",
+        "vue.js"
+    ],
+    "databases": [
+        "sql",
+        "mongodb",
+        "postgresql",
+        "mysql"
+    ],
+    "devops": [
+        "docker",
+        "kubernetes",
+        "jenkins",
+        "aws",
+        "azure",
+        "git"
+    ],
+    "methodologies": [
+        "agile",
+        "scrum",
+        "kanban",
+        "waterfall"
+    ]
+}

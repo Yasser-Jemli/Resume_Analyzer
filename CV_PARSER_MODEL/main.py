@@ -15,8 +15,7 @@ import sys
 
 from utilis.watchdog import Watchdog
 from parsers.PDFTextExtractor import PDFTextExtractor
-from parsers.ResumeInfoExtractor import ResumeInfoExtractor
-
+from parsers.ResumeInfoExtractor import *
 
 TEMP_FILE = "temp_save.txt"
 
@@ -39,7 +38,7 @@ Examples:
 def cleanup_temp_file():
     if os.path.exists(TEMP_FILE):
         try:
-            os.remove(TEMP_FILE)
+            #os.remove(TEMP_FILE)
             print(f"[INFO] Deleted temporary file: {TEMP_FILE}")
         except Exception as e:
             print(f"[WARNING] Could not delete {TEMP_FILE}: {e}")
@@ -56,21 +55,81 @@ signal.signal(signal.SIGINT, handle_exit)
 signal.signal(signal.SIGTERM, handle_exit)
 
 def extract_pdf_text(pdf_path):
-    extractor = PDFTextExtractor(pdf_path)
-    paragraphs = extractor.extract_paragraphs(TEMP_FILE)
-    extractor.close()
+    try:
+        extractor = PDFTextExtractor(pdf_path)
+        paragraphs = extractor.extract_paragraphs(TEMP_FILE)
+        extractor.close()
 
-    output = "\n\n".join([f"--- Paragraph {i+1} ---\n{para}" for i, para in enumerate(paragraphs)])
-    return output or "No paragraphs found."
+        if not paragraphs:
+            # Read from temp file as backup
+            with open(TEMP_FILE, 'r', encoding='utf-8') as f:
+                content = f.read()
+                paragraphs = [p.strip() for p in content.split('\n') if p.strip()]
+
+        if not paragraphs:
+            print("[WARNING] No paragraphs extracted from PDF")
+            return None
+
+        print(f"[DEBUG] Extracted {len(paragraphs)} paragraphs")
+        
+        # Create formatted output with non-empty paragraphs
+        output = "\n\n".join([f"--- Paragraph {i+1} ---\n{para}" 
+                             for i, para in enumerate(paragraphs) 
+                             if para.strip()])
+        return output if output else None
+
+    except Exception as e:
+        print(f"[ERROR] Failed to extract text from PDF: {str(e)}")
+        return None
 
 def CV_parsing_main(pdf_path):
-    extarcted_paragraphs = extract_pdf_text(pdf_path)
-    info_extractor = ResumeInfoExtractor(extarcted_paragraphs)
-    results = info_extractor.extract_all()
-
-    for key, value in results.items():
-        print(f"\n--- {key} ---")
-        print(value if not isinstance(value, list) else ", ".join(value))
+    try:
+        extracted_text = extract_pdf_text(pdf_path)
+        if not extracted_text:
+            print("[ERROR] No text could be extracted from the PDF")
+            return None
+        
+        print(f"[DEBUG] Raw extracted text length: {len(extracted_text)}")
+        
+        # Clean the text by removing paragraph markers
+        paragraphs = []
+        for line in extracted_text.split('\n'):
+            if not line.startswith('---'):
+                paragraphs.append(line.strip())
+        
+        cleaned_text = '\n'.join(p for p in paragraphs if p)
+        
+        if not cleaned_text:
+            print("[ERROR] No valid text content after cleaning")
+            return None
+            
+        print(f"[DEBUG] Cleaned text length: {len(cleaned_text)}")
+        
+        # Initialize extractor and process text
+        info_extractor = ResumeInfoExtractor(cleaned_text)
+        results = info_extractor.extract_all()
+        
+        if results:
+            print("\nExtracted Information:")
+            print("=====================")
+            for key, value in results.items():
+                print(f"\n{key}:")
+                if isinstance(value, list):
+                    if value:
+                        for item in value:
+                            print(f"- {item}")
+                    else:
+                        print("None found")
+                else:
+                    print(value if value else "None found")
+        
+        return results
+                
+    except Exception as e:
+        print(f"[ERROR] Exception occurred: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return None
 
 def main():
     parser = argparse.ArgumentParser(description="Resume Analyzer CLI", add_help=False)
