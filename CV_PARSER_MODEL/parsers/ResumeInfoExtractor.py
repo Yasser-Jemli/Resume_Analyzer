@@ -1,15 +1,46 @@
+#!/usr/bin/python3
+
 # -*- coding: utf-8 -*-
 # @Author  : Yasser JEMLI
 # @File    : ResumeInfoExtractor.py
 # @Description: Extracts structured information from resume paragraphs.
 
-#!/usr/bin/python3
 import re
+import json
+import os
+from pathlib import Path
 
 class ResumeInfoExtractor:
     def __init__(self, paragraphs):
-        self.paragraphs = paragraphs
-        self.text = "\n".join(paragraphs)
+        if not paragraphs:
+            raise ValueError("No paragraphs provided")
+            
+        # Convert to list if string is passed
+        if isinstance(paragraphs, str):
+            self.paragraphs = [p for p in paragraphs.split('\n\n') if p.strip()]
+        else:
+            self.paragraphs = [p for p in paragraphs if p.strip()]
+            
+        if not self.paragraphs:
+            raise ValueError("No valid paragraphs after processing")
+            
+        self.text = "\n".join(self.paragraphs)
+        print(f"Debug: Loaded {len(self.paragraphs)} paragraphs")
+        
+        self.skills_file = Path(__file__).parent.parent / 'assets' / 'skills_keywords.json'
+        self.skill_keywords = self._load_skills()
+        print(f"Debug: Loaded {len(self.skill_keywords)} skills")
+
+    def _load_skills(self):
+        """Load skills from JSON file"""
+        try:
+            with open(self.skills_file, 'r') as f:
+                skills_data = json.load(f)
+                # Flatten the dictionary of skill categories into a single list
+                return [skill.lower() for category in skills_data.values() for skill in category]
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            print(f"Error loading skills file: {e}")
+            return []
 
     def extract_name(self):
         # Naive assumption: first non-empty line is the name
@@ -25,30 +56,35 @@ class ResumeInfoExtractor:
         return re.findall(r"(\+?\d[\d\s\-]{8,}\d)", self.text)
 
     def extract_skills(self):
-        skill_keywords = ["Python", "Java", "SQL", "Machine Learning", "C++", "Excel", "Docker", "Git"]
-        found = set()
-        for word in skill_keywords:
-            if re.search(rf"\b{re.escape(word)}\b", self.text, re.IGNORECASE):
-                found.add(word)
-        return list(found)
+        """Extract skills from resume text using loaded keywords"""
+        found_skills = []
+        for skill in self.skill_keywords:
+            if re.search(r'\b' + re.escape(skill) + r'\b', self.text.lower()):
+                found_skills.append(skill)
+        return found_skills
 
     def extract_experience(self):
-        experience_section = []
-        capture = False
+        experience_markers = ['experience', 'work history', 'employment']
+        experience_text = []
+        
         for para in self.paragraphs:
-            if "experience" in para.lower():
-                capture = True
-            elif capture and (para.strip() == "" or len(para.split()) < 3):
-                break
-            if capture:
-                experience_section.append(para)
-        return "\n".join(experience_section) or "Experience section not found."
+            if any(marker in para.lower() for marker in experience_markers):
+                experience_text.append(para)
+        
+        return experience_text if experience_text else ["No experience found"]
 
     def extract_all(self):
-        return {
-            "Name": self.extract_name(),
-            "Email(s)": self.extract_emails(),
-            "Phone(s)": self.extract_phone_numbers(),
-            "Skills": self.extract_skills(),
-            "Experience": self.extract_experience()
-        }
+        """Extract all information from the resume"""
+        try:
+            results = {
+                "Name": self.extract_name(),
+                "Email": self.extract_emails(),
+                "Phone": self.extract_phone_numbers(),
+                "Skills": self.extract_skills(),
+                "Experience": self.extract_experience()
+            }
+            print("Debug: Extraction complete")
+            return results
+        except Exception as e:
+            print(f"Error in extract_all: {str(e)}")
+            return None
