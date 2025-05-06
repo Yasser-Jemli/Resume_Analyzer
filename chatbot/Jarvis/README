@@ -1,0 +1,84 @@
+
+# **Jarvis Chatbot - Documentation**
+
+## **1. Introduction**
+
+Le projet **Jarvis** est un chatbot développé avec le framework **Flask**, conçu pour interagir avec l'utilisateur de manière intelligente via une interface web. Ce chatbot exécute des commandes simples et répond à des requêtes en temps réel.
+
+Le projet vise à offrir une solution simple pour la gestion d'interactions via une interface graphique (HTML), tout en interagissant avec l'utilisateur et en lui fournissant des réponses basées sur des fichiers JSON.
+
+---
+
+## **2. Fonctionnalités principales**
+
+* **Chatbot interactif** : Répond aux requêtes de l'utilisateur via une interface web.
+* **Commandes personnalisées** : Exécute des commandes spécifiques, comme la capture d'écran ou l'affichage de messages.
+* **Gestion de conversation** : Les échanges sont enregistrés et récupérés depuis un fichier JSON pour une interaction persistante.
+* **Interface web** : Fournit une interface simple pour interagir avec le chatbot.
+
+---
+
+## **3. Prérequis**
+
+### **3.1 Prérequis système**
+
+* **Python 3.12** ou plus récent.
+* **Docker** (facultatif, recommandé pour la conteneurisation).
+* **Virtualenv** pour gérer un environnement virtuel Python.
+
+### **3.2 Dépendances**
+
+Le projet utilise les bibliothèques Python suivantes (répertoriées dans `requirements.txt`):
+
+* **Flask** : Framework web léger pour Python.
+* **PyAutoGUI** : Permet d'automatiser des actions comme prendre des captures d'écran.
+* **mouseinfo** : Permet de récupérer des informations sur la position de la souris.
+
+---
+
+## **4. Installation**
+
+### **4.1 Installation manuelle**
+
+1. Clonez ou téléchargez le projet.
+2. Créez un environnement virtuel pour isoler les dépendances :
+
+   ```bash
+   python3 -m venv venv
+   ```
+## **5. Structure des fichiers**
+
+Jarvis/
+├── app.py                # Code principal du chatbot Flask
+├── requirements.txt      # Liste des dépendances du projet
+├── static/               # Contient les fichiers statiques (images, CSS)
+│   ├── iron_man.jpg
+│   └── style.css
+├── templates/            # Modèles HTML utilisés par Flask
+│   ├── entretien.html
+│   ├── index.html
+│   └── nouvelle_page.html
+├── conversation.json     # Fichier JSON contenant les interactions du chatbot
+└── test.txt       
+
+## **6. Détails des fichiers clés :
+
+    app.py : Contient le code principal pour gérer les routes Flask et l'interaction avec l'utilisateur.
+
+    conversation.json : Fichier stockant les réponses du chatbot et les échanges avec l'utilisateur.
+
+    static/ : Contient des fichiers statiques comme des images et des fichiers CSS.
+
+    templates/ : Contient les fichiers HTML utilisés pour l'interface utilisateur.
+
+    requirements.txt : Liste les bibliothèques nécessaires pour le projet.
+    
+## **7. Lancer l'application localement
+
+Si vous avez installé les dépendances localement (sans Docker), vous pouvez démarrer l'application avec la commande suivante :
+
+python app.py
+
+Cela démarrera le serveur Flask sur http://127.0.0.1:5000. Vous pouvez alors ouvrir cette URL dans votre navigateur pour interagir avec le chatbot.
+    
+
