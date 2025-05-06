@@ -1,0 +1,2 @@
+generate file named report.txt with content 'Attendance Report: John, Alice, Bob'
+make file named notes.txt in folder notes with content 'Meeting notes for today'

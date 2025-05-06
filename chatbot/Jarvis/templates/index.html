@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>J.A.R.V.I.S Interface</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="jarvis-container">
+        <h1>J.A.R.V.I.S Interface</h1>
+        <form id="chat-form">
+            <input type="text" name="user_input" placeholder="Speak, Sir..." autocomplete="off" required>
+            <button type="submit">Ask</button>
+        </form>
+        <div id="response-box"></div>
+        <button id="clear-btn">Clear History</button>
+    </div>
+
+    <script>
+        const form = document.getElementById('chat-form');
+        const responseBox = document.getElementById('response-box');
+        const clearBtn = document.getElementById('clear-btn');
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const user_input = formData.get("user_input");
+
+            const res = await fetch("/ask", {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
+            responseBox.innerHTML += `<div><strong>You:</strong> ${user_input}</div>`;
+            responseBox.innerHTML += `<div class="ai"><strong>J.A.R.V.I.S:</strong> ${data.response}</div>`;
+            form.reset();
+        };
+
+        clearBtn.onclick = async () => {
+            await fetch("/clear-history", { method: "POST" });
+            responseBox.innerHTML = '';
+        };
+    </script>
+</body>
+<!-- Bouton pour ouvrir une nouvelle fenêtre -->
+<button onclick="window.open('/nouvelle-page', '_blank')">Ouvrir nouvelle fenêtre</button>
+<button onclick="window.open('/entretien', '_blank')">Démarrer un entretien technique</button>
+
+</html>

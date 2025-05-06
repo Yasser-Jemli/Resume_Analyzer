@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Entretien Technique - Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #chatbox { width: 100%; height: 400px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; }
+        .message { margin: 10px 0; }
+        .user { color: blue; }
+        .bot { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Simulation d'entretien technique</h1>
+    <div id="chatbox"></div>
+    <input type="text" id="user_input" placeholder="Votre réponse..." style="width: 80%;">
+    <button onclick="sendMessage()">Envoyer</button>
+
+    <script>
+        function sendMessage() {
+            let input = document.getElementById("user_input");
+            let message = input.value.trim();
+            if (message === "") return;
+
+            // Affiche la question de l'utilisateur
+            document.getElementById("chatbox").innerHTML += `<div class="message user"><strong>Vous :</strong> ${message}</div>`;
+            input.value = "";
+
+            // Envoie au serveur
+            fetch("/entretien-ask", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_input: message })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("chatbox").innerHTML += `<div class="message bot"><strong>Bot :</strong> ${data.response}</div>`;
+                document.getElementById("chatbox").scrollTop = document.getElementById("chatbox").scrollHeight;
+            });
+        }
+    </script>
+</body>
+</html>
