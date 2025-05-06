@@ -17,12 +17,21 @@ RUN apt-get update && apt-get install -y \
     libxrandr2 \
     libxi6 \
     x11-utils \
+    python3-tk \
+    python3-dev \
+    x11-xserver-utils \
     && rm -rf /var/lib/apt/lists/*
 
 # Installe les dépendances Python
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+RUN pip install flask
+RUN pip install groq
+RUN pip install gtts
+RUN pip install pygame
+RUN pip install pyautogui
 
+ENV DISPLAY=:0
 # Expose le port sur lequel l'app Flask s'exécutera
 EXPOSE 5000
 
