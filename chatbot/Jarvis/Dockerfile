@@ -30,7 +30,7 @@ RUN pip install groq
 RUN pip install gtts
 RUN pip install pygame
 RUN pip install pyautogui
-
+RUN apt-get update && apt-get install -y libglib2.0-0
 ENV DISPLAY=:0
 # Expose le port sur lequel l'app Flask s'exécutera
 EXPOSE 5000
