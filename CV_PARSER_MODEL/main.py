@@ -16,7 +16,8 @@ import logging
 from pathlib import Path
 
 from utilis.watchdog import Watchdog
-from parsers.PDFTextExtractor import PDFTextExtractor
+from parsers.PDFTextExtractorPyMuPDF import PDFTextExtractorPyMuPDF
+from parsers.PDFTextExtractorPdfMiner import PDFTextExtractorPdfMiner
 from parsers.ResumeInfoExtractor import ResumeInfoExtractor
 import sys
 sys.path.append(str(Path(__file__).parent / 'parsers'))
@@ -30,7 +31,7 @@ try:
 except ModuleNotFoundError:
     print("[ERROR] Could not import 'PyResParserExtractor'. Ensure the 'parsers' directory is in the Python path and contains 'PyResParserExtractor.py'.")
     HAS_PYRESPARSER = False
-from utilis.logger import ResumeParserLogger
+# from utilis.logger import ResumeParserLogger
 
 TEMP_FILE = "temp_save.txt"
 
@@ -82,9 +83,9 @@ def handle_exit(signum, frame):
 signal.signal(signal.SIGINT, handle_exit)
 signal.signal(signal.SIGTERM, handle_exit)
 
-def extract_pdf_text(pdf_path):
+def extract_pdf_text_using_PdfMuPDF(pdf_path):
     try:
-        extractor = PDFTextExtractor(pdf_path)
+        extractor = PDFTextExtractorPyMuPDF(pdf_path)
         paragraphs = extractor.extract_paragraphs(TEMP_FILE)
         extractor.close()
 
@@ -99,6 +100,40 @@ def extract_pdf_text(pdf_path):
             return None
 
         print(f"[DEBUG] Extracted {len(paragraphs)} paragraphs")
+        print("==================================================================================")
+        print(paragraphs)
+        print("===============================================================================")
+        
+        # Create formatted output with non-empty paragraphs
+        output = "\n\n".join([f"--- Paragraph {i+1} ---\n{para}" 
+                             for i, para in enumerate(paragraphs) 
+                             if para.strip()])
+        return output if output else None
+
+    except Exception as e:
+        print(f"[ERROR] Failed to extract text from PDF: {str(e)}")
+        return None
+    
+def extract_pdf_text_using_PdfMiner(pdf_path):
+    try:
+        extractor = PDFTextExtractorPdfMiner(pdf_path)
+        paragraphs = extractor.extract_paragraphs(TEMP_FILE)
+        extractor.close()
+
+        if not paragraphs:
+            # Read from temp file as backup
+            with open(TEMP_FILE, 'r', encoding='utf-8') as f:
+                content = f.read()
+                paragraphs = [p.strip() for p in content.split('\n') if p.strip()]
+
+        if not paragraphs:
+            print("[WARNING] No paragraphs extracted from PDF")
+            return None
+
+        print(f"[DEBUG] Extracted {len(paragraphs)} paragraphs")
+        print("==================================================================================")
+        print(paragraphs)
+        print("===============================================================================")
         
         # Create formatted output with non-empty paragraphs
         output = "\n\n".join([f"--- Paragraph {i+1} ---\n{para}" 
@@ -131,13 +166,23 @@ def compare_parsers(pdf_path):
     try:
         # Custom parser extraction
         logger.info("Running custom parser...")
-        extracted_text = extract_pdf_text(pdf_path)
+        extracted_text = extract_pdf_text_using_PdfMuPDF(pdf_path)
+        extracted_text1 = extract_pdf_text_using_PdfMiner(pdf_path)
         custom_parser = ResumeInfoExtractor(extracted_text)
+        custom_parser1 = ResumeInfoExtractor(extracted_text1)
+
         custom_results = custom_parser.extract_all()
+        custom_results1 = custom_parser1.extract_all()
         
-        print("\nCustom Parser Results:")
-        print("=====================")
+        print("=========================================================================================")
+        print("\nCustom Parser Results (using PyMuPDF):")
+        print("=========================================================================================")
         print_parser_results(custom_results)
+
+        print("=========================================================================================")
+        print("\nCustom Parser Results (using PdfMiner):")
+        print("=========================================================================================")
+        print_parser_results(custom_results1)
         
         # PyResParser extraction (if available)
         if HAS_PYRESPARSER:
@@ -145,11 +190,20 @@ def compare_parsers(pdf_path):
             py_parser = PyResParserExtractor(pdf_path)
             pyres_results = py_parser.extract_all()
             
+            print("=========================================================================================")
             print("\nPyResParser Results:")
-            print("=====================")
+            print("=========================================================================================")
             print_parser_results(pyres_results)
         else:
             logger.warning("PyResParser not available - skipping comparison")
+
+        if HAS_PYRESPARSER:
+            logger.info("Comparing results...")
+            
+            print("=========================================================================================")
+            print("\nComparison Results:")
+            print("=========================================================================================")
+            print_parser_results(comparison_results)
             
     except Exception as e:
         logger.error(f"Parser comparison failed: {str(e)}")
