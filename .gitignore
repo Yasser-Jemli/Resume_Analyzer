@@ -1,0 +1,42 @@
+# Ignore MySQL Database Dumps
+*.sql
+*.sql.gz
+*.dump
+
+# Ignore application properties
+/src/main/resources/application.properties
+
+# Ignore environment files
+.env
+
+
+# Ignore IDE files
+.idea/
+*.iml
+.vscode/
+
+# Ignore build directories
+/target/
+/out/
+/build/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+
+# Ignore JAR and WAR files
+*.jar
+*.war
+
+# Ignore compiled class files
+*.class
+
+# Ignore test reports
+/test-outputs/
+/test-reports/
+
+# Ignore environment variable files
+.env
