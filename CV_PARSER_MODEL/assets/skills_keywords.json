@@ -68,6 +68,7 @@
     ],
     "devops": [
         "docker",
+        "Docker",
         "kubernetes",
         "jenkins",
         "aws",
@@ -79,6 +80,8 @@
         "mac",
         "macOS",
         "Bash",
+        "bash",
+        "Shell",
         "shell",
         "powershell"
     ],
