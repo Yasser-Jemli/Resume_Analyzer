@@ -1,0 +1,113 @@
+<div class="cv-container" #cvContent>
+  <h2 class="text-primary text-center mb-2">Création de CV</h2>
+  <p class="text-muted text-center">Remplissez les informations ci-dessous pour générer votre CV</p>
+  <form [formGroup]="cvForm">
+    
+    <section>
+      <h4 class="section-title">Informations personnelles</h4>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <input class="form-control" formControlName="personalInfo.nom" placeholder="Nom">
+        </div>
+        <div class="col-md-6">
+          <input class="form-control" formControlName="personalInfo.prenom" placeholder="Prénom">
+        </div>
+        <div class="col-md-6">
+          <input class="form-control" formControlName="personalInfo.email" placeholder="Email">
+        </div>
+        <div class="col-md-6">
+          <input class="form-control" formControlName="personalInfo.telephone" placeholder="Téléphone">
+        </div>
+        <div class="col-12">
+          <input class="form-control" formControlName="personalInfo.adresse" placeholder="Adresse">
+        </div>
+        <div class="col-md-6">
+          <input type="date" class="form-control" formControlName="personalInfo.dateNaissance">
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h4 class="section-title">Formations</h4>
+      <div class="rounded-section" *ngFor="let formationGroup of getFormationControls(); let i = index" [formGroup]="formationGroup">
+        <input formControlName="diplome" class="form-control mb-2" placeholder="Diplôme">
+        <input formControlName="etablissement" class="form-control mb-2" placeholder="Établissement">
+        <div class="row">
+          <div class="col-md-6"><input formControlName="dateDebut" type="date" class="form-control mb-2"></div>
+          <div class="col-md-6"><input formControlName="dateFin" type="date" class="form-control mb-2"></div>
+        </div>
+        <textarea formControlName="description" class="form-control" rows="3" placeholder="Description"></textarea>
+        <div class="text-end mt-2">
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeFormation(i)">Supprimer</button>
+        </div>
+      </div>
+      <button type="button" class="btn btn-outline-primary" (click)="addFormation()">+ Ajouter une formation</button>
+    </section>
+
+    <section>
+      <h4 class="section-title">Expériences professionnelles</h4>
+      <div class="rounded-section" *ngFor="let experienceGroup of getExperienceControls(); let i = index" [formGroup]="experienceGroup">
+        <input formControlName="poste" class="form-control mb-2" placeholder="Poste">
+        <input formControlName="entreprise" class="form-control mb-2" placeholder="Entreprise">
+        <div class="row">
+          <div class="col-md-6"><input formControlName="dateDebut" type="date" class="form-control mb-2"></div>
+          <div class="col-md-6"><input formControlName="dateFin" type="date" class="form-control mb-2"></div>
+        </div>
+        <textarea formControlName="description" class="form-control" rows="3" placeholder="Description"></textarea>
+        <div class="text-end mt-2">
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeExperience(i)">Supprimer</button>
+        </div>
+      </div>
+      <button type="button" class="btn btn-outline-primary" (click)="addExperience()">+ Ajouter une expérience</button>
+    </section>
+
+    <section>
+      <h4 class="section-title">Compétences</h4>
+      <div class="rounded-section row g-3" *ngFor="let competenceGroup of getCompetencesControls(); let i = index" [formGroup]="competenceGroup">
+        <div class="col-md-6">
+          <input formControlName="nom" class="form-control" placeholder="Nom de la compétence">
+        </div>
+        <div class="col-md-6">
+          <select formControlName="niveau" class="form-select">
+            <option value="Débutant">Débutant</option>
+            <option value="Intermédiaire">Intermédiaire</option>
+            <option value="Avancé">Avancé</option>
+            <option value="Expert">Expert</option>
+          </select>
+        </div>
+        <div class="text-end mt-2">
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeCompetence(i)">Supprimer</button>
+        </div>
+      </div>
+      <button type="button" class="btn btn-outline-primary" (click)="addCompetence()">+ Ajouter une compétence</button>
+    </section>
+
+    <section>
+      <h4 class="section-title">Langues</h4>
+      <div class="rounded-section row g-3" *ngFor="let langueGroup of getLanguesControls(); let i = index" [formGroup]="langueGroup">
+        <div class="col-md-6">
+          <input formControlName="langue" class="form-control" placeholder="Langue">
+        </div>
+        <div class="col-md-6">
+          <select formControlName="niveau" class="form-select">
+            <option value="A1">A1 - Débutant</option>
+            <option value="A2">A2 - Élémentaire</option>
+            <option value="B1">B1 - Intermédiaire</option>
+            <option value="B2">B2 - Intermédiaire supérieur</option>
+            <option value="C1">C1 - Avancé</option>
+            <option value="C2">C2 - Maîtrise</option>
+          </select>
+        </div>
+        <div class="text-end mt-2">
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeLangue(i)">Supprimer</button>
+        </div>
+      </div>
+      <button type="button" class="btn btn-outline-primary" (click)="addLangue()">+ Ajouter une langue</button>
+    </section>
+
+    <div class="text-center">
+      <button type="button" class="btn btn-primary btn-lg mt-4 px-5" (click)="generateCV()">Générer le CV</button>
+    </div>
+
+  </form>
+</div>

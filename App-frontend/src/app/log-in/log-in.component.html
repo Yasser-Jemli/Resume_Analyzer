@@ -1,0 +1,95 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm p-4">
+          <h2 class="text-center mb-4">Connexion</h2>
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <!-- Email/Username Field -->
+            <div class="mb-3">
+              <label for="username" class="form-label">Email ou Nom d'utilisateur</label>
+              <input
+                type="text"
+                id="username"
+                class="form-control"
+                formControlName="username"
+                placeholder="Entrez votre email ou nom d'utilisateur"
+                [class.is-invalid]="username?.invalid && (username?.dirty || username?.touched)"
+                aria-describedby="usernameError"
+              />
+              <div
+                *ngIf="username?.invalid && (username?.dirty || username?.touched)"
+                id="usernameError"
+                class="invalid-feedback"
+              >
+                <div *ngIf="username?.errors?.['required']">Ce champ est requis.</div>
+                <div *ngIf="username?.errors?.['minlength']">
+                  Minimum 3 caractères requis.
+                </div>
+              </div>
+            </div>
+  
+            <!-- Password Field -->
+            <div class="mb-3">
+              <label for="password" class="form-label">Mot de passe</label>
+              <input
+                type="password"
+                id="password"
+                class="form-control"
+                formControlName="password"
+                placeholder="Entrez votre mot de passe"
+                [class.is-invalid]="password?.invalid && (password?.dirty || password?.touched)"
+                aria-describedby="passwordError"
+              />
+              <div
+                *ngIf="password?.invalid && (password?.dirty || password?.touched)"
+                id="passwordError"
+                class="invalid-feedback"
+              >
+                <div *ngIf="password?.errors?.['required']">Ce champ est requis.</div>
+                <div *ngIf="password?.errors?.['minlength']">
+                  Minimum 6 caractères requis.
+                </div>
+              </div>
+            </div>
+  
+            <!-- Remember Me and Forgot Password -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="form-check">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  class="form-check-input"
+                  formControlName="rememberMe"
+                />
+                <label for="rememberMe" class="form-check-label">Se souvenir de moi</label>
+              </div>
+              <a href="/forgot-password" class="text-primary text-decoration-none"
+                >Mot de passe oublié ?</a
+              >
+            </div>
+  
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="btn btn-primary w-100"
+              [disabled]="loginForm.invalid || loading"
+              aria-label="Se connecter"
+            >
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              {{ loading ? 'Connexion...' : 'Se connecter' }}
+            </button>
+  
+            <!-- Error Message -->
+            <div *ngIf="errorMessage" class="alert alert-danger mt-3" role="alert">
+              {{ errorMessage }}
+            </div>
+          </form>
+  
+          <!-- Sign Up Link -->
+          <p class="text-center mt-3">
+            Pas de compte ? <a href="/signup" class="text-primary text-decoration-none">Inscrivez-vous</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
