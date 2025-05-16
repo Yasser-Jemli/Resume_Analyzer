@@ -1,0 +1,18 @@
+.pdf-preview {
+  width: 100%;
+  max-width: 100%;
+  overflow: auto;
+}
+
+ngx-extended-pdf-viewer {
+  display: block;
+  min-height: 600px;
+}
+
+.card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
+  transition: width 0.2s ease-in-out;
+}

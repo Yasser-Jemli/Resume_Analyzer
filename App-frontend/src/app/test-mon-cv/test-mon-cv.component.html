@@ -1,0 +1,68 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card p-4">
+        <h2 class="mb-3">Uploader votre CV (PDF)</h2>
+
+        <input
+          type="file"
+          (change)="onFileSelected($event)"
+          accept="application/pdf"
+          class="form-control mb-3"
+          id="pdfUpload"
+          aria-label="Sélectionner un fichier PDF"
+        />
+
+        <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+          {{ errorMessage }}
+        </div>
+
+        <button
+          class="btn btn-primary mb-3"
+          (click)="uploadCV()"
+          [disabled]="!selectedFile"
+          aria-label="Uploader le CV"
+        >
+          Upload CV
+        </button>
+
+        <div *ngIf="uploadProgress > 0 && uploadProgress < 100" class="progress mb-3">
+          <div
+            class="progress-bar"
+            role="progressbar"
+            [style.width.%]="uploadProgress"
+            [attr.aria-valuenow]="uploadProgress"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+            {{ uploadProgress }}%
+          </div>
+        </div>
+
+        <div *ngIf="pdfSrc" class="pdf-preview mt-4">
+          <h5>Aperçu du CV :</h5>
+          <ngx-extended-pdf-viewer
+            [src]="pdfSrc"
+            [useBrowserLocale]="true"
+            [height]="'1000px'"
+            [showSidebarButton]="true"
+            [showZoomButtons]="true"
+            [showPrintButton]="true"
+            [showDownloadButton]="true"
+            [showPagingButtons]="true"
+          ></ngx-extended-pdf-viewer>
+        </div>
+
+        <!-- New Button: Get My Note -->
+        <button
+          class="btn btn-success mt-3"
+          (click)="getMyNote()"
+          [disabled]="!pdfisupdated"
+          aria-label="Get My Note"
+        >
+          Get My Note
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,29 @@
+<headers>
+  <div class="logo-section">
+    <div class="logo">
+      <a routerLink="/home"> <!-- Changed to home to match your routing -->
+        <img src="../../assets/logo.png" alt="ESPRIT Logo" class="logo-img">
+      </a>
+    </div>
+  </div>
+
+  <nav>
+    <!-- Show login button only when NOT logged in -->
+    <button *ngIf="!isLoggedIn()" class="nav-button" routerLink="/log-in">Log in</button>
+    
+    <!-- Show logout button only when logged in -->
+    <button *ngIf="isLoggedIn()" class="nav-button" (click)="logout()">Log out</button>
+
+    <!-- Always visible buttons -->
+    <button class="nav-button" routerLink="/home">HOME</button>
+    
+    <!-- Protected routes - only visible when logged in -->
+    <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/nouveauter">NOUVEAUTÉ</button>
+    <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/test-mon-cv">TEST MON CV</button>
+    <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/creation-cv">CRÉATION CV</button>
+    <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/chat-bot">CHAT BOT</button>
+    
+    <!-- Always visible -->
+    <button class="nav-button" routerLink="/about-nous">ABOUT NOUS</button>
+  </nav>
+</headers>
