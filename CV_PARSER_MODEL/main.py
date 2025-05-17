@@ -17,6 +17,7 @@ import logging
 from pathlib import Path
 from datetime import datetime
 import json
+import time
 
 from utilis.watchdog import Watchdog
 from parsers.PDFTextExtractorPyMuPDF import PDFTextExtractorPyMuPDF
@@ -229,6 +230,20 @@ def compare_parsers(pdf_path):
         logger.error(f"Parser comparison failed: {str(e)}")
         raise
 
+def measure_execution_time(func):
+    """Decorator to measure execution time of functions"""
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print(f"\n{'='*20} Execution Time {'='*20}")
+        print(f"Function '{func.__name__}' took {execution_time:.2f} seconds to execute")
+        print('='*55)
+        return result
+    return wrapper
+
+@measure_execution_time
 def CV_parsing_main(pdf_path, save_results=False):
     """Main parsing function with optional result saving"""
     try:
@@ -270,6 +285,8 @@ def CV_parsing_main(pdf_path, save_results=False):
         return None
 
 if __name__ == "__main__":
+    start_time = time.time()
+    
     parser = argparse.ArgumentParser(description=HELP_TEXT)
     parser.add_argument('action', choices=['parse_cv', 'recommend', 'match', 'compare'])
     parser.add_argument('--path', required=True, help='Path to the resume PDF file')
@@ -277,4 +294,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     if args.action == 'parse_cv':
-        CV_parsing_main(args.path, save_results=args.save)
+        result = CV_parsing_main(args.path, save_results=args.save)
+        
+    total_time = time.time() - start_time
+    print(f"\n{'='*20} Total Execution Time {'='*20}")
+    print(f"Total script execution time: {total_time:.2f} seconds")
+    print('='*60)
