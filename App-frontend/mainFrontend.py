@@ -4,7 +4,7 @@ import sys
 import shutil
 
 # Define project directory
-PROJECT_DIR = os.path.expanduser("../App frontend")
+PROJECT_DIR = os.path.expanduser("../App-frontend")
 
 def run_command(command, cwd=PROJECT_DIR, shell=True):
     """Run a shell command and handle errors."""
