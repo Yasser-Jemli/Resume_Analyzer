@@ -1,0 +1,48 @@
+{
+    "skills": {
+        "required": [
+            "python",
+            "c++",
+            "git",
+            "linux"
+        ],
+        "preferred": [
+            "rust",
+            "android",
+            "docker",
+            "kubernetes",
+            "aws"
+        ],
+        "weights": {
+            "required": 2.0,
+            "preferred": 1.0
+        }
+    },
+    "experience": {
+        "minimum_years": 2,
+        "preferred_years": 4,
+        "relevant_keywords": [
+            "software",
+            "developer",
+            "engineer",
+            "lead",
+            "manager",
+            "architect"
+        ],
+        "weights": {
+            "years": 1.5,
+            "relevance": 1.0
+        }
+    },
+    "education": {
+        "required_degrees": [
+            "bachelor",
+            "master",
+            "engineering",
+            "computer science"
+        ],
+        "weights": {
+            "degree": 1.0
+        }
+    }
+}

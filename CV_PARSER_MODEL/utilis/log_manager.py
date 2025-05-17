@@ -1,156 +1,162 @@
-import getpass  # To get the current user
+import threading
+from queue import Queue, Empty
+import getpass
 import logging
 import os
 import platform
-import subprocess
 import sys
 from datetime import datetime
-from time import sleep
-
-
-def ensure_psutil_installed():
-    """Ensure that the `psutil` package is installed."""
-    try:
-        global psutil
-        import psutil
-    except ImportError:
-        print("psutil not found. Attempting to install...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "psutil"])
-        sleep(5)  # Wait for installation to complete
-        try:
-            import psutil
-        except ImportError:
-            raise RuntimeError("Failed to install psutil. Please install it manually.")
+import time
+import shutil
+from pathlib import Path
 
 
 class LogManager:
-    _instance = None  # Class-level variable to store the singleton instance
+    _instance = None
+    _initialized = False
 
-    def __new__(cls, *args, **kwargs):
-        """Override the __new__ method to implement singleton behavior."""
+    def __new__(cls):
         if cls._instance is None:
             cls._instance = super(LogManager, cls).__new__(cls)
         return cls._instance
 
     def __init__(self):
-        """Initialize and configure the logging system."""
-        # Check if already initialized to avoid re-initialization on subsequent calls
-        if hasattr(self, "_initialized") and self._initialized:
+        if self._initialized:
             return
 
-        # Construct the log directory by moving three levels up from the current script's directory
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        self.log_directory = os.path.join(base_dir, ".app_cache", "logs")
+        self._log_queue = Queue()
+        self._stop_event = threading.Event()
 
-        self.ensure_log_directory_exists()
+        # Initialize logging directory and cleanup old logs
+        base_dir = Path(__file__).parent.parent
+        self.log_directory = base_dir / ".app_cache" / "logs"
+        self.cleanup_old_logs()
+        self.setup_logging()
 
-        # Create a new log file every time the app starts
-        log_filename = self.create_new_log_file()
-        self.write_log_header(log_filename)  # Write the custom header
-        self.setup_logging(log_filename)
+        # Start logging thread
+        self._log_thread = threading.Thread(target=self._log_worker, daemon=True)
+        self._log_thread.start()
 
-        # Mark as initialized to avoid re-initialization
         self._initialized = True
 
-    def ensure_log_directory_exists(self):
-        """Ensure that the log directory exists."""
-        if not os.path.exists(self.log_directory):
-            os.makedirs(self.log_directory)
+    def cleanup_old_logs(self):
+        """Remove old log files and create new directory"""
+        try:
+            if self.log_directory.exists():
+                shutil.rmtree(self.log_directory)
+            self.log_directory.mkdir(parents=True, exist_ok=True)
 
-    def create_new_log_file(self):
-        """Create a new log file with a timestamp in the filename."""
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        log_filename = f"app_log_{timestamp}.log"
-        log_filepath = os.path.join(self.log_directory, log_filename)
-        return log_filepath
+        except Exception as e:
+            print(f"Error cleaning up logs: {e}")
 
-    def write_log_header(self, log_filepath):
-        """Write a custom header to the log file."""
-        with open(log_filepath, "w") as log_file:
-            log_file.write("===== Application Log File =====\n")
-            log_file.write(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-            log_file.write(
-                f"Operating System: {platform.system()} {platform.release()} ({platform.version()})\n"
-            )
-            log_file.write(
-                f"Python Branch / Build / Compiler / Version :\n"
-                f"  Branch: {platform.python_branch()}\n"
-                f"  Build: {platform.python_build()}\n"
-                f"  Compiler: {platform.python_compiler()}\n"
-            )
-            log_file.write(f"Python Version : {platform.python_version()}\n")
-            log_file.write(f"Sys_Uname : {platform.uname()}\n")
-            log_file.write(f"User: {getpass.getuser()}\n")
-            log_file.write("=================================\n\n")
-            log_file.write("=========== PC performance ===============\n")
-            sys_info = self.get_system_info()
+    def _log_worker(self):
+        """Worker thread that processes log messages from the queue"""
+        while not self._stop_event.is_set():
+            try:
+                record = self._log_queue.get(timeout=0.1)
+                self._actual_log(record)
+                self._log_queue.task_done()
+            except Empty:
+                continue
+            except Exception as e:
+                print(f"Error in log worker: {str(e)}")
+                continue
 
-            # Format the system information dictionary into a readable string
-            for key, value in sys_info.items():
-                log_file.write(f"{key}: {value}\n")
+    def setup_logging(self):
+        """Configure logging with new file"""
+        timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        self.log_file = self.log_directory / f'app_log_{timestamp}.log'
 
-            log_file.write("==========================================\n")
-
-    def setup_logging(self, log_filepath):
-        """Set up the logging configuration."""
-        logging.basicConfig(
-            filename=log_filepath,
-            level=logging.DEBUG,  # Set the logging level
-            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S",
+        # Configure handlers
+        file_handler = logging.FileHandler(self.log_file)
+        file_handler.setLevel(logging.DEBUG)
+        file_formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         )
+        file_handler.setFormatter(file_formatter)
 
-        # Also log to console for debugging
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.DEBUG)
-        console_handler.setFormatter(
-            logging.Formatter("%(name)s - %(levelname)s - %(message)s")
-        )
-        logging.getLogger().addHandler(console_handler)
+        # Root logger setup
+        root_logger = logging.getLogger()
+        root_logger.setLevel(logging.DEBUG)
 
-    def get_system_info(self):
-        """Retrieve system performance and hardware information."""
-        ensure_psutil_installed()  # Ensure psutil is available
-        system_info = {
-            "CPU Usage (%)": psutil.cpu_percent(interval=1),
-            "RAM Usage (%)": psutil.virtual_memory().percent,
-            "Total RAM (GB)": round(psutil.virtual_memory().total / (1024 ** 3), 2),
-            "Available RAM (GB)": round(
-                psutil.virtual_memory().available / (1024 ** 3), 2
-            ),
-            "System Platform": platform.system(),
-            "Platform Version": platform.version(),
-            "Machine": platform.machine(),
-            "Node": platform.node(),
-            "Processor": platform.processor(),
-            "Boot Time": datetime.fromtimestamp(psutil.boot_time()).strftime(
-                "%Y-%m-%d %H:%M:%S"
-            ),
-            "Current Directory": os.getcwd(),
-        }
-        return system_info
+        # Remove any existing handlers
+        for handler in root_logger.handlers[:]:
+            root_logger.removeHandler(handler)
 
-    def log_matching_results(self, fully_matched, partially_matched, no_matching):
-        logger = self.get_logger("MatchingResultsLogger")
-        logger.info("Fully Matched Results:")
-        for config_file, items in fully_matched.items():
-            logger.info(f"{config_file}: {items}")
+        root_logger.addHandler(file_handler)
 
-        logger.info("Partially Matched Results:")
-        for config_file, items in partially_matched.items():
-            logger.info(f"{config_file}: {items}")
+        # Write initial log header
+        self.write_log_header()
 
-        logger.info("No Matching Results:")
-        for config_file, items in no_matching.items():
-            logger.info(f"{config_file}: {items}")
+    def write_log_header(self):
+        """Write application header to log file"""
+        with open(self.log_file, 'w') as f:
+            f.write("===== Application Log File =====\n")
+            f.write(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            f.write(f"Operating System: {platform.platform()}\n")
+            f.write("Python Branch / Build / Compiler / Version :\n")
+            f.write(f"  Branch: {sys.version}\n")
+            f.write(f"  Build: {sys.version_info}\n")
+            f.write(f"  Compiler: {platform.python_compiler()}\n")
+            f.write(f"Python Version : {platform.python_version()}\n")
+            f.write(f"Sys_Uname : {os.uname()}\n")
+            f.write(f"User: {getpass.getuser()}\n")
+            f.write("="*33 + "\n\n")
+
+    def queue_log(self, name, level, message):
+        """Queue a log message"""
+        if not self._stop_event.is_set():
+            self._log_queue.put({
+                'name': name,
+                'level': level,
+                'message': message
+            })
+
+    def _actual_log(self, record):
+        """Process a log record"""
+        logger = logging.getLogger(record['name'])
+
+        if record['level'] == 'DEBUG':
+            logger.debug(record['message'])
+        elif record['level'] == 'INFO':
+            logger.info(record['message'])
+        elif record['level'] == 'WARNING':
+            logger.warning(record['message'])
+        elif record['level'] == 'ERROR':
+            logger.error(record['message'])
+
+    def get_logger(self, name):
+        """Get a logger instance"""
+        return ThreadedLogger(self, name)
+
+    def shutdown(self):
+        """Clean shutdown of logging thread"""
+        self._stop_event.set()
+        if self._log_thread.is_alive():
+            self._log_thread.join(timeout=1.0)
 
     @classmethod
     def get_log_manager(cls):
-        """Return the singleton instance of the LogManager."""
+        """Get or create the singleton instance"""
         if cls._instance is None:
             cls._instance = LogManager()
         return cls._instance
 
-    def get_logger(self, name):
-        """Return a logger instance with the given name."""
-        return logging.getLogger(name)
+
+class ThreadedLogger:
+    """Thread-safe logger proxy"""
+    def __init__(self, manager, name):
+        self.manager = manager
+        self.name = name
+
+    def debug(self, message):
+        self.manager.queue_log(self.name, 'DEBUG', message)
+
+    def info(self, message):
+        self.manager.queue_log(self.name, 'INFO', message)
+
+    def warning(self, message):
+        self.manager.queue_log(self.name, 'WARNING', message)
+
+    def error(self, message):
+        self.manager.queue_log(self.name, 'ERROR', message)
