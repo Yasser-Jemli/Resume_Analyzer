@@ -2,9 +2,42 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Nouvelle Fenêtre</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entretien RH</title>
 </head>
 <body>
-    <h1>Bienvenue dans la nouvelle fenêtre, Monsieur.</h1>
+    <h1>Entretien RH - Questionnaire</h1>
+
+    <form action="/submit-interview" method="POST">
+        <!-- Questions à choix multiples (QCM) -->
+        <div>
+            <label for="q1">1. Quel est votre niveau d'expérience en programmation ?</label><br>
+            <input type="radio" name="answers" value="Débutant" id="q1_1">
+            <label for="q1_1">Débutant</label><br>
+            <input type="radio" name="answers" value="Intermédiaire" id="q1_2">
+            <label for="q1_2">Intermédiaire</label><br>
+            <input type="radio" name="answers" value="Avancé" id="q1_3">
+            <label for="q1_3">Avancé</label><br>
+        </div>
+
+        <div>
+            <label for="q2">2. Pourquoi souhaitez-vous rejoindre notre entreprise ?</label><br>
+            <input type="radio" name="answers" value="Croissance personnelle" id="q2_1">
+            <label for="q2_1">Croissance personnelle</label><br>
+            <input type="radio" name="answers" value="Développement de carrière" id="q2_2">
+            <label for="q2_2">Développement de carrière</label><br>
+            <input type="radio" name="answers" value="Autre" id="q2_3">
+            <label for="q2_3">Autre</label><br>
+        </div>
+
+        <!-- Réponse textuelle -->
+        <div>
+            <label for="text_responses">3. Décrivez une expérience professionnelle où vous avez surmonté un défi.</label><br>
+            <textarea name="text_responses" id="text_responses" rows="4" cols="50" placeholder="Décrivez votre expérience ici..."></textarea>
+        </div>
+
+        <button type="submit">Soumettre l'entretien</button>
+    </form>
+
 </body>
 </html>
