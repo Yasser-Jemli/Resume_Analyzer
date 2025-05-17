@@ -6,5 +6,9 @@
   "/ping": {
     "target": "http://localhost:5000",
     "secure": false
+  },
+  "/ask": {
+    "target": "http://localhost:5000",
+    "secure": false
   }
 }

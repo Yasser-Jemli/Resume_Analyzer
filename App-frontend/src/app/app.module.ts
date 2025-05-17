@@ -18,6 +18,7 @@ import { SignupComponent } from './signup/signup.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { AuthGuard } from './auth.guard';
 import { GestionManagersComponent } from './gestion-managers/gestion-managers.component';
+import { ChatAssistantComponent } from './chat-assistant/chat-assistant.component';
 
 
 @NgModule({
@@ -35,6 +36,8 @@ import { GestionManagersComponent } from './gestion-managers/gestion-managers.co
     SignupComponent,
     ForgotPasswordComponent,
     GestionManagersComponent,
+    ChatAssistantComponent
+    
   ],
   imports: [
     BrowserModule,

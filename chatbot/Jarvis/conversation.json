@@ -2,17 +2,5 @@
     {
         "role": "assistant",
         "content": "Pouvez-vous expliquer ce qu'est le polymorphisme en Python et donner un exemple de son utilisation ?"
-    },
-    {
-        "role": "user",
-        "content": "ls"
-    },
-    {
-        "role": "assistant",
-        "content": "Merci pour votre réponse. Note : 0/20. Il manque plusieurs éléments importants. Essayez de préciser davantage."
-    },
-    {
-        "role": "assistant",
-        "content": "Qu'est-ce qu'un conteneur Docker et pourquoi l'utiliser ?"
     }
 ]
