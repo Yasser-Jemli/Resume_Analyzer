@@ -6,14 +6,27 @@
         "professional background",
         "professional experience",
         "work experience",
-        "career history"
+        "career history",
+        "Experiance"
     ],
     "date_patterns": [
         "present",
         "current",
         "till now",
         "to date",
-        "ongoing"
+        "ongoing",
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
     ],
     "position_indicators": [
         "engineer",
@@ -25,7 +38,16 @@
         "coordinator",
         "designer",
         "architect",
-        "lead"
+        "lead",
+        "Software",
+        "SW",
+        "Technician",
+        "Embedded Sytem Developer",
+        "Embedded Sytem Designer",
+        "Embedded Sytem Engineer",
+        "Embedded Sytem Manager",
+        "Embedded Sytem Architect",
+        "SW Designer"
     ],
     "company_indicators": [
         "ltd",

@@ -17,6 +17,7 @@ import logging
 from pathlib import Path
 from datetime import datetime
 import json
+import time
 
 from utilis.watchdog import Watchdog
 from parsers.PDFTextExtractorPyMuPDF import PDFTextExtractorPyMuPDF
@@ -168,60 +169,42 @@ def print_parser_results(results):
 def compare_parsers(pdf_path):
     """Compare results from different parser implementations"""
     logger = logging.getLogger('ParserComparison')
-    results = {}
+    results = {
+        'extraction_methods': {},
+        'parsers': {}
+    }
     
     try:
-        # 1. Extract text using PdfMiner (preferred method)
+        # 1. Extract text using both methods
         logger.info("Extracting text using PdfMiner...")
         miner_text = extract_pdf_text_using_PdfMiner(pdf_path)
+        results['extraction_methods']['pdfminer'] = miner_text
         
-        if not miner_text:
-            # Fallback to PyMuPDF if PdfMiner fails
-            logger.warning("PdfMiner failed, falling back to PyMuPDF...")
-            miner_text = extract_pdf_text_using_PdfMuPDF(pdf_path)
+        logger.info("Extracting text using PyMuPDF...")
+        pymupdf_text = extract_pdf_text_using_PdfMuPDF(pdf_path)
+        results['extraction_methods']['pymupdf'] = pymupdf_text
         
-        if not miner_text:
-            logger.error("Failed to extract text from PDF")
+        # Use PdfMiner text as primary, fallback to PyMuPDF if needed
+        text_to_parse = miner_text if miner_text else pymupdf_text
+        
+        if not text_to_parse:
+            logger.error("Failed to extract text from PDF using both methods")
             return False
             
         # 2. Parse with ResumeInfoExtractor
         logger.info("Parsing with ResumeInfoExtractor...")
-        custom_parser = ResumeInfoExtractor(miner_text)
-        results['custom'] = custom_parser.extract_all()
+        custom_parser = ResumeInfoExtractor(text_to_parse)
+        results['parsers']['custom'] = custom_parser.extract_all()
         
         # 3. Parse with PyResParser if available
         if HAS_PYRESPARSER:
             logger.info("Parsing with PyResParser...")
             py_parser = PyResParserExtractor(pdf_path)
-            results['pyres'] = py_parser.extract_all()
+            results['parsers']['pyres'] = py_parser.extract_all()
         
         # 4. Print comparison results
         print("\n=== Parsing Results Comparison ===\n")
-        
-        for field in ['Name', 'Email', 'Phone', 'Skills', 'Experience']:
-            print(f"\n{field}:")
-            print("-" * 40)
-            
-            # Custom parser results
-            print("ResumeInfoExtractor:")
-            value = results['custom'].get(field, [])
-            if isinstance(value, list):
-                for item in value:
-                    print(f"  - {item}")
-            else:
-                print(f"  {value}")
-                
-            # PyResParser results if available
-            if HAS_PYRESPARSER:
-                print("\nPyResParser:")
-                value = results['pyres'].get(field, [])
-                if isinstance(value, list):
-                    for item in value:
-                        print(f"  - {item}")
-                else:
-                    print(f"  {value}")
-            
-            print()
+        print_parser_results(results['parsers'])
         
         return results
         
@@ -229,6 +212,20 @@ def compare_parsers(pdf_path):
         logger.error(f"Parser comparison failed: {str(e)}")
         raise
 
+def measure_execution_time(func):
+    """Decorator to measure execution time of functions"""
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print(f"\n{'='*20} Execution Time {'='*20}")
+        print(f"Function '{func.__name__}' took {execution_time:.2f} seconds to execute")
+        print('='*55)
+        return result
+    return wrapper
+
+@measure_execution_time
 def CV_parsing_main(pdf_path, save_results=False):
     """Main parsing function with optional result saving"""
     try:
@@ -270,6 +267,8 @@ def CV_parsing_main(pdf_path, save_results=False):
         return None
 
 if __name__ == "__main__":
+    start_time = time.time()
+    
     parser = argparse.ArgumentParser(description=HELP_TEXT)
     parser.add_argument('action', choices=['parse_cv', 'recommend', 'match', 'compare'])
     parser.add_argument('--path', required=True, help='Path to the resume PDF file')
@@ -277,4 +276,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     if args.action == 'parse_cv':
-        CV_parsing_main(args.path, save_results=args.save)
+        result = CV_parsing_main(args.path, save_results=args.save)
+        
+    total_time = time.time() - start_time
+    print(f"\n{'='*20} Total Execution Time {'='*20}")
+    print(f"Total script execution time: {total_time:.2f} seconds")
+    print('='*60)
