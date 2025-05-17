@@ -6,7 +6,8 @@
         "professional background",
         "professional experience",
         "work experience",
-        "career history"
+        "career history",
+        "Experiance"
     ],
     "date_patterns": [
         "present",
@@ -40,7 +41,13 @@
         "lead",
         "Software",
         "SW",
-        "Technician"
+        "Technician",
+        "Embedded Sytem Developer",
+        "Embedded Sytem Designer",
+        "Embedded Sytem Engineer",
+        "Embedded Sytem Manager",
+        "Embedded Sytem Architect",
+        "SW Designer"
     ],
     "company_indicators": [
         "ltd",
