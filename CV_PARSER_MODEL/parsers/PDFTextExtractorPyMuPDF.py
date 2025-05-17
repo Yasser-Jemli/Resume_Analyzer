@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # -*- coding: utf-8 -*-
 # @Time    : 2023/10/12 16:00
 # @Author  : Yasser JEMLI
@@ -5,7 +7,6 @@
 # @Software: Vscode
 # @Description: This module provides a class to extract text from PDF files.
 
-#!/usr/bin/python3
 import fitz  # PyMuPDF
 
 class PDFTextExtractorPyMuPDF:

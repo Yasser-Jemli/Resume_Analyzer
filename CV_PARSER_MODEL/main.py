@@ -15,6 +15,8 @@ import signal
 import sys
 import logging
 from pathlib import Path
+from datetime import datetime
+import json
 
 from utilis.watchdog import Watchdog
 from parsers.PDFTextExtractorPyMuPDF import PDFTextExtractorPyMuPDF
@@ -100,6 +102,8 @@ def extract_pdf_text_using_PdfMuPDF(pdf_path):
             print("[WARNING] No paragraphs extracted from PDF")
             return None
 
+        print("\n\n")
+        print("================================= Using PDF MINER ================================")
         print(f"[DEBUG] Extracted {len(paragraphs)} paragraphs")
         print("==================================================================================")
         print(paragraphs)
@@ -130,7 +134,8 @@ def extract_pdf_text_using_PdfMiner(pdf_path):
         if not paragraphs:
             print("[WARNING] No paragraphs extracted from PDF")
             return None
-
+        print("\n\n")
+        print("================================= Using PDF MINER ================================")
         print(f"[DEBUG] Extracted {len(paragraphs)} paragraphs")
         print("==================================================================================")
         print(paragraphs)
@@ -161,116 +166,115 @@ def print_parser_results(results):
             print(value)
 
 def compare_parsers(pdf_path):
-    """Compare results from both parsers"""
+    """Compare results from different parser implementations"""
     logger = logging.getLogger('ParserComparison')
+    results = {}
     
     try:
-        # Custom parser extraction
-        logger.info("Running custom parser...")
-        extracted_text = extract_pdf_text_using_PdfMuPDF(pdf_path)
-        extracted_text1 = extract_pdf_text_using_PdfMiner(pdf_path)
-        custom_parser = ResumeInfoExtractor(extracted_text)
-        custom_parser1 = ResumeInfoExtractor(extracted_text1)
-
-        custom_results = custom_parser.extract_all()
-        custom_results1 = custom_parser1.extract_all()
+        # 1. Extract text using PdfMiner (preferred method)
+        logger.info("Extracting text using PdfMiner...")
+        miner_text = extract_pdf_text_using_PdfMiner(pdf_path)
         
-        print("=========================================================================================")
-        print("\nCustom Parser Results (using PyMuPDF):")
-        print("=========================================================================================")
-        print_parser_results(custom_results)
-
-        print("=========================================================================================")
-        print("\nCustom Parser Results (using PdfMiner):")
-        print("=========================================================================================")
-        print_parser_results(custom_results1)
+        if not miner_text:
+            # Fallback to PyMuPDF if PdfMiner fails
+            logger.warning("PdfMiner failed, falling back to PyMuPDF...")
+            miner_text = extract_pdf_text_using_PdfMuPDF(pdf_path)
         
-        # PyResParser extraction (if available)
+        if not miner_text:
+            logger.error("Failed to extract text from PDF")
+            return False
+            
+        # 2. Parse with ResumeInfoExtractor
+        logger.info("Parsing with ResumeInfoExtractor...")
+        custom_parser = ResumeInfoExtractor(miner_text)
+        results['custom'] = custom_parser.extract_all()
+        
+        # 3. Parse with PyResParser if available
         if HAS_PYRESPARSER:
-            logger.info("Running PyResParser...")
+            logger.info("Parsing with PyResParser...")
             py_parser = PyResParserExtractor(pdf_path)
-            pyres_results = py_parser.extract_all()
+            results['pyres'] = py_parser.extract_all()
+        
+        # 4. Print comparison results
+        print("\n=== Parsing Results Comparison ===\n")
+        
+        for field in ['Name', 'Email', 'Phone', 'Skills', 'Experience']:
+            print(f"\n{field}:")
+            print("-" * 40)
             
-            print("=========================================================================================")
-            print("\nPyResParser Results:")
-            print("=========================================================================================")
-            print_parser_results(pyres_results)
-        else:
-            logger.warning("PyResParser not available - skipping comparison")
-
-        if HAS_PYRESPARSER:
-            logger.info("Comparing results...")
+            # Custom parser results
+            print("ResumeInfoExtractor:")
+            value = results['custom'].get(field, [])
+            if isinstance(value, list):
+                for item in value:
+                    print(f"  - {item}")
+            else:
+                print(f"  {value}")
+                
+            # PyResParser results if available
+            if HAS_PYRESPARSER:
+                print("\nPyResParser:")
+                value = results['pyres'].get(field, [])
+                if isinstance(value, list):
+                    for item in value:
+                        print(f"  - {item}")
+                else:
+                    print(f"  {value}")
             
-            print("=========================================================================================")
-            print("\nComparison Results:")
-            print("=========================================================================================")
-            print_parser_results(comparison_results)
-            
+            print()
+        
+        return results
+        
     except Exception as e:
         logger.error(f"Parser comparison failed: {str(e)}")
         raise
 
-def CV_parsing_main(pdf_path):
-    """Main parsing function"""
+def CV_parsing_main(pdf_path, save_results=False):
+    """Main parsing function with optional result saving"""
     try:
-        # Set up logging
+        # Set up logging with console handler
         logger = logging.getLogger('ResumeParser')
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.INFO)
+        formatter = logging.Formatter('%(levelname)s - %(message)s')
+        console_handler.setFormatter(formatter)
+        logger.addHandler(console_handler)
         
-        # Run both parsers
-        compare_parsers(pdf_path)
-        return True
+        logger.info(f"Processing PDF: {pdf_path}")
         
+        # Run parsers and get results
+        results = compare_parsers(pdf_path)
+        
+        if results:
+            logger.info("Successfully parsed resume")
+            
+            # Save results if flag is set
+            if save_results:
+                output_dir = Path(__file__).parent / 'results'
+                output_dir.mkdir(exist_ok=True)
+                
+                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                output_file = output_dir / f'parsed_resume_{timestamp}.json'
+                
+                with open(output_file, 'w', encoding='utf-8') as f:
+                    json.dump(results, f, indent=4, ensure_ascii=False)
+                logger.info(f"Results saved to: {output_file}")
+                
+            return results
+        else:
+            logger.error("Failed to parse resume")
+            return None
+            
     except Exception as e:
-        print(f"[ERROR] Exception occurred: {str(e)}")
-        return False
+        logger.error(f"Exception occurred: {str(e)}")
+        return None
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=HELP_TEXT)
     parser.add_argument('action', choices=['parse_cv', 'recommend', 'match', 'compare'])
     parser.add_argument('--path', required=True, help='Path to the resume PDF file')
+    parser.add_argument('--save', action='store_true', help='Save results to JSON file')
     args = parser.parse_args()
     
     if args.action == 'parse_cv':
-        CV_parsing_main(args.path)
-
-# from states.init_state import InitState
-# from states.listener_state import EventListenerState
-# from states.publisher_state import EventPublisherState
-# from states.logger_state import LoggerState
-# from states.verify_state import VerifyState
-# import logging
-# import time
-
-# logging.basicConfig(level=logging.INFO)
-
-# class MainModule:
-#     def start(self):
-#         logging.info("Main Module Started")
-
-#         if not InitState().run():
-#             self.stop("Init failed")
-#             return
-
-#         listener_proc = EventListenerState().run()
-#         publisher_success = EventPublisherState().run()
-#         logger_success = LoggerState().run()
-
-#         listener_proc.join()
-
-#         if VerifyState().run(publisher_success, logger_success):
-#             logging.info("In OK: Share to Main Model")
-#         else:
-#             logging.warning("In KO: Share to Main Model")
-
-#         while(1):
-#             print("Listening....")
-#             time.sleep(1)
-
-#         self.stop("Done")
-
-#     def stop(self, reason):
-#         logging.info(f"Stopping: {reason}")
-#         # Add cleanup here
-
-# if __name__ == "__main__":
-#     MainModule().start()
+        CV_parsing_main(args.path, save_results=args.save)
