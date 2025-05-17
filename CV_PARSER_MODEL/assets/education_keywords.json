@@ -1,0 +1,51 @@
+{
+    "section_headers": [
+        "education",
+        "academic background",
+        "qualifications",
+        "studies",
+        "academic history"
+    ],
+    "degree_types": {
+        "bachelor": [
+            "bachelor",
+            "b.s.",
+            "b.a.",
+            "bs",
+            "ba",
+            "undergraduate",
+            "licence"
+        ],
+        "master": [
+            "master",
+            "m.s.",
+            "m.a.",
+            "ms",
+            "ma",
+            "msc",
+            "graduate"
+        ],
+        "phd": [
+            "phd",
+            "ph.d",
+            "doctorate",
+            "doctoral"
+        ]
+    },
+    "fields": [
+        "computer science",
+        "engineering",
+        "information technology",
+        "software engineering",
+        "electronics",
+        "mathematics",
+        "physics"
+    ],
+    "institutions": [
+        "university",
+        "college",
+        "institute",
+        "school",
+        "academy"
+    ]
+}
