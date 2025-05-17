@@ -1,0 +1,59 @@
+{
+    "section_headers": [
+        "experience",
+        "employment",
+        "work history",
+        "professional background",
+        "professional experience",
+        "work experience",
+        "career history"
+    ],
+    "date_patterns": [
+        "present",
+        "current",
+        "till now",
+        "to date",
+        "ongoing"
+    ],
+    "position_indicators": [
+        "engineer",
+        "developer",
+        "manager",
+        "consultant",
+        "specialist",
+        "analyst",
+        "coordinator",
+        "designer",
+        "architect",
+        "lead"
+    ],
+    "company_indicators": [
+        "ltd",
+        "inc",
+        "llc",
+        "corporation",
+        "corp",
+        "company",
+        "solutions",
+        "services",
+        "technologies",
+        "group"
+    ],
+    "action_verbs": [
+        "developed",
+        "implemented",
+        "managed",
+        "created",
+        "designed",
+        "analyzed",
+        "coordinated",
+        "led",
+        "maintained",
+        "improved",
+        "established",
+        "launched",
+        "achieved",
+        "reduced",
+        "increased"
+    ]
+}

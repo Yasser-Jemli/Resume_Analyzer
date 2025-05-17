@@ -28,7 +28,9 @@ class ResumeInfoExtractor:
         print(f"Debug: Loaded {len(self.paragraphs)} paragraphs")
         
         self.skills_file = Path(__file__).parent.parent / 'assets' / 'skills_keywords.json'
+        self.experience_file = Path(__file__).parent.parent / 'assets' / 'experience_keywords.json'
         self.skill_keywords = self._load_skills()
+        self.experience_keywords = self._load_experience_keywords()
         print(f"Debug: Loaded {len(self.skill_keywords)} skills")
 
     def _load_skills(self):
@@ -41,6 +43,21 @@ class ResumeInfoExtractor:
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print(f"Error loading skills file: {e}")
             return []
+
+    def _load_experience_keywords(self):
+        """Load experience keywords from JSON file"""
+        try:
+            with open(self.experience_file, 'r') as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            print(f"Error loading experience keywords: {str(e)}")
+            return {
+                "section_headers": [],
+                "date_patterns": [],
+                "position_indicators": [],
+                "company_indicators": [],
+                "action_verbs": []
+            }
 
     def extract_name(self):
         # Naive assumption: first non-empty line is the name
@@ -64,14 +81,55 @@ class ResumeInfoExtractor:
         return found_skills
 
     def extract_experience(self):
-        experience_markers = ['experience', 'work history', 'employment']
-        experience_text = []
+        """Extract work experience using keywords from JSON file"""
+        experience_sections = []
+        current_section = []
+        in_experience_section = False
         
-        for para in self.paragraphs:
-            if any(marker in para.lower() for marker in experience_markers):
-                experience_text.append(para)
+        lines = self.text.split('\n')
         
-        return experience_text if experience_text else ["No experience found"]
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+                
+            # Check section headers
+            if any(header.lower() in line.lower() 
+                   for header in self.experience_keywords['section_headers']):
+                in_experience_section = True
+                if current_section:
+                    experience_sections.append(' '.join(current_section))
+                    current_section = []
+                continue
+                
+            # Identify experience entries using position and company indicators
+            has_position = any(indicator.lower() in line.lower() 
+                             for indicator in self.experience_keywords['position_indicators'])
+            has_company = any(indicator.lower() in line.lower() 
+                             for indicator in self.experience_keywords['company_indicators'])
+            
+            if in_experience_section and (has_position or has_company):
+                if current_section:
+                    experience_sections.append(' '.join(current_section))
+                current_section = [line]
+                continue
+                
+            if in_experience_section:
+                current_section.append(line)
+        
+        # Add final section
+        if current_section:
+            experience_sections.append(' '.join(current_section))
+        
+        # Clean and format sections
+        cleaned_sections = []
+        for section in experience_sections:
+            cleaned = ' '.join(section.split())
+            cleaned = re.sub(r'---\s*Paragraph\s*\d+\s*---', '', cleaned)
+            if cleaned:
+                cleaned_sections.append(cleaned)
+        
+        return cleaned_sections if cleaned_sections else ["No experience found"]
 
     def extract_all(self):
         """Extract all information from the resume"""
