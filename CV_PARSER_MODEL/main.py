@@ -24,6 +24,7 @@ from utilis.log_manager import LogManager
 from parsers.PDFTextExtractorPyMuPDF import PDFTextExtractorPyMuPDF
 from parsers.PDFTextExtractorPdfMiner import PDFTextExtractorPdfMiner
 from parsers.ResumeInfoExtractor import ResumeInfoExtractor
+from parsers.cv_scorer import CVScorer
 import sys
 sys.path.append(str(Path(__file__).parent / 'parsers'))
 logger_manager = LogManager.get_log_manager()
@@ -209,6 +210,17 @@ def compare_parsers(pdf_path):
         logger.error(f"Parser comparison failed: {str(e)}")
         raise
 
+def score_parsed_cv(parsed_results):
+    """Score CV based on parsed results"""
+    logger.info("Scoring CV...")
+    scorer = CVScorer()
+    
+    scores = {}
+    for parser_name, parser_data in parsed_results['parsers'].items():
+        scores[parser_name] = scorer.score_cv(parser_data)
+        
+    return scores
+
 def measure_execution_time(func):
     """Decorator to measure execution time of functions"""
     def wrapper(*args, **kwargs):
@@ -226,12 +238,14 @@ def measure_execution_time(func):
 def CV_parsing_main(pdf_path, save_results=False):
     try:
         logger.info(f"Processing PDF: {pdf_path}")
-        
-        # Run parsers and get results
         results = compare_parsers(pdf_path)
         
         if results:
-            logger.info("Successfully parsed resume")
+            # Score the CV
+            cv_scores = score_parsed_cv(results)
+            results['scores'] = cv_scores
+            
+            logger.info("Successfully parsed and scored resume")
             
             # Save results if flag is set
             if save_results:
@@ -244,6 +258,18 @@ def CV_parsing_main(pdf_path, save_results=False):
                 with open(output_file, 'w', encoding='utf-8') as f:
                     json.dump(results, f, indent=4, ensure_ascii=False)
                 logger.info(f"Results saved to: {output_file}")
+                
+            # Print scoring results
+            print("\n=== CV Scoring Results ===")
+            for parser_name, score_data in cv_scores.items():
+                print(f"\nParser: {parser_name}")
+                print(f"Total Score: {score_data['total_score']}%")
+                print("\nDetailed Scores:")
+                for category, score in score_data['detailed_scores'].items():
+                    print(f"  {category}: {score}%")
+                print("\nFeedback:")
+                for feedback in score_data['feedback']:
+                    print(f"  - {feedback}")
                 
             return results
         else:
