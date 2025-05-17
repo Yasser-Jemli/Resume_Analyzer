@@ -169,60 +169,42 @@ def print_parser_results(results):
 def compare_parsers(pdf_path):
     """Compare results from different parser implementations"""
     logger = logging.getLogger('ParserComparison')
-    results = {}
+    results = {
+        'extraction_methods': {},
+        'parsers': {}
+    }
     
     try:
-        # 1. Extract text using PdfMiner (preferred method)
+        # 1. Extract text using both methods
         logger.info("Extracting text using PdfMiner...")
         miner_text = extract_pdf_text_using_PdfMiner(pdf_path)
+        results['extraction_methods']['pdfminer'] = miner_text
         
-        if not miner_text:
-            # Fallback to PyMuPDF if PdfMiner fails
-            logger.warning("PdfMiner failed, falling back to PyMuPDF...")
-            miner_text = extract_pdf_text_using_PdfMuPDF(pdf_path)
+        logger.info("Extracting text using PyMuPDF...")
+        pymupdf_text = extract_pdf_text_using_PdfMuPDF(pdf_path)
+        results['extraction_methods']['pymupdf'] = pymupdf_text
         
-        if not miner_text:
-            logger.error("Failed to extract text from PDF")
+        # Use PdfMiner text as primary, fallback to PyMuPDF if needed
+        text_to_parse = miner_text if miner_text else pymupdf_text
+        
+        if not text_to_parse:
+            logger.error("Failed to extract text from PDF using both methods")
             return False
             
         # 2. Parse with ResumeInfoExtractor
         logger.info("Parsing with ResumeInfoExtractor...")
-        custom_parser = ResumeInfoExtractor(miner_text)
-        results['custom'] = custom_parser.extract_all()
+        custom_parser = ResumeInfoExtractor(text_to_parse)
+        results['parsers']['custom'] = custom_parser.extract_all()
         
         # 3. Parse with PyResParser if available
         if HAS_PYRESPARSER:
             logger.info("Parsing with PyResParser...")
             py_parser = PyResParserExtractor(pdf_path)
-            results['pyres'] = py_parser.extract_all()
+            results['parsers']['pyres'] = py_parser.extract_all()
         
         # 4. Print comparison results
         print("\n=== Parsing Results Comparison ===\n")
-        
-        for field in ['Name', 'Email', 'Phone', 'Skills', 'Experience']:
-            print(f"\n{field}:")
-            print("-" * 40)
-            
-            # Custom parser results
-            print("ResumeInfoExtractor:")
-            value = results['custom'].get(field, [])
-            if isinstance(value, list):
-                for item in value:
-                    print(f"  - {item}")
-            else:
-                print(f"  {value}")
-                
-            # PyResParser results if available
-            if HAS_PYRESPARSER:
-                print("\nPyResParser:")
-                value = results['pyres'].get(field, [])
-                if isinstance(value, list):
-                    for item in value:
-                        print(f"  - {item}")
-                else:
-                    print(f"  {value}")
-            
-            print()
+        print_parser_results(results['parsers'])
         
         return results
         
