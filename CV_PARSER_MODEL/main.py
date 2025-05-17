@@ -20,22 +20,32 @@ import json
 import time
 
 from utilis.watchdog import Watchdog
+from utilis.log_manager import LogManager
 from parsers.PDFTextExtractorPyMuPDF import PDFTextExtractorPyMuPDF
 from parsers.PDFTextExtractorPdfMiner import PDFTextExtractorPdfMiner
 from parsers.ResumeInfoExtractor import ResumeInfoExtractor
 import sys
 sys.path.append(str(Path(__file__).parent / 'parsers'))
+logger_manager = LogManager.get_log_manager()
+logger = logger_manager.get_logger(__name__)
 try:
+    logger.info("Trying to import PyResParserExtractor")
     try:
         from parsers.PyResParserExtractor import PyResParserExtractor
         HAS_PYRESPARSER = True
     except ModuleNotFoundError:
-        print("[ERROR] Could not import 'PyResParserExtractor'. Ensure the 'parsers' directory is in the Python path and contains 'PyResParserExtractor.py'.")
+        logger.error("Could not import 'PyResParserExtractor'. Ensure the 'parsers' directory is in the Python path and contains 'PyResParserExtractor.py'.")
         HAS_PYRESPARSER = False
 except ModuleNotFoundError:
-    print("[ERROR] Could not import 'PyResParserExtractor'. Ensure the 'parsers' directory is in the Python path and contains 'PyResParserExtractor.py'.")
+    logger.error("Could not import 'PyResParserExtractor'. Ensure the 'parsers' directory is in the Python path and contains 'PyResParserExtractor.py'.")
     HAS_PYRESPARSER = False
-# from utilis.logger import ResumeParserLogger
+
+# Initialize log manager
+log_manager = LogManager.get_log_manager()
+logger = log_manager.get_logger(__name__)
+
+# Register cleanup
+atexit.register(log_manager.shutdown)
 
 TEMP_FILE = "temp_save.txt"
 
@@ -57,31 +67,8 @@ Examples:
     python main.py compare --path resume.pdf
 """
 
-def setup_logging():
-    log_file = Path(__file__).parent / 'logs' / 'parser_comparison.log'
-    log_file.parent.mkdir(exist_ok=True)
-    
-    logging.basicConfig(
-        filename=str(log_file),
-        level=logging.DEBUG,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-    return logging.getLogger('ParserComparison')
-
-def cleanup_temp_file():
-    if os.path.exists(TEMP_FILE):
-        try:
-            #os.remove(TEMP_FILE)
-            print(f"[INFO] Deleted temporary file: {TEMP_FILE}")
-        except Exception as e:
-            print(f"[WARNING] Could not delete {TEMP_FILE}: {e}")
-
-# Register cleanup for normal exit
-atexit.register(cleanup_temp_file)
-
 # Handle Ctrl+C and SIGTERM
 def handle_exit(signum, frame):
-    cleanup_temp_file()
     sys.exit(0)
 
 signal.signal(signal.SIGINT, handle_exit)
@@ -100,9 +87,10 @@ def extract_pdf_text_using_PdfMuPDF(pdf_path):
                 paragraphs = [p.strip() for p in content.split('\n') if p.strip()]
 
         if not paragraphs:
-            print("[WARNING] No paragraphs extracted from PDF")
+            logger.warning("No paragraphs extracted from PDF")
             return None
 
+        logger.info(f"Extracted {len(paragraphs)} paragraphs from PDF")
         print("\n\n")
         print("================================= Using PDF MINER ================================")
         print(f"[DEBUG] Extracted {len(paragraphs)} paragraphs")
@@ -117,7 +105,7 @@ def extract_pdf_text_using_PdfMuPDF(pdf_path):
         return output if output else None
 
     except Exception as e:
-        print(f"[ERROR] Failed to extract text from PDF: {str(e)}")
+        logger.error(f"Failed to extract text from PDF: {str(e)}")
         return None
     
 def extract_pdf_text_using_PdfMiner(pdf_path):
@@ -133,8 +121,14 @@ def extract_pdf_text_using_PdfMiner(pdf_path):
                 paragraphs = [p.strip() for p in content.split('\n') if p.strip()]
 
         if not paragraphs:
-            print("[WARNING] No paragraphs extracted from PDF")
+            logger.warning("No paragraphs extracted from PDF")
             return None
+
+        logger.info(f"Extracted {len(paragraphs)} paragraphs from PDF")
+        logger.info(f"********************************************************")
+        logger.info("******************** Printing paragraphs *****************")
+        logger.info(paragraphs)
+        logger.info(f"********************************************************")
         print("\n\n")
         print("================================= Using PDF MINER ================================")
         print(f"[DEBUG] Extracted {len(paragraphs)} paragraphs")
@@ -149,19 +143,21 @@ def extract_pdf_text_using_PdfMiner(pdf_path):
         return output if output else None
 
     except Exception as e:
-        print(f"[ERROR] Failed to extract text from PDF: {str(e)}")
+        logger.error(f"Failed to extract text from PDF: {str(e)}")
         return None
 
 def print_parser_results(results):
     """Pretty print parser results"""
     if not results:
-        print("No results available")
+        logger.error("No results available")
         return
         
     for key, value in results.items():
         print(f"\n{key}:")
+        logger.info(f"{key}:")
         if isinstance(value, list):
             for item in value:
+                logger.info(f"-{item}")
                 print(f"- {item}")
         else:
             print(value)
@@ -176,6 +172,7 @@ def compare_parsers(pdf_path):
     
     try:
         # 1. Extract text using both methods
+
         logger.info("Extracting text using PdfMiner...")
         miner_text = extract_pdf_text_using_PdfMiner(pdf_path)
         results['extraction_methods']['pdfminer'] = miner_text
@@ -227,16 +224,7 @@ def measure_execution_time(func):
 
 @measure_execution_time
 def CV_parsing_main(pdf_path, save_results=False):
-    """Main parsing function with optional result saving"""
     try:
-        # Set up logging with console handler
-        logger = logging.getLogger('ResumeParser')
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.INFO)
-        formatter = logging.Formatter('%(levelname)s - %(message)s')
-        console_handler.setFormatter(formatter)
-        logger.addHandler(console_handler)
-        
         logger.info(f"Processing PDF: {pdf_path}")
         
         # Run parsers and get results
