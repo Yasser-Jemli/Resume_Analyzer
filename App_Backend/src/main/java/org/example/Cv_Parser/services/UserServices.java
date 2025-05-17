@@ -5,8 +5,8 @@ import org.example.Cv_Parser.dto.CreateUserRequest;
 import org.example.Cv_Parser.dto.UserResponse;
 import org.example.Cv_Parser.models.User;
 import org.example.Cv_Parser.repositories.UserRepository;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServices {
     private final UserRepository userRepository;
-
     public UserResponse createUser(CreateUserRequest request) {
         // Create an encoder instance
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();

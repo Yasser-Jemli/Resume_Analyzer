@@ -8,48 +8,59 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import io.jsonwebtoken.security.Keys;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 
 @Component
 public class JwtUtil {
 
     @Value("${jwt.secret}")
-    private String secretKey;
+    private String secretKeyString;
 
     @Value("${jwt.expiration}")
     private long expirationTime;
 
-    // Generate JWT token
-    public String generateToken(String email, UserRole role) {
-        Claims claims = Jwts.claims().setSubject(email);
-        claims.put("role", role.name()); // Add role to JWT claims
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(secretKeyString.getBytes(StandardCharsets.UTF_8));
+    }
 
+    public String generateToken(String email, UserRole role) {
         return Jwts.builder()
-                .setClaims(claims)
+                .setSubject(email)
+                .claim("role", role.name())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime)) // Set expiration time from properties
-                .signWith(SignatureAlgorithm.HS256, secretKey) // Use your secret key here
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // Validate JWT token
     public boolean validateToken(String token) {
         try {
-            Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .parseClaimsJws(token);  // Validate the token
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
-    // Extract username from JWT token
     public String extractEmail(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody(); // Extract claims from the token
+        return getClaims(token).getSubject();
+    }
 
-        return claims.getSubject(); // Extract username (subject)
+    public String extractRole(String token) {
+        return getClaims(token).get("role", String.class);
+    }
+
+    private Claims getClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
