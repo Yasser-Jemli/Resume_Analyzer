@@ -1,5 +1,6 @@
 package org.example.Cv_Parser.Security;
-
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import jakarta.servlet.FilterChain;
@@ -9,6 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -21,17 +24,30 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {  // Declare the exceptions here
-        String token = getJwtFromRequest(request);
+            throws ServletException, IOException {
+        try {
+            String token = getJwtFromRequest(request);
+            if (token != null) {
+                String email = jwtUtil.extractEmail(token);
+                String role = jwtUtil.extractRole(token);
 
-        if (token != null && jwtUtil.validateToken(token)) {
-            String email = jwtUtil.extractEmail(token);
-            var authentication = new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
-                    email, null, null); // No authorities here
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                // Add ROLE_ prefix to match Spring Security's expectations
+                List<SimpleGrantedAuthority> authorities = Collections.singletonList(
+                        new SimpleGrantedAuthority("ROLE_" + role)
+                );
+
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                        email, null, authorities
+                );
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+        } catch (Exception e) {
+            // Important: Clear context on failure
+            SecurityContextHolder.clearContext();
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid token");
+            return;
         }
-
-        filterChain.doFilter(request, response);  // Continue with the filter chain
+        filterChain.doFilter(request, response);
     }
 
     // Extract JWT token from the request header
