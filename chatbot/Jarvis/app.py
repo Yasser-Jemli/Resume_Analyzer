@@ -1,25 +1,14 @@
 from flask import Flask, render_template, request, jsonify
-from groq import Groq
-import os
-import pyautogui
-import re
-import time
+import os, pyautogui, re, time, tempfile, pygame
 from gtts import gTTS
-import pygame
-import tempfile
-import json  # <-- Ajouté pour sauvegarde JSON
-
+from shared import client, conversation_history, save_conversation_to_json
+from nouvelle_page import nouvelle_page  # Correct the import to match the function name
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
-client = Groq(api_key='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')
-
-conversation_history = []
-
-# 📦 Sauvegarde dans un fichier JSON
-def save_conversation_to_json():
-    with open("conversation.json", "w", encoding="utf-8") as f:
-        json.dump(conversation_history, f, indent=4, ensure_ascii=False)
-
+@app.route('/nouvelle-page')
+def nouvelle_page_route():
+    return nouvelle_page()
+# Réponse principale
 def get_chat_response(user_input):
     global conversation_history
 
@@ -38,7 +27,6 @@ def get_chat_response(user_input):
         filename = match.group(3) or "fichier.txt"
         directory = match.group(5) or ""
         content = match.group(7) or "Bonjour"
-
         file_path = os.path.join(directory, filename) if directory else filename
 
         if directory and not os.path.exists(directory):
@@ -74,17 +62,14 @@ def get_chat_response(user_input):
 
         assistant_response = chat_completion.choices[0].message.content
 
-        # 🧠 Mise à jour de l'historique
         conversation_history.append({"role": "user", "content": user_input})
         conversation_history.append({"role": "assistant", "content": assistant_response})
 
-        # 💾 Sauvegarde dans conversation.json
         save_conversation_to_json()
 
         if len(conversation_history) > 20:
             conversation_history = conversation_history[-20:]
 
-        # 🔊 Synthèse vocale
         tts = gTTS(text=assistant_response, lang='fr')
         with tempfile.NamedTemporaryFile(delete=True, suffix=".mp3") as temp_audio:
             tts.save(temp_audio.name)
@@ -100,6 +85,7 @@ def get_chat_response(user_input):
         print(f"Erreur : {e}")
         return "⚠️ Erreur système : Dysfonctionnement temporaire. Veuillez réessayer, Monsieur."
 
+
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -113,78 +99,25 @@ def ask():
 @app.route("/clear-history", methods=["POST"])
 def clear_history():
     global conversation_history
-    #conversation_history = []
-    #save_conversation_to_json()
+    conversation_history = []
+    save_conversation_to_json()
     return jsonify({"status": "success"})
-@app.route("/nouvelle-page")
-def nouvelle_page():
-    return render_template("nouvelle_page.html")
+
+
 
 @app.route("/entretien")
+
 def entretien():
+    print("Requête reçue")
+    data = request.get_json()
+    print("Données reçues :", data)
+    user_input = data.get("user_input", "") if data else ""
+    print("User input:", user_input)
     return render_template("entretien.html")
 
+# Import du module entretien (placé ici pour éviter les imports circulaires)
+from entretien import entretien_ask
+app.add_url_rule("/entretien-ask", view_func=entretien_ask, methods=["POST"])
 
-
-
-# Sauvegarder l'historique dans un fichier JSON
-def save_conversation_to_json():
-    with open("conversation.json", "w", encoding="utf-8") as f:
-        json.dump(conversation_history, f, indent=4, ensure_ascii=False)
-
-@app.route("/entretien-ask", methods=["POST"])
-def entretien_ask():
-    data = request.get_json()
-    user_input = data["user_input"]
-
-    # Initialiser les messages si c'est la première question de l'entretien
-    if len(conversation_history) == 0:
-        greeting_message = "Bonjour ! Je suis ravi de discuter avec vous. Comme nous avions commencé, je vais vous poser une question technique pour évaluer vos compétences en Python."
-        first_question = "Pouvez-vous expliquer ce qu'est le polymorphisme en Python et donner un exemple de son utilisation ?"
-        # Ajouter un message d'accueil et la première question
-        conversation_history.append({"role": "assistant", "content": greeting_message})
-        conversation_history.append({"role": "assistant", "content": first_question})
-        save_conversation_to_json()
-        return jsonify({"response": greeting_message + " " + first_question})
-
-    # Si l'entretien est déjà en cours, évaluer la réponse
-    if user_input:
-        # Ajouter la réponse de l'utilisateur à l'historique
-        conversation_history.append({"role": "user", "content": user_input})
-
-        # Générer une réponse et une note via l'API
-        messages = [
-            {"role": "system", "content": "Tu es un recruteur technique d'une entreprise. Pose des questions techniques en français sur Python, Git, Docker, etc. Après chaque réponse, donne une note sur 20 et un feedback."},
-        ]
-
-        # Ajouter l'historique de la conversation
-        for entry in conversation_history:
-            messages.append({"role": entry["role"], "content": entry["content"]})
-
-        try:
-            # Demander au modèle de générer une réponse avec une note
-            response = client.chat.completions.create(
-                messages=messages,
-                model="llama-3.3-70b-versatile",
-                temperature=0.6,
-                max_tokens=512
-            )
-
-            assistant_response = response.choices[0].message.content
-            note = "Note : 15/20"  # Ici, la note est à ajuster dynamiquement
-            feedback = assistant_response + " " + note
-
-            # Ajouter la réponse avec la note dans l'historique de la conversation
-            conversation_history.append({"role": "assistant", "content": feedback})
-
-            # Sauvegarder l'historique dans un fichier JSON
-            save_conversation_to_json()
-
-            return jsonify({"response": feedback})
-
-        except Exception as e:
-            return jsonify({"response": f"Erreur serveur : {str(e)}"})
-
-            
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5000)
