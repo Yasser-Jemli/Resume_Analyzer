@@ -13,7 +13,19 @@
         "current",
         "till now",
         "to date",
-        "ongoing"
+        "ongoing",
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
     ],
     "position_indicators": [
         "engineer",
@@ -25,7 +37,10 @@
         "coordinator",
         "designer",
         "architect",
-        "lead"
+        "lead",
+        "Software",
+        "SW",
+        "Technician"
     ],
     "company_indicators": [
         "ltd",
