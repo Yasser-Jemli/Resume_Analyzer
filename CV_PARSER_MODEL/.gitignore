@@ -2,6 +2,6 @@
 __pycache__/
 *.py[cod]
 
-tempo_save.txt
+temp_save.txt
 
 results/
