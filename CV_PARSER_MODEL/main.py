@@ -25,6 +25,8 @@ from parsers.PDFTextExtractorPyMuPDF import PDFTextExtractorPyMuPDF
 from parsers.PDFTextExtractorPdfMiner import PDFTextExtractorPdfMiner
 from parsers.ResumeInfoExtractor import ResumeInfoExtractor
 from parsers.cv_scorer import CVScorer
+from recommanders.skill_recommander import SkillRecommender
+from recommanders.course_recommander import CourseRecommender
 import sys
 sys.path.append(str(Path(__file__).parent / 'parsers'))
 logger_manager = LogManager.get_log_manager()
@@ -241,13 +243,29 @@ def CV_parsing_main(pdf_path, save_results=False):
         results = compare_parsers(pdf_path)
         
         if results:
+            # Add skill recommendations
+            custom_results = results['parsers'].get('custom', {})
+            current_skills = custom_results.get('Skills', [])
+            position = custom_results.get('Position', 'sw_designer')  # default to sw_designer if not found
+            
+            # Get skill recommendations
+            recommender = SkillRecommender()
+            skill_recommendations = recommender.recommend_skills(position, current_skills)
+            
+            # Get course recommendations
+            course_recommender = CourseRecommender()
+            course_recommendations = course_recommender.recommend_courses(skill_recommendations)
+            
+            # Add recommendations to results
+            results['skill_recommendations'] = skill_recommendations
+            results['learning_path'] = course_recommendations
+            
             # Score the CV
             cv_scores = score_parsed_cv(results)
             results['scores'] = cv_scores
             
-            logger.info("Successfully parsed and scored resume")
+            logger.info("Successfully parsed, scored and generated recommendations")
             
-            # Always save results if flag is set, regardless of console setting
             if save_results:
                 output_dir = Path(__file__).parent / 'results'
                 output_dir.mkdir(exist_ok=True)
@@ -259,18 +277,36 @@ def CV_parsing_main(pdf_path, save_results=False):
                     json.dump(results, f, indent=4, ensure_ascii=False)
                 logger.info(f"Results saved to: {output_file}")
             
-            # Only print results if console output is enabled
             if args.console:
-                print("\n=== CV Scoring Results ===")
-                for parser_name, score_data in cv_scores.items():
-                    print(f"\nParser: {parser_name}")
-                    print(f"Total Score: {score_data['total_score']}%")
-                    print("\nDetailed Scores:")
-                    for category, score in score_data['detailed_scores'].items():
-                        print(f"  {category}: {score}%")
-                    print("\nFeedback:")
-                    for feedback in score_data['feedback']:
-                        print(f"  - {feedback}")
+                print("\n=== CV Analysis Results ===")
+                print(f"\nCurrent Position: {position}")
+                print("\nSkill Recommendations:")
+                if skill_recommendations["status"] == "success":
+                    print("\nMissing Required Skills:")
+                    for skill in skill_recommendations["recommendations"]["missing_required"]:
+                        print(f"- {skill}")
+                    
+                    print("\nMissing Preferred Skills:")
+                    for skill in skill_recommendations["recommendations"]["missing_preferred"]:
+                        print(f"- {skill}")
+                    
+                    print("\nRelated Skills to Consider:")
+                    for skill in skill_recommendations["recommendations"]["related_skills"]:
+                        print(f"- {skill}")
+                
+                print("\n=== Learning Resources ===")
+                if course_recommendations["status"] == "success":
+                    print("\nPriority Courses:")
+                    for skill, courses in course_recommendations["high_priority"].items():
+                        print(f"\nFor {skill.upper()}:")
+                        if courses["udemy"]:
+                            print("  Udemy Courses:")
+                            for course in courses["udemy"][:2]:
+                                print(f"    - {course['title']}")
+                        if courses["certificates"]:
+                            print("  Recommended Certificates:")
+                            for cert in courses["certificates"]:
+                                print(f"    - {cert}")
             
             return results
         else:
