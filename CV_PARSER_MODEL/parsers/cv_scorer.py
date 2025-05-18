@@ -2,6 +2,7 @@ from pathlib import Path
 import json
 import logging
 import re
+from datetime import datetime
 
 class CVScorer:
     """CV scoring system with configurable criteria"""
@@ -108,20 +109,78 @@ class CVScorer:
             self.logger.error(f"Error scoring skills: {str(e)}")
             return 0
 
+    def _extract_years_of_experience(self, experience_text):
+        """Extract total years of experience from text"""
+        total_years = 0
+        try:
+            # Pattern for date ranges like "2020 - 2023" or "2020-present"
+            date_pattern = r'(\d{4})\s*[-–—]\s*((?:\d{4})|(?:present|current|now))'
+            
+            # Find all date ranges
+            matches = re.finditer(date_pattern, experience_text.lower())
+            
+            current_year = datetime.now().year
+            
+            for match in matches:
+                start_year = int(match.group(1))
+                end_str = match.group(2)
+                
+                # Handle 'present' or current year
+                if end_str in ['present', 'current', 'now']:
+                    end_year = current_year
+                else:
+                    end_year = int(end_str)
+                
+                # Add years from this position
+                if start_year <= end_year:
+                    total_years += end_year - start_year
+            
+            # Also look for explicit mentions of experience
+            year_patterns = [
+                r'(\d+)\+?\s*years? of experience',
+                r'(\d+)\+?\s*years? in',
+                r'experienced (\d+)\+?\s*years?'
+            ]
+            
+            for pattern in year_patterns:
+                matches = re.finditer(pattern, experience_text.lower())
+                for match in matches:
+                    years = int(match.group(1))
+                    total_years = max(total_years, years)
+            
+            return total_years
+            
+        except Exception as e:
+            self.logger.error(f"Error extracting years of experience: {str(e)}")
+            return 0
+
     def _score_experience(self, experience):
-        """Score experience section"""
+        """Score experience section with years calculation"""
         if not experience:
             return 0
             
         try:
+            # Join experience entries into single text
             text = ' '.join(str(exp) for exp in experience).lower()
+            
+            # Get years of experience
+            years = self._extract_years_of_experience(text)
+            
+            # Score based on years (assuming ideal is 5+ years)
+            year_score = min(100, (years / 5) * 100)
+            
+            # Score based on keywords
             keywords = self.criteria["experience"]["relevant_keywords"]
+            keyword_matches = sum(1 for keyword in keywords if keyword.lower() in text)
+            keyword_score = (keyword_matches / len(keywords)) * 100 if keywords else 0
             
-            # Count keyword matches
-            matches = sum(1 for keyword in keywords if keyword.lower() in text)
-            score = (matches / len(keywords)) * 100 if keywords else 0
+            # Combined score (60% years, 40% keywords)
+            total_score = (year_score * 0.6) + (keyword_score * 0.4)
             
-            return min(100, score)
+            self.logger.info(f"Experience score breakdown - Years: {years} ({year_score}%), "
+                            f"Keywords: {keyword_score}%, Total: {total_score}%")
+            
+            return min(100, total_score)
             
         except Exception as e:
             self.logger.error(f"Error scoring experience: {str(e)}")
