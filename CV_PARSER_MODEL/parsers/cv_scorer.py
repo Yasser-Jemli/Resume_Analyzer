@@ -53,38 +53,48 @@ class CVScorer:
         }
     
     def score_cv(self, cv_data):
-        """Score a CV based on criteria"""
-        if not cv_data:
-            self.logger.error("No CV data provided")
-            return {
-                "total_score": 0,
-                "detailed_scores": {},
-                "feedback": ["No CV data to analyze"]
-            }
-
+        """Score a CV with detailed metrics"""
         try:
+            experience_results = self._score_experience(cv_data.get("Experience", []))
+            skills_score = self._score_skills(cv_data.get("Skills", []))
+            education_score = self._score_education(cv_data.get("Education", []))
+            
             scores = {
-                "skills": self._score_skills(cv_data.get("Skills", [])),
-                "experience": self._score_experience(cv_data.get("Experience", [])),
-                "education": self._score_education(cv_data.get("Education", []))
+                "skills": skills_score,
+                "experience": experience_results["score"],
+                "education": education_score
             }
             
-            # Calculate total score with weights
-            weights = self.criteria.get("weights", {"skills": 0.4, "experience": 0.35, "education": 0.25})
+            # Calculate weighted total
+            weights = self.criteria.get("weights", {
+                "skills": 0.4,
+                "experience": 0.35,
+                "education": 0.25
+            })
             total_score = sum(scores[cat] * weights[cat] for cat in scores)
             
             return {
                 "total_score": round(total_score, 2),
                 "detailed_scores": {k: round(v, 2) for k, v in scores.items()},
+                "experience_metrics": {
+                    "years": experience_results["years"],
+                    "positions": experience_results["positions"],
+                    "details": experience_results["details"]
+                },
                 "feedback": self._generate_feedback(scores)
             }
             
         except Exception as e:
-            self.logger.error(f"Error scoring CV: {str(e)}")
+            self.logger.error(f"Error in CV scoring: {str(e)}")
             return {
                 "total_score": 0,
                 "detailed_scores": {},
-                "feedback": [f"Error scoring CV: {str(e)}"]
+                "experience_metrics": {
+                    "years": 0,
+                    "positions": 0,
+                    "details": f"Error: {str(e)}"
+                },
+                "feedback": ["Error occurred during scoring"]
             }
 
     def _score_skills(self, skills):
@@ -155,36 +165,55 @@ class CVScorer:
             return 0
 
     def _score_experience(self, experience):
-        """Score experience section with years calculation"""
+        """Score experience section with detailed metrics"""
         if not experience:
-            return 0
+            return {
+                "score": 0,
+                "years": 0,
+                "positions": 0,
+                "details": "No experience found"
+            }
             
         try:
             # Join experience entries into single text
             text = ' '.join(str(exp) for exp in experience).lower()
             
-            # Get years of experience
-            years = self._extract_years_of_experience(text)
+            # Extract years of experience
+            total_years = self._extract_years_of_experience(text)
             
-            # Score based on years (assuming ideal is 5+ years)
-            year_score = min(100, (years / 5) * 100)
+            # Count different positions
+            position_markers = ["developer", "engineer", "designer", "analyst"]
+            positions = sum(1 for marker in position_markers if marker in text.lower())
             
-            # Score based on keywords
+            # Score based on years (40%)
+            year_score = min(100, (total_years / 5) * 100)
+            
+            # Score based on keywords (40%)
             keywords = self.criteria["experience"]["relevant_keywords"]
             keyword_matches = sum(1 for keyword in keywords if keyword.lower() in text)
             keyword_score = (keyword_matches / len(keywords)) * 100 if keywords else 0
             
-            # Combined score (60% years, 40% keywords)
-            total_score = (year_score * 0.6) + (keyword_score * 0.4)
+            # Score based on positions (20%)
+            position_score = min(100, positions * 25)
             
-            self.logger.info(f"Experience score breakdown - Years: {years} ({year_score}%), "
-                            f"Keywords: {keyword_score}%, Total: {total_score}%")
+            # Calculate total weighted score
+            total_score = (year_score * 0.4) + (keyword_score * 0.4) + (position_score * 0.2)
             
-            return min(100, total_score)
+            return {
+                "score": round(total_score, 2),
+                "years": total_years,
+                "positions": positions,
+                "details": f"{total_years} years, {positions} positions"
+            }
             
         except Exception as e:
             self.logger.error(f"Error scoring experience: {str(e)}")
-            return 0
+            return {
+                "score": 0,
+                "years": 0,
+                "positions": 0,
+                "details": f"Error: {str(e)}"
+            }
 
     def _score_education(self, education):
         """Score education section"""
