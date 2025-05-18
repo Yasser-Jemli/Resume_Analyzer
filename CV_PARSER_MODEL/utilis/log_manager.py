@@ -90,17 +90,20 @@ class LogManager:
 
     def configure_logging(self, file_logging=True, console_logging=True):
         """Configure logging with specified handlers"""
-        # Remove existing handlers
+        # Remove all existing handlers
         root_logger = logging.getLogger()
-        root_logger.handlers = []
-        
-        if not file_logging and not console_logging:
-            return
+        for handler in root_logger.handlers[:]:
+            root_logger.removeHandler(handler)
         
         # Set base configuration
         root_logger.setLevel(logging.DEBUG)
         
         if file_logging:
+            # Clean up old logs first
+            if self.log_directory.exists():
+                shutil.rmtree(self.log_directory)
+            self.log_directory.mkdir(parents=True, exist_ok=True)
+            
             # File handler setup
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             log_file = self.log_directory / f'resume_parser_{timestamp}.log'
@@ -119,6 +122,10 @@ class LogManager:
             console_formatter = logging.Formatter('%(levelname)s - %(message)s')
             console_handler.setFormatter(console_formatter)
             root_logger.addHandler(console_handler)
+        
+        # If neither logging type is enabled, add a null handler
+        if not file_logging and not console_logging:
+            root_logger.addHandler(logging.NullHandler())
 
     def write_log_header(self):
         """Write application header to log file"""
@@ -192,3 +199,23 @@ class ThreadedLogger:
 
     def error(self, message):
         self.manager.queue_log(self.name, 'ERROR', message)
+
+
+def print_parser_results(results):
+    """Pretty print parser results"""
+    if not results:
+        logger.error("No results available")
+        return
+        
+    for key, value in results.items():
+        if args.console:  # Only print if console output is enabled
+            print(f"\n{key}:")
+        logger.info(f"{key}:")
+        if isinstance(value, list):
+            for item in value:
+                logger.info(f"-{item}")
+                if args.console:
+                    print(f"- {item}")
+        else:
+            if args.console:
+                print(value)

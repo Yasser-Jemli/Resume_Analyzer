@@ -247,7 +247,7 @@ def CV_parsing_main(pdf_path, save_results=False):
             
             logger.info("Successfully parsed and scored resume")
             
-            # Save results if flag is set
+            # Always save results if flag is set, regardless of console setting
             if save_results:
                 output_dir = Path(__file__).parent / 'results'
                 output_dir.mkdir(exist_ok=True)
@@ -258,19 +258,20 @@ def CV_parsing_main(pdf_path, save_results=False):
                 with open(output_file, 'w', encoding='utf-8') as f:
                     json.dump(results, f, indent=4, ensure_ascii=False)
                 logger.info(f"Results saved to: {output_file}")
-                
-            # Print scoring results
-            print("\n=== CV Scoring Results ===")
-            for parser_name, score_data in cv_scores.items():
-                print(f"\nParser: {parser_name}")
-                print(f"Total Score: {score_data['total_score']}%")
-                print("\nDetailed Scores:")
-                for category, score in score_data['detailed_scores'].items():
-                    print(f"  {category}: {score}%")
-                print("\nFeedback:")
-                for feedback in score_data['feedback']:
-                    print(f"  - {feedback}")
-                
+            
+            # Only print results if console output is enabled
+            if args.console:
+                print("\n=== CV Scoring Results ===")
+                for parser_name, score_data in cv_scores.items():
+                    print(f"\nParser: {parser_name}")
+                    print(f"Total Score: {score_data['total_score']}%")
+                    print("\nDetailed Scores:")
+                    for category, score in score_data['detailed_scores'].items():
+                        print(f"  {category}: {score}%")
+                    print("\nFeedback:")
+                    for feedback in score_data['feedback']:
+                        print(f"  - {feedback}")
+            
             return results
         else:
             logger.error("Failed to parse resume")
