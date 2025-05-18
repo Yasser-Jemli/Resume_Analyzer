@@ -17,6 +17,7 @@ import { LogInComponent } from './log-in/log-in.component';
 import { SignupComponent } from './signup/signup.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { AuthGuard } from './auth.guard';
+import { GestionManagersComponent } from './gestion-managers/gestion-managers.component';
 
 
 @NgModule({
@@ -33,6 +34,7 @@ import { AuthGuard } from './auth.guard';
     LogInComponent,
     SignupComponent,
     ForgotPasswordComponent,
+    GestionManagersComponent,
   ],
   imports: [
     BrowserModule,

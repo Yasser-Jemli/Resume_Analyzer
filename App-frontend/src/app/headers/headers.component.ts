@@ -13,8 +13,12 @@ export class HeadersComponent {
     return localStorage.getItem('token') !== null;
   }
 
+  isAdmin(): boolean {
+    return localStorage.getItem('username') === 'admin';
+  }
+
   logout(): void {
     localStorage.removeItem('token');
-    this.router.navigate(['/home']);
+    this.router.navigate(['/log-in']);
   }
 }
