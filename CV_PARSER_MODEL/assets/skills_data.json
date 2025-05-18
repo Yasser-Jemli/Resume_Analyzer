@@ -1,0 +1,27 @@
+{
+    "positions": {
+        "sw_designer": {
+            "required": ["python", "c", "c++", "git"],
+            "preferred": ["rust", "linux", "android"],
+            "related": ["docker", "kubernetes", "jenkins"]
+        },
+        "embedded_systems_engineer": {
+            "required": ["c", "c++", "linux", "rtos"],
+            "preferred": ["python", "rust", "git"],
+            "related": ["yocto", "buildroot", "arm"]
+        },
+        "test_engineer": {
+            "required": ["python", "git", "jira"],
+            "preferred": ["selenium", "jenkins", "docker"],
+            "related": ["pytest", "cucumber", "robot"]
+        }
+    },
+    "skill_relationships": {
+        "python": ["django", "flask", "fastapi", "pytest"],
+        "c++": ["qt", "boost", "cmake", "gtest"],
+        "git": ["github", "gitlab", "bitbucket"],
+        "linux": ["bash", "systemd", "docker"],
+        "android": ["kotlin", "java", "gradle"],
+        "rust": ["cargo", "actix", "tokio"]
+    }
+}

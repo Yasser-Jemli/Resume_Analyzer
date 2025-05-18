@@ -86,7 +86,64 @@ class ResumeInfoExtractor:
         return re.findall(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", self.text)
 
     def extract_phone_numbers(self):
-        return re.findall(r"(\+?\d[\d\s\-]{8,}\d)", self.text)
+        """Extract phone numbers with improved validation"""
+        phone_patterns = [
+            # International format with country code
+            r'(?:\+\d{1,3}[-\s]?)?\d{8,12}',
+            # Format: +XXX XXXXXXXX
+            r'\+\d{1,3}\s\d{8}',
+            # Common Tunisian format
+            r'\+216\s\d{8}'
+        ]
+        
+        found_numbers = []
+        
+        for para in self.paragraphs:
+            for pattern in phone_patterns:
+                matches = re.finditer(pattern, para)
+                for match in matches:
+                    number = match.group().strip()
+                    # Additional validation
+                    if self._is_valid_phone(number):
+                        found_numbers.append(number)
+        
+        # Remove duplicates while maintaining order
+        unique_numbers = list(dict.fromkeys(found_numbers))
+        
+        return unique_numbers if unique_numbers else ["No phone number found"]
+
+    def _is_valid_phone(self, number):
+        """Validate phone number"""
+        # Remove all non-digit characters except '+'
+        cleaned = ''.join(c for c in number if c.isdigit() or c == '+')
+        
+        # Basic validation rules
+        if not cleaned:
+            return False
+            
+        # Must start with + or digit
+        if not (cleaned.startswith('+') or cleaned[0].isdigit()):
+            return False
+            
+        # Check length (including country code)
+        if len(cleaned) < 8 or len(cleaned) > 15:
+            return False
+            
+        # If starts with +, must have proper country code
+        if cleaned.startswith('+'):
+            # For Tunisia (+216)
+            if cleaned.startswith('+216'):
+                return len(cleaned) == 12  # +216 + 8 digits
+                
+        # Must contain only digits after potential '+'
+        if not cleaned[1:].isdigit():
+            return False
+            
+        # Reject if contains year-like numbers
+        if re.search(r'[12]\d{3}', cleaned):
+            return False
+            
+        return True
 
     def extract_skills(self):
         """Extract skills from resume text using loaded keywords"""
