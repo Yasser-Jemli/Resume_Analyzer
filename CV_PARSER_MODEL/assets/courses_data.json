@@ -1,0 +1,42 @@
+{
+    "platforms": {
+        "udemy": {
+            "base_url": "https://www.udemy.com/course/",
+            "courses": {
+                "python": ["complete-python-bootcamp", "python-for-data-science-and-ml-bootcamp"],
+                "c++": ["beginning-c-plus-plus-programming", "learn-advanced-c-programming"],
+                "rust": ["rust-programming-for-beginners", "rust-lang"],
+                "android": ["android-app-development-with-kotlin", "complete-android-developer-course"],
+                "linux": ["complete-linux-training", "linux-administration-bootcamp"],
+                "docker": ["docker-kubernetes-complete-guide", "docker-mastery"],
+                "kubernetes": ["kubernetes-for-beginners", "certified-kubernetes-administrator"],
+                "jenkins": ["jenkins-from-zero-to-hero", "jenkins-cicd-pipelines"]
+            }
+        },
+        "coursera": {
+            "base_url": "https://www.coursera.org/learn/",
+            "courses": {
+                "python": ["programming-python", "python-data-structures"],
+                "c++": ["cpp-programming", "advanced-cpp-specialization"],
+                "android": ["android-app-development", "android-developer-specialization"],
+                "linux": ["linux-server-management", "linux-systems-programming"]
+            }
+        },
+        "youtube": {
+            "channels": {
+                "python": ["sentdex", "corey-schafer", "tech-with-tim"],
+                "c++": ["the-cherno", "cppcon", "code-beauty"],
+                "rust": ["lets-get-rusty", "rust-lang-official"],
+                "android": ["coding-in-flow", "android-developers"],
+                "linux": ["linux-foundation", "networkchuck"]
+            }
+        },
+        "certificates": {
+            "python": ["Python Institute PCEP", "Microsoft Python Certification"],
+            "c++": ["C++ Institute CPA", "Microsoft C++ Certification"],
+            "linux": ["Linux Foundation LFCS", "Red Hat RHCSA"],
+            "kubernetes": ["CKA", "CKAD"],
+            "android": ["Google Associate Android Developer", "Android ATC Certification"]
+        }
+    }
+}
