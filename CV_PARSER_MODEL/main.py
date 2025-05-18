@@ -280,6 +280,24 @@ def CV_parsing_main(pdf_path, save_results=False):
         logger.error(f"Exception occurred: {str(e)}")
         return None
 
+def setup_logging(enable_file_logging=False, enable_console=False):
+    """Configure logging based on flags"""
+    logger_manager = LogManager.get_log_manager()
+    
+    # Configure logging levels and handlers
+    if not enable_file_logging and not enable_console:
+        # Disable all logging
+        logging.getLogger().handlers = []
+        return logger_manager
+    
+    # Set up logging with specified handlers
+    logger_manager.configure_logging(
+        file_logging=enable_file_logging,
+        console_logging=enable_console
+    )
+    
+    return logger_manager
+
 if __name__ == "__main__":
     start_time = time.time()
     
@@ -287,12 +305,23 @@ if __name__ == "__main__":
     parser.add_argument('action', choices=['parse_cv', 'recommend', 'match', 'compare'])
     parser.add_argument('--path', required=True, help='Path to the resume PDF file')
     parser.add_argument('--save', action='store_true', help='Save results to JSON file')
+    parser.add_argument('--logging', action='store_true', help='Enable logging to file')
+    parser.add_argument('--console', action='store_true', help='Enable console output')
     args = parser.parse_args()
+    
+    # Setup logging based on flags
+    log_manager = setup_logging(
+        enable_file_logging=args.logging,
+        enable_console=args.console
+    )
+    logger = log_manager.get_logger(__name__)
     
     if args.action == 'parse_cv':
         result = CV_parsing_main(args.path, save_results=args.save)
-        
-    total_time = time.time() - start_time
-    print(f"\n{'='*20} Total Execution Time {'='*20}")
-    print(f"Total script execution time: {total_time:.2f} seconds")
-    print('='*60)
+    
+    # Only show execution time if console output is enabled
+    if args.console:
+        total_time = time.time() - start_time
+        print(f"\n{'='*20} Total Execution Time {'='*20}")
+        print(f"Total script execution time: {total_time:.2f} seconds")
+        print('='*60)

@@ -88,6 +88,38 @@ class LogManager:
         # Write initial log header
         self.write_log_header()
 
+    def configure_logging(self, file_logging=True, console_logging=True):
+        """Configure logging with specified handlers"""
+        # Remove existing handlers
+        root_logger = logging.getLogger()
+        root_logger.handlers = []
+        
+        if not file_logging and not console_logging:
+            return
+        
+        # Set base configuration
+        root_logger.setLevel(logging.DEBUG)
+        
+        if file_logging:
+            # File handler setup
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            log_file = self.log_directory / f'resume_parser_{timestamp}.log'
+            file_handler = logging.FileHandler(log_file)
+            file_handler.setLevel(logging.DEBUG)
+            file_formatter = logging.Formatter(
+                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            )
+            file_handler.setFormatter(file_formatter)
+            root_logger.addHandler(file_handler)
+        
+        if console_logging:
+            # Console handler setup
+            console_handler = logging.StreamHandler()
+            console_handler.setLevel(logging.INFO)
+            console_formatter = logging.Formatter('%(levelname)s - %(message)s')
+            console_handler.setFormatter(console_formatter)
+            root_logger.addHandler(console_handler)
+
     def write_log_header(self):
         """Write application header to log file"""
         with open(self.log_file, 'w') as f:
