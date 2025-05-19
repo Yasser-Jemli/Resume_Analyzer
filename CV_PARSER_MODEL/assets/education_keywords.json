@@ -177,7 +177,7 @@
             "Technical"
         ]
     },
-    "fields": {
+    "field_preferences": {
         "required_fields": [
             "Computer Science",
             "Software Engineering",

@@ -269,43 +269,54 @@
             "vulnerability-assessment"
         ]
     },
-    "programming": [
-        "python",
-        "c",
-        "c++",
-        "rust",
-        "java",
-        "javascript"
-    ],
-    "tools": [
-        "git",
-        "github",
-        "gitlab",
-        "jira",
-        "docker",
-        "kubernetes"
-    ],
-    "frameworks": [
-        "django",
-        "flask",
-        "react",
-        "angular",
-        "vue"
-    ],
-    "platforms": [
-        "linux",
-        "windows",
-        "macos",
-        "android",
-        "ios",
-        "aws",
-        "azure"
-    ],
-    "other": [
-        "scrum",
-        "agile",
-        "testing",
-        "debugging",
-        "ci/cd"
-    ]
+    "programming": {
+        "programming_languages": [
+            "python",
+            "c",
+            "c++",
+            "rust",
+            "java",
+            "javascript"
+        ],
+        "frameworks": [
+            "django",
+            "flask",
+            "react",
+            "angular"
+        ]
+    },
+    "tools": {
+        "version_control": [
+            "git",
+            "github",
+            "gitlab"
+        ],
+        "project_management": [
+            "jira",
+            "scrum",
+            "agile"
+        ]
+    },
+    "platforms": {
+        "os": [
+            "linux",
+            "windows",
+            "android",
+            "aosp",
+            "aaos"
+        ],
+        "embedded": [
+            "raspberry pi",
+            "arduino",
+            "arm"
+        ]
+    },
+    "other": {
+        "general": [
+            "testing",
+            "debugging",
+            "documentation",
+            "api"
+        ]
+    }
 }

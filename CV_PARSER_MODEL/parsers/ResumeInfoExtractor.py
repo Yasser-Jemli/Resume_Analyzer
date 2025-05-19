@@ -122,140 +122,41 @@ class ResumeInfoExtractor:
             all_skills = {
                 "programming": set(),
                 "tools": set(),
-                "frameworks": set(),
                 "platforms": set(),
                 "other": set()
             }
             
-            # Extract from explicit skills sections
-            sections = self._split_into_sections('\n'.join(self.paragraphs))
-            skills_text = sections.get('skills', '') or sections.get('expertise', '')
+            text_lower = ' '.join(self.paragraphs).lower()
             
-            if skills_text:
-                explicit_skills = self._process_skill_text(skills_text.lower())
-                for category, skills in explicit_skills.items():
-                    all_skills[category].update(skills)
-            
-            # Extract from projects
-            project_skills = self._extract_project_skills()
-            for category, skills in project_skills.items():
-                all_skills[category].update(skills)
-            
-            # Extract from experience
-            experience_skills = self._extract_experience_skills()
-            for category, skills in experience_skills.items():
-                all_skills[category].update(skills)
+            if not isinstance(self.skill_keywords, dict):
+                self.logger.error("Skill keywords not properly loaded")
+                return {"other": []}
+
+            # Process each category
+            for category, subcategories in self.skill_keywords.items():
+                if isinstance(subcategories, dict):
+                    # Process each subcategory
+                    for subcategory_name, skills in subcategories.items():
+                        if isinstance(skills, list):
+                            # Check each skill
+                            for skill in skills:
+                                if re.search(r'\b' + re.escape(str(skill).lower()) + r'\b', text_lower):
+                                    if category in all_skills:
+                                        all_skills[category].add(skill)
+                                    else:
+                                        all_skills["other"].add(skill)
             
             # Clean and normalize results
             result = {}
             for category, skills in all_skills.items():
                 if skills:
-                    cleaned_skills = {
-                        skill.lower() for skill in skills 
-                        if len(skill) > 1
-                    }
-                    if cleaned_skills:
-                        result[category] = sorted(list(cleaned_skills))
+                    result[category] = sorted(list(skills))
             
             return result if result else {"other": []}
             
         except Exception as e:
             self.logger.error(f"Error extracting skills: {str(e)}")
             return {"other": []}
-
-    def _extract_project_skills(self):
-        """Extract skills from project descriptions"""
-        project_skills = {
-            "programming": set(),
-            "tools": set(),
-            "frameworks": set(),
-            "platforms": set(),
-            "other": set()
-        }
-        
-        # Find projects section
-        sections = self._split_into_sections('\n'.join(self.paragraphs))
-        project_text = sections.get('projects', '')
-        
-        if not project_text:
-            return project_skills
-            
-        # Look for skill indicators
-        skill_indicators = [
-            "skills:", "technologies:", "tools:", 
-            "built with:", "developed using:", "implemented with:"
-        ]
-        
-        for line in project_text.lower().split('\n'):
-            # Check if line contains skill indicators
-            if any(indicator in line for indicator in skill_indicators):
-                skills_found = self._process_skill_text(line)
-                for category, skills in skills_found.items():
-                    project_skills[category].update(skills)
-        
-        return project_skills
-
-    def _extract_experience_skills(self):
-        """Extract skills from experience descriptions"""
-        experience_skills = {
-            "programming": set(),
-            "tools": set(),
-            "frameworks": set(),
-            "platforms": set(),
-            "other": set()
-        }
-        
-        # Find experience section
-        sections = self._split_into_sections('\n'.join(self.paragraphs))
-        experience_text = sections.get('experience', '')
-        
-        if not experience_text:
-            return experience_skills
-        
-        # Process each paragraph in experience section
-        for para in experience_text.split('\n'):
-            skills_found = self._process_skill_text(para.lower())
-            for category, skills in skills_found.items():
-                experience_skills[category].update(skills)
-        
-        return experience_skills
-
-    def _find_skill_sections(self, text):
-        """Find skill-related sections in text"""
-        sections = []
-        skill_markers = [
-            "expertise", "skills", "technical skills", 
-            "technologies", "competencies", "tools used",
-            "programming languages", "frameworks"
-        ]
-        
-        for marker in skill_markers:
-            if marker in text:
-                start = text.find(marker)
-                end = self._find_next_section(text, start)
-                if end > start:
-                    sections.append(text[start:end])
-        
-        return sections
-
-    def _process_skill_text(self, text):
-        """Process text to extract categorized skills"""
-        found_skills = {
-            "programming": set(),
-            "tools": set(),
-            "frameworks": set(),
-            "platforms": set(),
-            "other": set()
-        }
-        
-        # Use skill keywords from assets
-        for category, skills in self.skill_keywords.items():
-            if isinstance(skills, list):
-                for skill in skills:
-                    if re.search(r'\b' + re.escape(skill.lower()) + r'\b', text):
-                        found_skills[category].add(skill)
-        
-        return found_skills
 
     def extract_experience(self):
         """Extract work experience with improved company detection"""
@@ -338,7 +239,7 @@ class ResumeInfoExtractor:
         return ""
 
     def extract_education(self):
-        """Extract education information with improved section handling"""
+        """Extract education with improved field handling"""
         education = []
         
         # Get education section content
@@ -360,40 +261,44 @@ class ResumeInfoExtractor:
                 for key in schools.keys():
                     if key in para:
                         if current_edu:
-                            self._validate_and_append_education(current_edu, education)
+                            if current_edu.get("school") and (
+                                current_edu.get("degree") or 
+                                current_edu.get("field")
+                            ):
+                                education.append(current_edu)
                         
                         current_edu = {
                             "school": self._extract_school_name(para),
                             "degree": self._extract_degree(para),
                             "period": self._extract_date_range(para),
-                            "field": self._extract_field(para),
+                            "field": self._normalize_field(self._extract_field(para)),
                             "type": school_type
                         }
                         break
             
-            # If we have a current entry, check for additional info
+            # Update current education entry with additional info
             if current_edu:
-                # Update period if found
                 if not current_edu["period"]:
                     period = self._extract_date_range(para)
                     if period:
                         current_edu["period"] = period
-                
-                # Update field if found
+                        
                 if not current_edu["field"]:
                     field = self._extract_field(para)
                     if field:
-                        current_edu["field"] = field
+                        current_edu["field"] = self._normalize_field(field)
                         
-                # Update degree if found
                 if not current_edu["degree"]:
                     degree = self._extract_degree(para)
                     if degree:
                         current_edu["degree"] = degree
         
-        # Add last entry if exists
-        if current_edu:
-            self._validate_and_append_education(current_edu, education)
+        # Add last entry if valid
+        if current_edu and current_edu.get("school") and (
+            current_edu.get("degree") or 
+            current_edu.get("field")
+        ):
+            education.append(current_edu)
         
         return education
 
@@ -434,27 +339,72 @@ class ResumeInfoExtractor:
         return ""
 
     def _extract_field(self, text):
-        """Extract field of study with improved matching"""
+        """Extract and normalize field of study"""
         text_lower = text.lower()
         
-        # Check all fields
-        for field_type, fields in self.education_keywords["fields"].items():
+        # Check against known fields from keywords
+        for field_type, fields in self.education_keywords.get('fields', {}).items():
             for field in fields:
                 if field.lower() in text_lower:
-                    return field
+                    return self._normalize_field(field)
         
-        # Look for field patterns after degree keywords
+        # Look for field patterns
         field_patterns = [
-            r"(?:in|of)\s+([\w\s]+(?:Science|Engineering|Technology|Development)[\w\s]*)",
-            r"(?:bachelor|master|phd|license)\s+(?:in|of)\s+([\w\s]+)"
+            r'(?:in|of)\s+([\w\s]+(?:Science|Engineering|Technology|Development)[\w\s]*)',
+            r'(?:bachelor|master|phd|license)\s+(?:in|of)\s+([\w\s]+)',
+            r'(?:degree|diploma)\s+(?:in|of)\s+([\w\s]+)'
         ]
         
         for pattern in field_patterns:
             match = re.search(pattern, text_lower)
             if match:
-                return match.group(1).strip().title()
+                return self._normalize_field(match.group(1))
         
         return ""
+
+    def _normalize_field(self, field):
+        """Normalize field of study names"""
+        if not field:
+            return ""
+            
+        field_lower = field.lower()
+        
+        # Field name mapping for standardization
+        field_map = {
+            # Computer Science related
+            "computer science": "Computer Science",
+            "cs": "Computer Science",
+            "software engineering": "Software Engineering",
+            "software dev": "Software Development",
+            "information technology": "Information Technology",
+            "it": "Information Technology",
+            
+            # Engineering fields
+            "computer engineering": "Computer Engineering",
+            "electronic": "Electronic Engineering",
+            "electrical": "Electrical Engineering",
+            "embedded systems": "Embedded Systems Engineering",
+            "mechatronics": "Mechatronics Engineering",
+            
+            # Other technical fields
+            "data science": "Data Science",
+            "artificial intelligence": "Artificial Intelligence",
+            "machine learning": "Machine Learning",
+            "robotics": "Robotics Engineering"
+        }
+        
+        # Try exact matches first
+        for key, value in field_map.items():
+            if key in field_lower:
+                return value
+                
+        # Try partial matches
+        for key, value in field_map.items():
+            if any(word in field_lower for word in key.split()):
+                return value
+                
+        # Clean and capitalize if no match found
+        return ' '.join(word.capitalize() for word in field_lower.split())
 
     def _normalize_degree(self, degree):
         """Normalize degree naming"""
