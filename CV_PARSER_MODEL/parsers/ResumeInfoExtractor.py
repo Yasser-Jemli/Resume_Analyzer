@@ -23,8 +23,12 @@ class ResumeInfoExtractor:
         try:
             assets_dir = Path(__file__).parent.parent / 'assets'
             
+            # Debug print
+            print("Loading skills from:", assets_dir / 'skills_keywords.json')
+            
             with open(assets_dir / 'skills_keywords.json', 'r') as f:
                 self.skill_keywords = json.load(f)
+                print("Loaded skills:", type(self.skill_keywords), self.skill_keywords)
             
             with open(assets_dir / 'education_keywords.json', 'r') as f:
                 self.education_keywords = json.load(f)
