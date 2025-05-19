@@ -11,19 +11,20 @@
     <!-- Show login button only when NOT logged in -->
     <button *ngIf="!isLoggedIn()" class="nav-button" routerLink="/log-in">Log in</button>
     
-    <!-- Show logout button only when logged in -->
-    <button *ngIf="isLoggedIn()" class="nav-button" (click)="logout()">Log out</button>
+  
 
     <!-- Always visible buttons -->
-    <button class="nav-button" routerLink="/home">HOME</button>
+    
     
     <!-- Protected routes - only visible when logged in -->
-    <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/nouveauter">NOUVEAUTÉ</button>
-    <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/test-mon-cv">TEST MON CV</button>
-    <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/creation-cv">CRÉATION CV</button>
+    <button *ngIf="isLoggedIn()" class="nav-button"routerLink="/home">HOME</button>
+    <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/nouveauter">NEW JOBS</button>
+    <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/test-mon-cv">GET CV NOTE</button>
+    <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/creation-cv">CREAT CV</button>
     <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/chat-bot">CHAT BOT</button>
+    <button *ngIf="isLoggedIn()&& isAdmin()" class="nav-button" routerLink="/gestion-managers">MANAGER MANAGMENT</button>
+    <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/about-nous">US</button>
+    <button *ngIf="isLoggedIn()" class="nav-button" (click)="logout()">Log out</button>
     
-    <!-- Always visible -->
-    <button class="nav-button" routerLink="/about-nous">ABOUT NOUS</button>
   </nav>
 </header>

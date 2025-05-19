@@ -12,6 +12,7 @@ import { LogInComponent } from './log-in/log-in.component';
 import { SignupComponent } from './signup/signup.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { AuthGuard } from './auth.guard'; // 👈 Ajout ici
+import { GestionManagersComponent } from './gestion-managers/gestion-managers.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/log-in', pathMatch: 'full' },
@@ -21,6 +22,7 @@ const routes: Routes = [
   { path: 'creation-cv', component: CreationCVComponent, canActivate: [AuthGuard] },
   { path: 'about-nous', component: AboutNousComponent, canActivate: [AuthGuard] },
   { path: 'chat-bot', component: ChatBotComponent, canActivate: [AuthGuard] },
+  {path: 'gestion-managers', component: GestionManagersComponent, canActivate: [AuthGuard] },
   { path: 'log-in', component: LogInComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },

@@ -61,9 +61,11 @@ export class LogInComponent implements OnInit {
       next: (response) => {
         console.log('✅ Connexion réussie :', response);
         this.loading = false;
-
-        // ✅ Stockage du token
+        localStorage.clear();
+        // ✅ Stockage du token et du rôle
         localStorage.setItem('token', response.token);
+        localStorage.setItem('userRole', response.role);
+        localStorage.setItem('username', username); // Add this line
 
         if (rememberMe) {
           // Exemple : stocker dans localStorage pour persistance (déjà fait ci-dessus)
@@ -86,12 +88,17 @@ export class LogInComponent implements OnInit {
    */
   private authenticateUser(credentials: { username: string; password: string }): Observable<any> {
     return new Observable((observer) => {
-      const staticUsername = 'admin';
-      const staticPassword = 'admin123';
+      const users = [
+        { username: 'admin', password: 'admin123', role: 'admin' },
+        { username: 'user', password: 'user123', role: 'admin' }
+      ];
 
       setTimeout(() => {
-        if (credentials.username === staticUsername && credentials.password === staticPassword) {
-          observer.next({ token: 'fake-jwt-token' });
+        const foundUser = users.find(
+          u => u.username === credentials.username && u.password === credentials.password
+        );
+        if (foundUser) {
+          observer.next({ token: 'fake-jwt-token', role: foundUser.role });
           observer.complete();
         } else {
           observer.error({ status: 401, message: 'Identifiants invalides' });
