@@ -581,3 +581,30 @@ class ResumeInfoExtractor:
             sections[marker] = content
         
         return sections
+
+    def _extract_school_name(self, text):
+        """Extract school name from text using education keywords"""
+        text = text.strip()
+        
+        # Check against known school names from keywords
+        for category, schools in self.education_keywords.get('schools', {}).items():
+            for short_name, full_name in schools.items():
+                if short_name in text:
+                    return full_name
+        
+        # Fallback: Try to extract using school indicators
+        school_indicators = [
+            'university', 'college', 'institute', 'school',
+            'academy', 'faculty', 'higher', 'technical'
+        ]
+        
+        words = text.split()
+        for i, word in enumerate(words):
+            if any(indicator.lower() in word.lower() for indicator in school_indicators):
+                # Get complete school name (up to 6 words before indicator)
+                start = max(0, i-6)
+                school_name = ' '.join(words[start:i+1])
+                return school_name.strip()
+        
+        # If no match found, return original text
+        return text
