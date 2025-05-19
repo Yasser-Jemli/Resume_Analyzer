@@ -268,5 +268,44 @@
             "penetration-testing",
             "vulnerability-assessment"
         ]
-    }
+    },
+    "programming": [
+        "python",
+        "c",
+        "c++",
+        "rust",
+        "java",
+        "javascript"
+    ],
+    "tools": [
+        "git",
+        "github",
+        "gitlab",
+        "jira",
+        "docker",
+        "kubernetes"
+    ],
+    "frameworks": [
+        "django",
+        "flask",
+        "react",
+        "angular",
+        "vue"
+    ],
+    "platforms": [
+        "linux",
+        "windows",
+        "macos",
+        "android",
+        "ios",
+        "aws",
+        "azure"
+    ],
+    "other": [
+        "scrum",
+        "agile",
+        "testing",
+        "debugging",
+        "ci/cd"
+    ]
 }
