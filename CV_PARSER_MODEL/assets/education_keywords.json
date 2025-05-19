@@ -4,32 +4,70 @@
         "academic background",
         "qualifications",
         "studies",
-        "academic history"
+        "academic history",
+        "educational background",
+        "academic qualifications",
+        "academic preparation",
+        "schooling",
+        "formal education"
     ],
     "degree_types": {
         "bachelor": [
             "bachelor",
             "b.s.",
             "b.a.",
+            "b.eng",
+            "b.tech",
             "bs",
             "ba",
+            "beng",
+            "btech",
             "undergraduate",
-            "licence"
+            "licence",
+            "bachelor of science",
+            "bachelor of engineering",
+            "bachelor of technology",
+            "bachelor of arts"
         ],
         "master": [
             "master",
             "m.s.",
             "m.a.",
+            "m.eng",
+            "m.tech",
             "ms",
             "ma",
             "msc",
-            "graduate"
+            "meng",
+            "mtech",
+            "graduate",
+            "master of science",
+            "master of engineering",
+            "master of technology",
+            "master of arts",
+            "mba",
+            "master of business administration"
         ],
         "phd": [
             "phd",
             "ph.d",
             "doctorate",
-            "doctoral"
+            "doctoral",
+            "doctor of philosophy",
+            "d.eng",
+            "doctor of engineering",
+            "sc.d",
+            "doctor of science"
+        ],
+        "certifications": [
+            "certification",
+            "certificate",
+            "diploma",
+            "professional certification",
+            "advanced diploma",
+            "technical diploma",
+            "vocational training",
+            "professional diploma"
         ]
     },
     "fields": [
@@ -39,13 +77,70 @@
         "software engineering",
         "electronics",
         "mathematics",
-        "physics"
+        "physics",
+        "electrical engineering",
+        "mechanical engineering",
+        "computer engineering",
+        "embedded systems",
+        "robotics",
+        "artificial intelligence",
+        "data science",
+        "cybersecurity",
+        "telecommunications",
+        "automation",
+        "control systems",
+        "automotive engineering",
+        "system design",
+        "network engineering",
+        "machine learning",
+        "microelectronics",
+        "digital systems",
+        "industrial engineering",
+        "mechatronics"
     ],
     "institutions": [
         "university",
         "college",
         "institute",
         "school",
-        "academy"
+        "academy",
+        "polytechnic",
+        "technical institute",
+        "technological university",
+        "engineering school",
+        "faculty",
+        "department",
+        "research center",
+        "laboratory",
+        "technical college",
+        "vocational school"
+    ],
+    "achievements": [
+        "honors",
+        "distinction",
+        "cum laude",
+        "magna cum laude",
+        "summa cum laude",
+        "with honors",
+        "first class",
+        "dean's list",
+        "scholarship",
+        "academic excellence",
+        "research grant",
+        "fellowship",
+        "best thesis",
+        "outstanding achievement"
+    ],
+    "research": [
+        "thesis",
+        "dissertation",
+        "research project",
+        "publication",
+        "journal paper",
+        "conference paper",
+        "research work",
+        "academic project",
+        "laboratory research",
+        "experimental study"
     ]
 }
