@@ -119,39 +119,26 @@ class ResumeInfoExtractor:
     def extract_skills(self):
         """Extract skills with improved categorization"""
         try:
+            # Initialize skill sets
             all_skills = {
-                "programming": set(),
-                "tools": set(),
-                "platforms": set(),
-                "other": set()
+                "programming": [],
+                "tools": [],
+                "platforms": [],
+                "other": []
             }
             
+            # Get normalized text
             text_lower = ' '.join(self.paragraphs).lower()
             
-            if not isinstance(self.skill_keywords, dict):
-                self.logger.error("Skill keywords not properly loaded")
-                return {"other": []}
-
-            # Process each category
-            for category, subcategories in self.skill_keywords.items():
-                if isinstance(subcategories, dict):
-                    # Process each subcategory
-                    for subcategory_name, skills in subcategories.items():
-                        if isinstance(skills, list):
-                            # Check each skill
-                            for skill in skills:
-                                if re.search(r'\b' + re.escape(str(skill).lower()) + r'\b', text_lower):
-                                    if category in all_skills:
-                                        all_skills[category].add(skill)
-                                    else:
-                                        all_skills["other"].add(skill)
+            # Simple skill extraction - direct list processing
+            for category, skills in self.skill_keywords.items():
+                if isinstance(skills, list):
+                    for skill in skills:
+                        if re.search(r'\b' + re.escape(str(skill).lower()) + r'\b', text_lower):
+                            all_skills[category].append(skill)
             
-            # Clean and normalize results
-            result = {}
-            for category, skills in all_skills.items():
-                if skills:
-                    result[category] = sorted(list(skills))
-            
+            # Clean results
+            result = {k: sorted(list(set(v))) for k, v in all_skills.items() if v}
             return result if result else {"other": []}
             
         except Exception as e:
