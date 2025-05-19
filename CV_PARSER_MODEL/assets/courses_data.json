@@ -3,40 +3,202 @@
         "udemy": {
             "base_url": "https://www.udemy.com/course/",
             "courses": {
-                "python": ["complete-python-bootcamp", "python-for-data-science-and-ml-bootcamp"],
-                "c++": ["beginning-c-plus-plus-programming", "learn-advanced-c-programming"],
-                "rust": ["rust-programming-for-beginners", "rust-lang"],
-                "android": ["android-app-development-with-kotlin", "complete-android-developer-course"],
-                "linux": ["complete-linux-training", "linux-administration-bootcamp"],
-                "docker": ["docker-kubernetes-complete-guide", "docker-mastery"],
-                "kubernetes": ["kubernetes-for-beginners", "certified-kubernetes-administrator"],
-                "jenkins": ["jenkins-from-zero-to-hero", "jenkins-cicd-pipelines"]
+                "python": [
+                    "complete-python-bootcamp",
+                    "python-for-data-science-and-ml-bootcamp",
+                    "python-for-automation-testing",
+                    "django-with-react-full-stack",
+                    "flask-web-development"
+                ],
+                "c++": [
+                    "beginning-c-plus-plus-programming",
+                    "learn-advanced-c-programming",
+                    "unreal-engine-cpp-developer",
+                    "qt6-gui-development",
+                    "modern-cpp-concurrent-programming"
+                ],
+                "rust": [
+                    "rust-programming-for-beginners",
+                    "rust-lang",
+                    "rust-web-programming",
+                    "embedded-rust",
+                    "rust-systems-programming"
+                ],
+                "android": [
+                    "android-app-development-with-kotlin",
+                    "complete-android-developer-course",
+                    "android-automotive-development",
+                    "android-testing-masterclass",
+                    "android-architecture-patterns"
+                ],
+                "linux": [
+                    "complete-linux-training",
+                    "linux-administration-bootcamp",
+                    "linux-shell-scripting",
+                    "linux-security-essential",
+                    "embedded-linux-development"
+                ],
+                "docker": [
+                    "docker-kubernetes-complete-guide",
+                    "docker-mastery",
+                    "docker-swarm-orchestration",
+                    "docker-security-essentials",
+                    "microservices-with-docker"
+                ],
+                "kubernetes": [
+                    "kubernetes-for-beginners",
+                    "certified-kubernetes-administrator",
+                    "kubernetes-security",
+                    "kubernetes-microservices",
+                    "kubernetes-devops"
+                ],
+                "jenkins": [
+                    "jenkins-from-zero-to-hero",
+                    "jenkins-cicd-pipelines",
+                    "jenkins-security",
+                    "jenkins-shared-libraries",
+                    "jenkins-kubernetes-ci"
+                ],
+                "embedded": [
+                    "embedded-systems-bare-metal",
+                    "arm-cortex-programming",
+                    "rtos-development",
+                    "embedded-linux-yocto",
+                    "automotive-embedded-systems"
+                ]
             }
         },
         "coursera": {
             "base_url": "https://www.coursera.org/learn/",
             "courses": {
-                "python": ["programming-python", "python-data-structures"],
-                "c++": ["cpp-programming", "advanced-cpp-specialization"],
-                "android": ["android-app-development", "android-developer-specialization"],
-                "linux": ["linux-server-management", "linux-systems-programming"]
+                "python": [
+                    "programming-python",
+                    "python-data-structures",
+                    "python-machine-learning",
+                    "python-testing-automation",
+                    "python-web-development"
+                ],
+                "c++": [
+                    "cpp-programming",
+                    "advanced-cpp-specialization",
+                    "game-programming-cpp",
+                    "parallel-programming-cpp",
+                    "data-structures-cpp"
+                ],
+                "android": [
+                    "android-app-development",
+                    "android-developer-specialization",
+                    "android-security",
+                    "android-testing",
+                    "android-ui-material-design"
+                ],
+                "linux": [
+                    "linux-server-management",
+                    "linux-systems-programming",
+                    "linux-networking",
+                    "linux-kernel-programming",
+                    "devops-with-linux"
+                ],
+                "embedded": [
+                    "embedded-software-essentials",
+                    "real-time-systems",
+                    "iot-development",
+                    "embedded-security",
+                    "automotive-software"
+                ]
             }
         },
         "youtube": {
             "channels": {
-                "python": ["sentdex", "corey-schafer", "tech-with-tim"],
-                "c++": ["the-cherno", "cppcon", "code-beauty"],
-                "rust": ["lets-get-rusty", "rust-lang-official"],
-                "android": ["coding-in-flow", "android-developers"],
-                "linux": ["linux-foundation", "networkchuck"]
+                "python": [
+                    "sentdex",
+                    "corey-schafer",
+                    "tech-with-tim",
+                    "python-engineer",
+                    "real-python",
+                    "mosh-hamedani"
+                ],
+                "c++": [
+                    "the-cherno",
+                    "cppcon",
+                    "code-beauty",
+                    "javidx9",
+                    "abdul-bari",
+                    "cpp-weekly"
+                ],
+                "rust": [
+                    "lets-get-rusty",
+                    "rust-lang-official",
+                    "jon-gjengset",
+                    "ryan-levick",
+                    "embedded-rust"
+                ],
+                "android": [
+                    "coding-in-flow",
+                    "android-developers",
+                    "philip-lackner",
+                    "stevdza-san",
+                    "chirag-kachhadiya"
+                ],
+                "linux": [
+                    "linux-foundation",
+                    "networkchuck",
+                    "tutoriaLinux",
+                    "learn-linux-tv",
+                    "kris-occhipinti"
+                ],
+                "embedded": [
+                    "fastbit-embedded",
+                    "embedded-systems",
+                    "digikey",
+                    "make-electronics",
+                    "phil-electronics"
+                ]
             }
         },
         "certificates": {
-            "python": ["Python Institute PCEP", "Microsoft Python Certification"],
-            "c++": ["C++ Institute CPA", "Microsoft C++ Certification"],
-            "linux": ["Linux Foundation LFCS", "Red Hat RHCSA"],
-            "kubernetes": ["CKA", "CKAD"],
-            "android": ["Google Associate Android Developer", "Android ATC Certification"]
+            "python": [
+                "Python Institute PCEP",
+                "Microsoft Python Certification",
+                "AWS Python Developer",
+                "Google Python Certification",
+                "Python Testing with Pytest"
+            ],
+            "c++": [
+                "C++ Institute CPA",
+                "Microsoft C++ Certification",
+                "C++ Programming MOOC",
+                "Google C++ Developer",
+                "Unreal Engine C++"
+            ],
+            "linux": [
+                "Linux Foundation LFCS",
+                "Red Hat RHCSA",
+                "CompTIA Linux+",
+                "LPI Linux Essentials",
+                "AWS Linux Administration"
+            ],
+            "kubernetes": [
+                "CKA",
+                "CKAD",
+                "CKS",
+                "AWS EKS Certification",
+                "Azure Kubernetes Certification"
+            ],
+            "android": [
+                "Google Associate Android Developer",
+                "Android ATC Certification",
+                "AWS Mobile Developer",
+                "Oracle Java Android Developer",
+                "Mobile App Security Certification"
+            ],
+            "embedded": [
+                "Embedded Systems Certification",
+                "ARM Accredited Engineer",
+                "AutoSAR Certified Engineer",
+                "RTOS Certification",
+                "IoT Developer Certification"
+            ]
         }
     }
 }
