@@ -204,5 +204,24 @@
         "delivered",
         "achieved",
         "exceeded"
-    ]
+    ],
+    "company_names": {
+        "automotive": {
+            "ACTIA": "ACTIA Engineering Services",
+            "Continental": "Continental Automotive",
+            "Bosch": "Robert Bosch GmbH",
+            "Valeo": "Valeo Group"
+        },
+        "technology": {
+            "SASTEC": "SASTEC group",
+            "Microsoft": "Microsoft Corporation",
+            "Google": "Google LLC",
+            "Apple": "Apple Inc."
+        },
+        "consulting": {
+            "Accenture": "Accenture Technology Solutions",
+            "Capgemini": "Capgemini Engineering",
+            "Altran": "Altran Technologies"
+        }
+    }
 }
