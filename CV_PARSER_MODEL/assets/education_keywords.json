@@ -142,5 +142,52 @@
         "academic project",
         "laboratory research",
         "experimental study"
-    ]
+    ],
+    "schools": {
+        "engineering": {
+            "ESPRIT": "ESPRIT - Private School of Engineering and Technology",
+            "ENIT": "National Engineering School of Tunis",
+            "ENSI": "National School of Computer Science"
+        },
+        "university": {
+            "Higher Institute": "Higher Institute of Computer Science and Mathematics in Monastir",
+            "FST": "Faculty of Sciences of Tunis",
+            "FSEG": "Faculty of Economic Sciences and Management"
+        },
+        "technical": {
+            "Technical": "Technical 2 mars 1934 of Sousse high school"
+        }
+    },
+    "degrees": {
+        "required_degrees": [
+            "Engineering",
+            "Computer Science",
+            "Software Engineering",
+            "Computer Engineering",
+            "Information Technology"
+        ],
+        "preferred_degrees": [
+            "Masters",
+            "PhD",
+            "MBA"
+        ],
+        "other_degrees": [
+            "Bachelor",
+            "License",
+            "Technical"
+        ]
+    },
+    "fields": {
+        "required_fields": [
+            "Computer Science",
+            "Software Engineering",
+            "Information Technology",
+            "Computer Engineering"
+        ],
+        "preferred_fields": [
+            "Embedded Systems",
+            "Software Development",
+            "System Engineering"
+        ]
+    }
 }
