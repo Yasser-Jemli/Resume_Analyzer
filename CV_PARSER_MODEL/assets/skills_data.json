@@ -1,27 +1,89 @@
 {
     "positions": {
         "sw_designer": {
-            "required": ["python", "c", "c++", "git"],
-            "preferred": ["rust", "linux", "android"],
-            "related": ["docker", "kubernetes", "jenkins"]
+            "required": ["python", "c", "c++", "git", "linux"],
+            "preferred": ["rust", "android", "docker", "kubernetes"],
+            "related": ["jenkins", "jira", "aws", "azure"],
+            "domains": ["automotive", "embedded", "cloud"],
+            "tools": ["vscode", "eclipse", "cmake", "gdb"]
         },
         "embedded_systems_engineer": {
-            "required": ["c", "c++", "linux", "rtos"],
-            "preferred": ["python", "rust", "git"],
-            "related": ["yocto", "buildroot", "arm"]
+            "required": ["c", "c++", "linux", "rtos", "git"],
+            "preferred": ["python", "rust", "arm", "autosar"],
+            "related": ["yocto", "buildroot", "freertos", "qnx"],
+            "domains": ["automotive", "iot", "industrial"],
+            "tools": ["eclipse", "jtag", "gdb", "oscilloscope"]
         },
         "test_engineer": {
-            "required": ["python", "git", "jira"],
-            "preferred": ["selenium", "jenkins", "docker"],
-            "related": ["pytest", "cucumber", "robot"]
+            "required": ["python", "git", "jira", "linux"],
+            "preferred": ["selenium", "jenkins", "docker", "pytest"],
+            "related": ["cucumber", "robot", "appium", "junit"],
+            "domains": ["automotive", "web", "mobile"],
+            "tools": ["jenkins", "testng", "postman", "wireshark"]
+        }
+    },
+    "skill_categories": {
+        "programming_languages": {
+            "systems": ["c", "c++", "rust", "assembly"],
+            "scripting": ["python", "bash", "perl", "tcl"],
+            "web": ["javascript", "typescript", "html", "css"],
+            "mobile": ["java", "kotlin", "swift"]
+        },
+        "frameworks": {
+            "testing": ["pytest", "gtest", "junit", "cucumber"],
+            "web": ["django", "flask", "fastapi", "spring"],
+            "mobile": ["android-sdk", "flutter", "react-native"],
+            "embedded": ["autosar", "freertos", "qnx", "threadx"]
+        },
+        "tools": {
+            "version_control": ["git", "svn", "mercurial"],
+            "ci_cd": ["jenkins", "gitlab-ci", "github-actions"],
+            "containerization": ["docker", "kubernetes", "podman"],
+            "ide": ["vscode", "eclipse", "clion", "android-studio"]
+        },
+        "platforms": {
+            "cloud": ["aws", "azure", "gcp"],
+            "embedded": ["arm", "x86", "risc-v", "mips"],
+            "os": ["linux", "windows", "macos", "qnx"],
+            "mobile": ["android", "ios"]
         }
     },
     "skill_relationships": {
-        "python": ["django", "flask", "fastapi", "pytest"],
-        "c++": ["qt", "boost", "cmake", "gtest"],
-        "git": ["github", "gitlab", "bitbucket"],
-        "linux": ["bash", "systemd", "docker"],
-        "android": ["kotlin", "java", "gradle"],
-        "rust": ["cargo", "actix", "tokio"]
+        "python": {
+            "frameworks": ["django", "flask", "fastapi", "pytest"],
+            "libraries": ["numpy", "pandas", "requests", "selenium"],
+            "tools": ["pip", "virtualenv", "jupyter"],
+            "related_skills": ["automation", "scripting", "testing"]
+        },
+        "c++": {
+            "frameworks": ["qt", "boost", "opencv", "gtest"],
+            "tools": ["cmake", "make", "gdb", "valgrind"],
+            "standards": ["c++11", "c++14", "c++17", "c++20"],
+            "related_skills": ["memory-management", "optimization", "multithreading"]
+        },
+        "embedded": {
+            "languages": ["c", "c++", "rust", "assembly"],
+            "os": ["freertos", "qnx", "vxworks", "threadx"],
+            "tools": ["gdb", "jtag", "oscilloscope", "logic-analyzer"],
+            "protocols": ["can", "lin", "ethernet", "uart"]
+        },
+        "android": {
+            "languages": ["kotlin", "java"],
+            "tools": ["android-studio", "gradle", "adb"],
+            "frameworks": ["jetpack", "compose", "room"],
+            "testing": ["espresso", "junit", "mockito"]
+        },
+        "testing": {
+            "frameworks": ["pytest", "selenium", "robot", "cucumber"],
+            "tools": ["jenkins", "jira", "testng", "postman"],
+            "types": ["unit", "integration", "e2e", "performance"],
+            "methodologies": ["tdd", "bdd", "automation"]
+        }
+    },
+    "certification_paths": {
+        "cloud": ["aws-certified-developer", "azure-developer", "gcp-developer"],
+        "devops": ["docker-certified", "cka", "aws-devops"],
+        "embedded": ["arm-certified", "autosar-certified"],
+        "testing": ["istqb", "selenium-certified", "aws-testing"]
     }
 }
