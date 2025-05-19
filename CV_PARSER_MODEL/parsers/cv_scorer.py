@@ -315,22 +315,43 @@ class CVScorer:
         keyword_matches = sum(1 for keyword in keywords if keyword.lower() in text)
         return (keyword_matches / len(keywords)) * 100 if keywords else 0
 
-    def _score_education(self, education):
-        """Score education section"""
-        if not education:
+    def _score_education(self, education_data):
+        """Score education with improved validation"""
+        if not education_data:
             return 0
             
+        score = 0
+        max_score = 100
+        
         try:
-            text = ' '.join(str(edu) for edu in education).lower()
-            required_degrees = self.criteria["education"]["required_degrees"]
+            required_degrees = set(self.criteria["education"]["required_degrees"])
+            preferred_degrees = set(self.criteria["education"]["preferred_degrees"])
             
-            # Count matching degrees
-            matches = sum(1 for degree in required_degrees 
-                         if degree.lower() in text)
+            # Score each education entry
+            for edu in education_data:
+                degree_score = 0
+                
+                # Check degree
+                if edu.get("degree"):
+                    if any(req.lower() in edu["degree"].lower() for req in required_degrees):
+                        degree_score += 50
+                    elif any(pref.lower() in edu["degree"].lower() for pref in preferred_degrees):
+                        degree_score += 30
+                    else:
+                        degree_score += 10
+                
+                # Check field
+                if edu.get("field"):
+                    if any(field.lower() in edu["field"].lower() 
+                          for field in self.criteria["education"]["required_fields"]):
+                        degree_score += 50
+                    elif any(field.lower() in edu["field"].lower() 
+                            for field in self.criteria["education"]["preferred_fields"]):
+                        degree_score += 30
+                
+                score = max(score, degree_score)
             
-            score = (matches / len(required_degrees)) * 100 if required_degrees else 0
-            
-            return min(100, score)
+            return min(score, max_score)
             
         except Exception as e:
             self.logger.error(f"Error scoring education: {str(e)}")
