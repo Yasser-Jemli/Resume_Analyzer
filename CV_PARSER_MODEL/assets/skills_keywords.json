@@ -1,114 +1,272 @@
 {
-    "programming_languages": [
-        "python",
-        "java",
-        "javascript",
-        "c++",
-        "c#",
-        "ruby",
-        "C",
-        "c",
-        "swift",
-        "kotlin",
-        "php",
-        "haskell",
-        "r",
-        "matlab",
-        "go",
-        "Bash",
-        "shell",
-        "powershell",
-        "Rust",
-        "R"
-    ],
-    "web_technologies": [
-        "html",
-        "css",
-        "react",
-        "angular",
-        "node.js",
-        "vue.js",
-        "django",
-        "flask",
-        "spring",
-        "express",
-        "next.js",
-        "nuxt.js",
-        "gatsby",
-        "react-native",
-        "vue-native",
-        "ionic",
-        "flutter",
-        "react-native",
-        "react-native-web",
-        "react-native-expo",
-        "typescript",
-        "tailwindcss",
-        "bootstrap",
-        "material-ui",
-        "materialize",
-        "bulma",
-        "TypeScript",
-        "HTML",
-        "CSS",
-        "JavaScript",
-        "JS",
-        "Flask",
-        "Django",
-        "TypeScript",
-        "Angular",
-        "React",
-        "Node.js"
-    ],
-    "databases": [
-        "sql",
-        "mongodb",
-        "postgresql",
-        "mysql"
-    ],
-    "devops": [
-        "docker",
-        "Docker",
-        "kubernetes",
-        "jenkins",
-        "aws",
-        "azure",
-        "git",
-        "Linux" ,
-        "linux",
-        "windows",
-        "mac",
-        "macOS",
-        "Bash",
-        "bash",
-        "Shell",
-        "shell",
-        "powershell"
-    ],
-    "methodologies": [
-        "agile",
-        "scrum",
-        "kanban",
-        "waterfall",
-        "sprint",
-        "Jira",
-        "ClckUp",
-        "Trello",
-        "Asana",
-        "Jira Software",
-        "Jira Service Management",
-        "Jira Service Desk",
-        "Jira Agile",
-        "Jira Software Agile",
-        "Jira Service Management Agile",
-        "Jira Service Desk Agile",
-        "Jira Cloud",
-        "Jira Software Cloud",
-        "Jira Service Management Cloud",
-        "Jira Service Desk Cloud",
-        "Jira Cloud Agile",
-        "Jira Software Cloud Agile",
-        "Jira Service Management Cloud Agile",
-        "Jira Service Desk Cloud Agile"
-    ]
+    "programming_languages": {
+        "systems": [
+            "c",
+            "c++",
+            "rust",
+            "assembly",
+            "ada"
+        ],
+        "general_purpose": [
+            "python",
+            "java",
+            "javascript",
+            "c#",
+            "go",
+            "ruby",
+            "php"
+        ],
+        "mobile": [
+            "swift",
+            "kotlin",
+            "objective-c"
+        ],
+        "scripting": [
+            "bash",
+            "shell",
+            "powershell",
+            "perl",
+            "tcl",
+            "python"
+        ],
+        "scientific": [
+            "r",
+            "matlab",
+            "julia",
+            "fortran",
+            "scala"
+        ]
+    },
+    "web_technologies": {
+        "frontend": {
+            "core": [
+                "html5",
+                "css3",
+                "javascript",
+                "typescript"
+            ],
+            "frameworks": [
+                "react",
+                "angular",
+                "vue.js",
+                "svelte",
+                "next.js",
+                "nuxt.js",
+                "gatsby"
+            ],
+            "styling": [
+                "tailwindcss",
+                "bootstrap",
+                "material-ui",
+                "sass",
+                "less",
+                "styled-components"
+            ]
+        },
+        "backend": {
+            "frameworks": [
+                "django",
+                "flask",
+                "fastapi",
+                "spring",
+                "express",
+                "laravel",
+                "rails"
+            ],
+            "apis": [
+                "rest",
+                "graphql",
+                "grpc",
+                "soap",
+                "websocket"
+            ]
+        },
+        "mobile": [
+            "react-native",
+            "flutter",
+            "ionic",
+            "xamarin",
+            "android-sdk",
+            "ios-sdk"
+        ]
+    },
+    "databases": {
+        "relational": [
+            "postgresql",
+            "mysql",
+            "oracle",
+            "sql-server",
+            "sqlite"
+        ],
+        "nosql": [
+            "mongodb",
+            "cassandra",
+            "redis",
+            "elasticsearch",
+            "dynamodb"
+        ],
+        "query_languages": [
+            "sql",
+            "cypher",
+            "graphql"
+        ]
+    },
+    "devops": {
+        "containerization": [
+            "docker",
+            "kubernetes",
+            "podman",
+            "containerd"
+        ],
+        "ci_cd": [
+            "jenkins",
+            "gitlab-ci",
+            "github-actions",
+            "travis-ci",
+            "circleci"
+        ],
+        "cloud": {
+            "aws": [
+                "ec2",
+                "s3",
+                "lambda",
+                "ecs",
+                "rds"
+            ],
+            "azure": [
+                "azure-vm",
+                "azure-functions",
+                "azure-storage",
+                "azure-devops"
+            ],
+            "gcp": [
+                "compute-engine",
+                "cloud-functions",
+                "cloud-storage",
+                "bigquery"
+            ]
+        },
+        "version_control": [
+            "git",
+            "svn",
+            "mercurial"
+        ],
+        "monitoring": [
+            "prometheus",
+            "grafana",
+            "nagios",
+            "elk-stack"
+        ]
+    },
+    "embedded_systems": {
+        "rtos": [
+            "freertos",
+            "qnx",
+            "vxworks",
+            "threadx",
+            "zephyr"
+        ],
+        "protocols": [
+            "can",
+            "lin",
+            "flexray",
+            "ethernet",
+            "uart",
+            "i2c",
+            "spi"
+        ],
+        "tools": [
+            "gdb",
+            "jtag",
+            "oscilloscope",
+            "logic-analyzer",
+            "cmake",
+            "make"
+        ],
+        "platforms": [
+            "arm",
+            "x86",
+            "risc-v",
+            "pic",
+            "avr",
+            "stm32"
+        ]
+    },
+    "methodologies": {
+        "project_management": [
+            "agile",
+            "scrum",
+            "kanban",
+            "waterfall",
+            "lean",
+            "xp"
+        ],
+        "tools": {
+            "tracking": [
+                "jira",
+                "trello",
+                "asana",
+                "clickup",
+                "monday"
+            ],
+            "documentation": [
+                "confluence",
+                "notion",
+                "gitlab-wiki",
+                "markdown"
+            ],
+            "collaboration": [
+                "slack",
+                "teams",
+                "discord",
+                "zoom"
+            ]
+        },
+        "practices": [
+            "tdd",
+            "bdd",
+            "ci/cd",
+            "devops",
+            "code-review"
+        ]
+    },
+    "testing": {
+        "frameworks": [
+            "pytest",
+            "junit",
+            "selenium",
+            "cypress",
+            "jest",
+            "mocha"
+        ],
+        "types": [
+            "unit-testing",
+            "integration-testing",
+            "e2e-testing",
+            "performance-testing",
+            "security-testing"
+        ],
+        "tools": [
+            "postman",
+            "jmeter",
+            "k6",
+            "gatling",
+            "wireshark"
+        ]
+    },
+    "security": {
+        "tools": [
+            "nmap",
+            "metasploit",
+            "burp-suite",
+            "owasp-zap"
+        ],
+        "concepts": [
+            "encryption",
+            "authentication",
+            "authorization",
+            "penetration-testing",
+            "vulnerability-assessment"
+        ]
+    }
 }
