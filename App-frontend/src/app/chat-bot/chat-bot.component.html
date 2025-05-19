@@ -1,12 +1,41 @@
 <div class="chat-bot-container">
   <h2>Chat Bot</h2>
+
+  <!-- Score cumulé -->
+  <div class="final-score-container">
+    <span class="final-score-icon">🏆</span>
+    Score cumulé : {{ finalScore }} / {{ questionCount * 20 }}
+  </div>
+
+  <!-- Compteur de questions -->
+  <div class="question-counter">
+    {{ questionLabel }}
+  </div>
+
+  <!-- Fenêtre de discussion -->
   <div class="chat-window">
-    <div *ngFor="let message of messages" [ngClass]="{ 'user-message': message.sender === 'User', 'bot-message': message.sender === 'Bot' }">
-      <strong>{{ message.sender }}:</strong> {{ message.text }}
+    <div *ngFor="let m of messages"
+         [ngClass]="{
+           'user-message': m.sender === 'Vous',
+           'bot-message': m.sender === 'Bot'
+         }">
+      <strong>{{ m.sender }}:</strong> {{ m.text }}
+      <span *ngIf="m.score !== undefined" class="score-icon">
+        {{ getStars(m.score) }}
+      </span>
     </div>
   </div>
-  <div class="chat-input">
-    <input [(ngModel)]="userInput" placeholder="Type your message..." />
-    <button (click)="sendMessage()">Send</button>
+
+  <!-- Compte à rebours -->
+  <div class="countdown" *ngIf="sessionActive && timeLeft > 0">
+    Prochaine question dans {{ timeLeft }} s
+  </div>
+
+  <!-- Zone de saisie -->
+  <div class="chat-input" *ngIf="sessionActive">
+    <input [(ngModel)]="userInput"
+           (keyup.enter)="sendMessage()"
+           placeholder="Tapez votre message..." />
+    <button (click)="sendMessage()">Envoyer</button>
   </div>
 </div>

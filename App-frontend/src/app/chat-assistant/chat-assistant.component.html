@@ -1,0 +1,10 @@
+<div class="chatbot-header">Assistant</div>
+<div class="chatbot-body">
+  <div *ngFor="let msg of messages">
+    <strong>{{ msg.sender }}:</strong> {{ msg.text }}
+  </div>
+</div>
+<div class="chatbot-input">
+  <input [(ngModel)]="userInput" (keydown.enter)="sendMessage()" placeholder="Écrivez ici..." />
+  <button (click)="sendMessage()">Envoyer</button>
+</div>

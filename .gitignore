@@ -9,7 +9,9 @@
 # Ignore environment files
 .env
 
-
+# ignore 
+*.mp3
+*.pyc
 # Ignore IDE files
 .idea/
 *.iml

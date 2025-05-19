@@ -1,44 +1,168 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Entretien Technique - Chatbot</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        #chatbox { width: 100%; height: 400px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; }
-        .message { margin: 10px 0; }
-        .user { color: blue; }
-        .bot { color: green; }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Entretien Technique - Chatbot</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      background-color: #4a90e2;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.5em;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    #score-icon {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+
+    #chatbox {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message {
+      max-width: 70%;
+      padding: 10px 15px;
+      border-radius: 15px;
+      line-height: 1.5;
+      word-wrap: break-word;
+    }
+
+    .user {
+      align-self: flex-end;
+      background-color: #d1e8ff;
+      color: #003366;
+    }
+
+    .bot {
+      align-self: flex-start;
+      background-color: #e4f6e7;
+      color: #2d6636;
+    }
+
+    .input-container {
+      display: flex;
+      padding: 10px;
+      background-color: white;
+      border-top: 1px solid #ddd;
+    }
+
+    #user_input {
+      flex-grow: 1;
+      padding: 10px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    button {
+      margin-left: 10px;
+      padding: 10px 20px;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #357abd;
+    }
+  </style>
 </head>
+
 <body>
-    <h1>Simulation d'entretien technique</h1>
-    <div id="chatbox"></div>
-    <input type="text" id="user_input" placeholder="Votre réponse..." style="width: 80%;">
+  <header>
+    Simulation d'entretien technique
+    <span id="score-icon" title="Voir le score">🏆</span>
+  </header>
+
+  <div id="chatbox"></div>
+
+  <div class="input-container">
+    <input
+      type="text"
+      id="user_input"
+      placeholder="Tapez votre réponse ici..."
+      onkeypress="if(event.key === 'Enter') sendMessage()"
+    />
     <button onclick="sendMessage()">Envoyer</button>
+  </div>
 
-    <script>
-        function sendMessage() {
-            let input = document.getElementById("user_input");
-            let message = input.value.trim();
-            if (message === "") return;
+  <script>
+    function addMessage(text, isBot, audioUrl = null) {
+      const chatbox = document.getElementById("chatbox");
+      const msg = document.createElement("div");
+      msg.className = "message " + (isBot ? "bot" : "user");
+      msg.textContent = text;
+      chatbox.appendChild(msg);
+      chatbox.scrollTop = chatbox.scrollHeight;
 
-            // Affiche la question de l'utilisateur
-            document.getElementById("chatbox").innerHTML += `<div class="message user"><strong>Vous :</strong> ${message}</div>`;
-            input.value = "";
+      if (isBot && audioUrl) {
+        const audio = new Audio(audioUrl);
+        audio.play();
+      }
+    }
 
-            // Envoie au serveur
-            fetch("/entretien-ask", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_input: message })
-            })
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById("chatbox").innerHTML += `<div class="message bot"><strong>Bot :</strong> ${data.response}</div>`;
-                document.getElementById("chatbox").scrollTop = document.getElementById("chatbox").scrollHeight;
-            });
-        }
-    </script>
+    window.onload = () => {
+      fetch("/entretien-ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_input: "" }),
+      })
+      .then(res => res.json())
+      .then(data => {
+        addMessage(data.response, true, data.audio_url);
+      });
+    };
+
+    function sendMessage() {
+      const input = document.getElementById("user_input");
+      const message = input.value.trim();
+      if (!message) return;
+
+      addMessage(message, false);
+      input.value = "";
+
+      fetch("/entretien-ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_input: message }),
+      })
+      .then(res => res.json())
+      .then(data => {
+        addMessage(data.response, true, data.audio_url);
+      });
+    }
+  </script>
+  
 </body>
 </html>

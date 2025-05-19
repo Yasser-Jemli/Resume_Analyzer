@@ -1,38 +1,201 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>J.A.R.V.I.S Interface</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interface J.A.R.V.I.S</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8; /* Light professional background */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #005b96; /* Professional dark blue */
+            animation: fadeIn 1s ease-out;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .chatbox {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .chatbox div {
+            margin-bottom: 15px;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .chatbox .ai {
+            background-color: #e0f7fa; /* Light blue for AI */
+            padding: 10px;
+            border-radius: 5px;
+            margin-left: 20px;
+            border: 1px solid #b2ebf2; /* Lighter blue border */
+        }
+
+        .chatbox input {
+            width: calc(100% - 90px);
+            padding: 12px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .chatbox input:focus {
+            border-color: #005b96; /* Blue border on focus */
+        }
+
+        .chatbox button {
+            background-color: #005b96;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .chatbox button:hover {
+            background-color: #003d72; /* Darker blue when hovered */
+        }
+
+        .actions button {
+            background-color: #004d80;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .actions button:hover {
+            background-color: #003d72;
+        }
+
+        .loading {
+            text-align: center;
+            font-style: italic;
+            color: #005b96;
+        }
+
+        /* Responsive Styles */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 15px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            header {
+                font-size: 1.5rem;
+            }
+
+            .chatbox input {
+                width: calc(100% - 70px);
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="jarvis-container">
-        <h1>J.A.R.V.I.S Interface</h1>
-        <form id="chat-form">
-            <input type="text" name="user_input" placeholder="Speak, Sir..." autocomplete="off" required>
-            <button type="submit">Ask</button>
-        </form>
-        <div id="response-box"></div>
-        <button id="clear-btn">Clear History</button>
+    <div class="container">
+        <header>
+            <h1>Bienvenue sur l'Interface J.A.R.V.I.S</h1>
+        </header>
+
+        <div class="chatbox">
+            <div id="response-box"></div>
+            <form id="chat-form">
+                <input type="text" name="user_input" placeholder="Parlez, Monsieur..." autocomplete="off" required>
+                <button type="submit">Envoyer</button>
+            </form>
+            <button id="clear-btn">Effacer l'historique</button>
+        </div>
+
+        <div class="actions">
+            <button onclick="window.open('/nouvelle-page', '_blank')">Ouvrir nouvelle fenêtre</button>
+            <button onclick="window.open('/entretien', '_blank')">Démarrer entretien technique</button>
+        </div>
     </div>
 
     <script>
         const form = document.getElementById('chat-form');
         const responseBox = document.getElementById('response-box');
         const clearBtn = document.getElementById('clear-btn');
+        
+        // Loading state
+        const loadingIndicator = '<div class="loading">Chargement...</div>';
 
         form.onsubmit = async (e) => {
             e.preventDefault();
             const formData = new FormData(form);
             const user_input = formData.get("user_input");
 
+            // Add user input to the chatbox
+            responseBox.innerHTML += `<div><strong>Vous :</strong> ${user_input}</div>`;
+
+            // Show loading indicator while awaiting response
+            responseBox.innerHTML += loadingIndicator;
+
             const res = await fetch("/ask", {
                 method: "POST",
                 body: formData
             });
+
             const data = await res.json();
-            responseBox.innerHTML += `<div><strong>You:</strong> ${user_input}</div>`;
-            responseBox.innerHTML += `<div class="ai"><strong>J.A.R.V.I.S:</strong> ${data.response}</div>`;
+            const responseMessage = data.response;
+
+            // Replace the loading indicator with the actual response
+            responseBox.innerHTML = responseBox.innerHTML.replace(loadingIndicator, '');
+            responseBox.innerHTML += `<div class="ai"><strong>J.A.R.V.I.S :</strong> ${responseMessage}</div>`;
+            
+            // Scroll to the bottom of the chat
+            responseBox.scrollTop = responseBox.scrollHeight;
             form.reset();
         };
 
@@ -42,8 +205,4 @@
         };
     </script>
 </body>
-<!-- Bouton pour ouvrir une nouvelle fenêtre -->
-<button onclick="window.open('/nouvelle-page', '_blank')">Ouvrir nouvelle fenêtre</button>
-<button onclick="window.open('/entretien', '_blank')">Démarrer un entretien technique</button>
-
 </html>
