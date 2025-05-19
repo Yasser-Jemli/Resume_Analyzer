@@ -54,10 +54,33 @@ class CVScorer:
     
     def score_cv(self, cv_data):
         """Score a CV with detailed metrics"""
+        if not cv_data:
+            self.logger.warning("Received empty CV data")
+            return self._get_default_score_result("No CV data provided")
+
         try:
-            experience_results = self._score_experience(cv_data.get("Experience", []))
-            skills_score = self._score_skills(cv_data.get("Skills", []))
-            education_score = self._score_education(cv_data.get("Education", []))
+            # Handle different parser formats
+            if isinstance(cv_data, dict) and "parsers" in cv_data:
+                # If we received the full parsing results
+                custom_data = cv_data.get("parsers", {}).get("custom", {})
+                if not custom_data:
+                    return self._get_default_score_result("No custom parser data found")
+                cv_data = custom_data
+
+            # Get sections with better error handling
+            experience_data = self._safe_get_section(cv_data, "Experience")
+            skills_data = self._safe_get_section(cv_data, "Skills")
+            education_data = self._safe_get_section(cv_data, "Education")
+
+            # Debug logging
+            self.logger.debug(f"Processing CV with: {len(skills_data)} skills, "
+                            f"{len(experience_data)} experience entries, "
+                            f"{len(education_data)} education entries")
+
+            # Score individual sections
+            experience_results = self._score_experience(experience_data)
+            skills_score = self._score_skills(skills_data)
+            education_score = self._score_education(education_data)
             
             scores = {
                 "skills": skills_score,
@@ -65,15 +88,17 @@ class CVScorer:
                 "education": education_score
             }
             
-            # Calculate weighted total
-            weights = self.criteria.get("weights", {
+            # Calculate weighted total with safe weights from criteria
+            weights = self.criteria.get("scoring", {}).get("weights", {
                 "skills": 0.4,
                 "experience": 0.35,
                 "education": 0.25
             })
-            total_score = sum(scores[cat] * weights[cat] for cat in scores)
             
-            return {
+            total_score = sum(scores.get(cat, 0) * weights.get(cat, 0) 
+                            for cat in scores.keys())
+            
+            result = {
                 "total_score": round(total_score, 2),
                 "detailed_scores": {k: round(v, 2) for k, v in scores.items()},
                 "experience_metrics": {
@@ -83,41 +108,84 @@ class CVScorer:
                 },
                 "feedback": self._generate_feedback(scores)
             }
-            
-        except Exception as e:
-            self.logger.error(f"Error in CV scoring: {str(e)}")
-            return {
-                "total_score": 0,
-                "detailed_scores": {},
-                "experience_metrics": {
-                    "years": 0,
-                    "positions": 0,
-                    "details": f"Error: {str(e)}"
-                },
-                "feedback": ["Error occurred during scoring"]
-            }
 
-    def _score_skills(self, skills):
-        """Score skills section"""
-        if not skills:
-            return 0
-        
-        try:
-            skills_lower = [s.lower() for s in skills]
-            required_skills = self.criteria["skills"]["required"]
-            
-            # Count matching required skills
-            matches = sum(1 for skill in required_skills 
-                         if any(skill.lower() in s for s in skills_lower))
-            
-            # Calculate percentage score
-            score = (matches / len(required_skills)) * 100 if required_skills else 0
-            
-            return min(100, score)
+            # Log the scoring result
+            self.logger.info(f"CV Scoring completed - Total score: {result['total_score']}")
+            return result
             
         except Exception as e:
-            self.logger.error(f"Error scoring skills: {str(e)}")
+            self.logger.error(f"Error in CV scoring: {str(e)}", exc_info=True)
+            return self._get_default_score_result(str(e))
+
+    def _safe_get_section(self, data, section_name):
+        """Safely extract section data with type checking"""
+        try:
+            section_data = data.get(section_name, [])
+            if section_data is None:
+                return []
+            if isinstance(section_data, (list, tuple)):
+                return section_data
+            if isinstance(section_data, str):
+                return [section_data]
+            return []
+        except Exception as e:
+            self.logger.warning(f"Error getting {section_name} section: {e}")
+            return []
+
+    def _get_default_score_result(self, error_message):
+        """Return default scoring result with error message"""
+        return {
+            "total_score": 0,
+            "detailed_scores": {
+                "skills": 0,
+                "experience": 0,
+                "education": 0
+            },
+            "experience_metrics": {
+                "years": 0,
+                "positions": 0,
+                "details": f"Error: {error_message}"
+            },
+            "feedback": ["Error occurred during scoring"]
+        }
+
+    def _score_skills(self, skills_data):
+        """Score skills with improved accuracy"""
+        if not skills_data:
             return 0
+            
+        # Handle both dict and list formats
+        all_skills = set()
+        if isinstance(skills_data, dict):
+            for category in skills_data.values():
+                if isinstance(category, list):
+                    all_skills.update(s.lower() for s in category)
+        elif isinstance(skills_data, list):
+            all_skills.update(s.lower() for s in skills_data)
+        
+        if not all_skills:
+            return 0
+            
+        # Get required and preferred skills
+        required_skills = set(s.lower() for s in self.criteria["skills"]["required"])
+        preferred_skills = set(s.lower() for s in self.criteria["skills"]["preferred"])
+        
+        # Calculate matches
+        required_matches = len(required_skills.intersection(all_skills))
+        preferred_matches = len(preferred_skills.intersection(all_skills))
+        
+        # Calculate weighted scores
+        required_score = (required_matches / len(required_skills)) * 100
+        preferred_score = (preferred_matches / len(preferred_skills)) * 100
+        
+        # Apply weights
+        weights = self.criteria["skills"]["weights"]
+        total_score = (
+            (required_score * weights["required"]) +
+            (preferred_score * weights["preferred"])
+        ) / (weights["required"] + weights["preferred"])
+        
+        return min(100, total_score)
 
     def _extract_years_of_experience(self, experience_text):
         """Extract total years of experience from text"""
@@ -164,6 +232,32 @@ class CVScorer:
             self.logger.error(f"Error extracting years of experience: {str(e)}")
             return 0
 
+    def _parse_experience_text(self, experience_data):
+        """Parse experience data into text considering different formats"""
+        if isinstance(experience_data, str):
+            return experience_data.lower()
+        
+        if isinstance(experience_data, list):
+            if all(isinstance(x, str) for x in experience_data):
+                return ' '.join(experience_data).lower()
+            
+            if all(isinstance(x, dict) for x in experience_data):
+                text_parts = []
+                for exp in experience_data:
+                    parts = []
+                    if isinstance(exp.get('company'), str):
+                        parts.append(exp['company'])
+                    if isinstance(exp.get('position'), str):
+                        parts.append(exp['position'])
+                    if isinstance(exp.get('period'), str):
+                        parts.append(exp['period'])
+                    if isinstance(exp.get('responsibilities'), list):
+                        parts.extend(exp['responsibilities'])
+                    text_parts.append(' '.join(parts))
+                return ' '.join(text_parts).lower()
+        
+        return ''
+
     def _score_experience(self, experience):
         """Score experience section with detailed metrics"""
         if not experience:
@@ -175,25 +269,22 @@ class CVScorer:
             }
             
         try:
-            # Join experience entries into single text
-            text = ' '.join(str(exp) for exp in experience).lower()
+            # Safely parse experience entries
+            text = self._parse_experience_text(experience)
             
             # Extract years of experience
             total_years = self._extract_years_of_experience(text)
             
             # Count different positions
-            position_markers = ["developer", "engineer", "designer", "analyst"]
-            positions = sum(1 for marker in position_markers if marker in text.lower())
+            position_markers = self.criteria.get("experience", {}).get(
+                "relevant_keywords", 
+                ["developer", "engineer", "designer", "analyst"]
+            )
+            positions = sum(1 for marker in position_markers if marker in text)
             
-            # Score based on years (40%)
+            # Calculate scores with safe weights
             year_score = min(100, (total_years / 5) * 100)
-            
-            # Score based on keywords (40%)
-            keywords = self.criteria["experience"]["relevant_keywords"]
-            keyword_matches = sum(1 for keyword in keywords if keyword.lower() in text)
-            keyword_score = (keyword_matches / len(keywords)) * 100 if keywords else 0
-            
-            # Score based on positions (20%)
+            keyword_score = self._calculate_keyword_score(text)
             position_score = min(100, positions * 25)
             
             # Calculate total weighted score
@@ -214,6 +305,15 @@ class CVScorer:
                 "positions": 0,
                 "details": f"Error: {str(e)}"
             }
+
+    def _calculate_keyword_score(self, text):
+        """Calculate score based on keyword matches"""
+        keywords = self.criteria.get("experience", {}).get("relevant_keywords", [])
+        if not keywords:
+            return 0
+            
+        keyword_matches = sum(1 for keyword in keywords if keyword.lower() in text)
+        return (keyword_matches / len(keywords)) * 100 if keywords else 0
 
     def _score_education(self, education):
         """Score education section"""
