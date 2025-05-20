@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { UserService } from '../services/user.service'; // Import your service
 
 @Component({
   selector: 'app-signup',
@@ -12,7 +12,7 @@ export class SignupComponent {
   errorMessage: string | null = null;
   successMessage: string | null = null;
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+  constructor(private fb: FormBuilder, private userService: UserService) {
     this.signupForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
@@ -21,29 +21,16 @@ export class SignupComponent {
     }, { validators: this.passwordMatchValidator });
   }
 
-  // Custom validator to check if password and confirmPassword match
   private passwordMatchValidator(form: FormGroup) {
     const password = form.get('password')?.value;
     const confirmPassword = form.get('confirmPassword')?.value;
     return password === confirmPassword ? null : { mismatch: true };
   }
 
-  // Getters for form controls
-  get username() {
-    return this.signupForm.get('username');
-  }
-
-  get email() {
-    return this.signupForm.get('email');
-  }
-
-  get password() {
-    return this.signupForm.get('password');
-  }
-
-  get confirmPassword() {
-    return this.signupForm.get('confirmPassword');
-  }
+  get username() { return this.signupForm.get('username'); }
+  get email() { return this.signupForm.get('email'); }
+  get password() { return this.signupForm.get('password'); }
+  get confirmPassword() { return this.signupForm.get('confirmPassword'); }
 
   onSubmit(): void {
     if (this.signupForm.invalid) {
@@ -55,11 +42,10 @@ export class SignupComponent {
     this.errorMessage = null;
     const { username, email, password } = this.signupForm.value;
 
-    // Send data to backend
-    const apiUrl = 'http://localhost:8081/api/signup'; // Replace with your backend URL
-    const signupData = { username, email, password };
+    // Log the data being sent to the backend
+    console.log('Sending to backend:', { username, email, password });
 
-    this.http.post(apiUrl, signupData).subscribe({
+    this.userService.addUser({ username, email, password }).subscribe({
       next: (response) => {
         console.log('Signup successful:', response);
         this.successMessage = 'Signup successful! Please log in.';
