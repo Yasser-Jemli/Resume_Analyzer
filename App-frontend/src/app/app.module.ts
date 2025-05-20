@@ -19,6 +19,7 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { AuthGuard } from './auth.guard';
 import { GestionManagersComponent } from './gestion-managers/gestion-managers.component';
 import { ChatAssistantComponent } from './chat-assistant/chat-assistant.component';
+import { ConfirmCodeComponent } from './confirm-code/confirm-code.component';
 
 
 @NgModule({
@@ -36,8 +37,9 @@ import { ChatAssistantComponent } from './chat-assistant/chat-assistant.componen
     SignupComponent,
     ForgotPasswordComponent,
     GestionManagersComponent,
-    ChatAssistantComponent
+    ChatAssistantComponent,
     
+    ConfirmCodeComponent,
   ],
   imports: [
     BrowserModule,

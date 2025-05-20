@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import { UserService } from '../services/user.service';
 
 @Component({
@@ -14,7 +13,7 @@ export class LogInComponent implements OnInit {
   loginForm: FormGroup;
   errorMessage: string | null = null;
   loading: boolean = false;
-  private users: Array<{ username: string; password: string; role: string }> = [];
+  showPassword: boolean = false; // 👁️ Used for toggle
 
   constructor(
     private fb: FormBuilder,
@@ -30,26 +29,25 @@ export class LogInComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // ✅ Si l'utilisateur est déjà connecté, rediriger vers /home
+    // ✅ Redirect to home if already logged in
     const token = localStorage.getItem('token');
     if (token) {
       this.router.navigate(['/home']);
     }
-
-    // Initialize users here
-    this.users = [
-      { username: 'admin', password: 'admin123', role: 'admin' },
-      { username: 'user', password: 'user123', role: 'admin' }
-    ];
   }
 
-  // Getters pratiques pour le template
+  // Getters for template access
   get username() {
     return this.loginForm.get('username');
   }
 
   get password() {
     return this.loginForm.get('password');
+  }
+
+  // 🔁 Toggle password visibility
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 
   onSubmit(): void {
@@ -63,12 +61,8 @@ export class LogInComponent implements OnInit {
     this.loading = true;
 
     const { username, password, rememberMe } = this.loginForm.value;
-
-    // Detect if username input is an email
     const isEmail = username.includes('@');
-    const credentials = isEmail
-      ? { email: username, password }
-      : { username, password };
+    const credentials = isEmail ? { email: username, password } : { username, password };
 
     console.log('🔐 Tentative de connexion :', credentials);
 
@@ -76,6 +70,7 @@ export class LogInComponent implements OnInit {
       next: (response) => {
         console.log('✅ Connexion réussie :', response);
         this.loading = false;
+
         localStorage.clear();
         localStorage.setItem('token', response.token);
         localStorage.setItem('userRole', response.role);
@@ -91,23 +86,6 @@ export class LogInComponent implements OnInit {
         console.error('❌ Échec de connexion :', error);
         this.errorMessage = 'Identifiants incorrects ou erreur serveur. Veuillez réessayer.';
         this.loading = false;
-      }
-    });
-  }
-
-  /**
-   * 🔐 Simule une authentification vers un backend (remplace cette méthode par un appel réel à ton API)
-   */
-  private authenticateUser(credentials: { username: string; password: string }): Observable<any> {
-    return new Observable((observer) => {
-      const foundUser = this.users.find(
-        u => u.username === credentials.username && u.password === credentials.password
-      );
-      if (foundUser) {
-        observer.next({ token: 'fake-jwt-token', role: foundUser.role });
-        observer.complete();
-      } else {
-        observer.error({ status: 401, message: 'Identifiants invalides' });
       }
     });
   }

@@ -13,6 +13,7 @@ import { SignupComponent } from './signup/signup.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { AuthGuard } from './auth.guard'; // 👈 Ajout ici
 import { GestionManagersComponent } from './gestion-managers/gestion-managers.component';
+import { ConfirmCodeComponent } from './confirm-code/confirm-code.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/log-in', pathMatch: 'full' },
@@ -27,6 +28,7 @@ const routes: Routes = [
   { path: 'signup', component: SignupComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'not-found', component: NotFoundComponent },
+  {path : 'confirm-code', component: ConfirmCodeComponent}, 
   { path: '**', redirectTo: '/not-found' }
 ];
 

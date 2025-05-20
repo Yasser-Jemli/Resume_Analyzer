@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UserService } from '../services/user.service'; // Import UserService
 
 @Component({
   selector: 'app-forgot-password',
@@ -11,9 +12,9 @@ export class ForgotPasswordComponent {
   successMessage: string | null = null;
   errorMessage: string | null = null;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private userService: UserService) {
     this.forgotPasswordForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]]
+      email: ['test@example.com', [Validators.required, Validators.email]] // email statique pour test
     });
   }
 
@@ -32,17 +33,21 @@ export class ForgotPasswordComponent {
     this.errorMessage = null;
     const email = this.forgotPasswordForm.value.email;
 
-    console.log('Password reset request submitted for email:', email);
+    // Log the email sent to the backend
+    console.log('🔎 Email sent to backend for password reset:', email);
 
-    // Simulate a backend call
-    setTimeout(() => {
-      if (email === 'test@example.com') {
-        this.successMessage = 'A password reset link has been sent to your email.';
+    // Use the UserService to check if the email exists
+    this.userService.serachUserByEmail(email).subscribe({
+      next: (response) => {
+        this.successMessage = 'A code for changing your password has been sent to your email.';
         this.errorMessage = null;
-      } else {
+        console.log('Password reset code sent to:', email);
+      },
+      error: (error) => {
         this.errorMessage = 'Email address not found.';
         this.successMessage = null;
+        console.error('Email not found:', error);
       }
-    }, 1000); // Simulate a delay
+    });
   }
 }

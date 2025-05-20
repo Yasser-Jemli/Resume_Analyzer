@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '../services/user.service'; // Import your service
+import { Router } from '@angular/router'; // Import Router
 
 @Component({
   selector: 'app-signup',
@@ -12,7 +13,7 @@ export class SignupComponent {
   errorMessage: string | null = null;
   successMessage: string | null = null;
 
-  constructor(private fb: FormBuilder, private userService: UserService) {
+  constructor(private fb: FormBuilder, private userService: UserService, private router: Router) { // Inject Router
     this.signupForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
@@ -48,8 +49,8 @@ export class SignupComponent {
     this.userService.addUser({ username, email, password }).subscribe({
       next: (response) => {
         console.log('Signup successful:', response);
-        this.successMessage = 'Signup successful! Please log in.';
-        this.errorMessage = null;
+        // Redirect to confirmation page with email as query param
+        this.router.navigate(['/confirm-code'], { queryParams: { email } });
       },
       error: (error) => {
         console.error('Signup failed:', error);
