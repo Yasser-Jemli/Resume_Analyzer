@@ -1,2 +1,29 @@
 <p>gestion-managers works!</p>
-<button *ngIf="isAdmin">Manager Management</button>
+<button *ngIf="isAdmin" class="add-btn" (click)="toggleAddForm()">Add Manager</button>
+
+<!-- Add Manager Form -->
+<div *ngIf="showAddForm" class="add-manager-form">
+  <input type="text" placeholder="Manager Name" [(ngModel)]="newManager.name" />
+  <input type="email" placeholder="Manager Email" [(ngModel)]="newManager.email" />
+  <button class="add-btn" (click)="addManager()">Save</button>
+  <button class="delete-btn" (click)="toggleAddForm()">Cancel</button>
+</div>
+
+<table *ngIf="isAdmin" class="manager-table">
+  <thead>
+    <tr>
+      <th>Manager Name</th>
+      <th>Manager Email</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let manager of managers; let i = index">
+      <td>{{ manager.name }}</td>
+      <td>{{ manager.email }}</td>
+      <td>
+        <button class="delete-btn" (click)="deleteManager(i)">Delete</button>
+      </td>
+    </tr>
+  </tbody>
+</table>

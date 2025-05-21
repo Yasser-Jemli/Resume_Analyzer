@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-log-in',
@@ -13,11 +14,13 @@ export class LogInComponent implements OnInit {
   loginForm: FormGroup;
   errorMessage: string | null = null;
   loading: boolean = false;
+  private users: Array<{ username: string; password: string; role: string }> = [];
 
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private userService: UserService
   ) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
@@ -32,6 +35,12 @@ export class LogInComponent implements OnInit {
     if (token) {
       this.router.navigate(['/home']);
     }
+
+    // Initialize users here
+    this.users = [
+      { username: 'admin', password: 'admin123', role: 'admin' },
+      { username: 'user', password: 'user123', role: 'admin' }
+    ];
   }
 
   // Getters pratiques pour le template
@@ -55,24 +64,27 @@ export class LogInComponent implements OnInit {
 
     const { username, password, rememberMe } = this.loginForm.value;
 
-    console.log('🔐 Tentative de connexion :', { username, rememberMe });
+    // Detect if username input is an email
+    const isEmail = username.includes('@');
+    const credentials = isEmail
+      ? { email: username, password }
+      : { username, password };
 
-    this.authenticateUser({ username, password }).subscribe({
+    console.log('🔐 Tentative de connexion :', credentials);
+
+    this.userService.searchUser(credentials).subscribe({
       next: (response) => {
         console.log('✅ Connexion réussie :', response);
         this.loading = false;
         localStorage.clear();
-        // ✅ Stockage du token et du rôle
         localStorage.setItem('token', response.token);
         localStorage.setItem('userRole', response.role);
-        localStorage.setItem('username', username); // Add this line
+        localStorage.setItem('username', response.username || username);
 
         if (rememberMe) {
-          // Exemple : stocker dans localStorage pour persistance (déjà fait ci-dessus)
           console.log('📝 Session persistante activée');
         }
 
-        // Rediriger vers la page d'accueil
         this.router.navigate(['/home']);
       },
       error: (error) => {
@@ -88,22 +100,15 @@ export class LogInComponent implements OnInit {
    */
   private authenticateUser(credentials: { username: string; password: string }): Observable<any> {
     return new Observable((observer) => {
-      const users = [
-        { username: 'admin', password: 'admin123', role: 'admin' },
-        { username: 'user', password: 'user123', role: 'admin' }
-      ];
-
-      setTimeout(() => {
-        const foundUser = users.find(
-          u => u.username === credentials.username && u.password === credentials.password
-        );
-        if (foundUser) {
-          observer.next({ token: 'fake-jwt-token', role: foundUser.role });
-          observer.complete();
-        } else {
-          observer.error({ status: 401, message: 'Identifiants invalides' });
-        }
-      }, 1000);
+      const foundUser = this.users.find(
+        u => u.username === credentials.username && u.password === credentials.password
+      );
+      if (foundUser) {
+        observer.next({ token: 'fake-jwt-token', role: foundUser.role });
+        observer.complete();
+      } else {
+        observer.error({ status: 401, message: 'Identifiants invalides' });
+      }
     });
   }
 }
