@@ -19,6 +19,15 @@ export class UserService {
   searchUser(credentials: { username?: string; email?: string; password: string }): Observable<any> {
     return this.http.post(this.searchUrl, credentials);
   }
+  serachUserByEmail(email: string): Observable<any> {
+    return this.http.post(this.searchUrl, { email });
+  }
+  verifyCode(data: { email: string; code: string }): Observable<any> {
+    return this.http.post('http://localhost:8081/api/user/verify-code', data);
 
+  }
+  resendConfirmationCode(email: string) {
+    return this.http.post('http://localhost:8081/api/user/resend-code', { email });
+  }
 
 }

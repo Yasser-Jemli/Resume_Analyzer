@@ -1,0 +1,56 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+      <div class="card shadow-sm p-4">
+        <h2 class="text-center mb-3">Confirmation du code</h2>
+        <p class="text-center text-muted mb-4">
+          Un code de confirmation a été envoyé à <strong>{{ email }}</strong>.
+        </p>
+
+        <form (ngSubmit)="onSubmit()">
+          <!-- Confirmation Code Input -->
+          <div class="mb-3">
+            <label for="code" class="form-label">Code de confirmation</label>
+            <input
+              type="text"
+              id="code"
+              name="code"
+              [(ngModel)]="code"
+              required
+              class="form-control"
+              placeholder="Entrez le code"
+              [class.is-invalid]="codeInvalid"
+              aria-describedby="codeError"
+            />
+            <div *ngIf="codeInvalid" id="codeError" class="invalid-feedback">
+              Ce champ est requis.
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn btn-primary w-100" aria-label="Confirmer">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            {{ loading ? 'Vérification...' : 'Confirmer' }}
+          </button>
+
+          <!-- Error Message -->
+          <div *ngIf="errorMessage" class="alert alert-danger mt-3" role="alert">
+            {{ errorMessage }}
+          </div>
+        </form>
+
+        <!-- Resend Code -->
+        <p class="text-center mt-3">
+          <a href="#" class="text-primary text-decoration-none" (click)="resendCode($event)">
+            Renvoyer le code
+          </a>
+        </p>
+
+        <!-- Success Message -->
+        <div *ngIf="resendSuccessMessage" class="alert alert-success text-center" role="alert">
+          {{ resendSuccessMessage }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

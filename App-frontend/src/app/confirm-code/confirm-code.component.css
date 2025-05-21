@@ -1,0 +1,30 @@
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .form-control {
+    border-radius: 8px;
+  }
+  
+  .btn-primary {
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 1.1rem;
+  }
+  
+  .form-check-label {
+    font-size: 0.9rem;
+  }
+  
+  .text-primary {
+    transition: color 0.2s;
+  }
+  
+  .text-primary:hover {
+    color: #0056b3;
+  }
+  
+  .alert {
+    font-size: 0.9rem;
+  }
