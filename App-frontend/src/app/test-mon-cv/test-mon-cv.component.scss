@@ -1,0 +1,31 @@
+.analysis-results {
+  .card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .skill-tags {
+    .badge {
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+    }
+  }
+
+  .score-item {
+    text-align: center;
+    margin-bottom: 1rem;
+
+    h5 {
+      margin-bottom: 0.5rem;
+    }
+
+    .progress {
+      height: 1.5rem;
+    }
+  }
+}
+
+.pdf-preview {
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  padding: 1rem;
+}
