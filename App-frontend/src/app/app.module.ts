@@ -20,7 +20,7 @@ import { AuthGuard } from './auth.guard';
 import { GestionManagersComponent } from './gestion-managers/gestion-managers.component';
 import { ChatAssistantComponent } from './chat-assistant/chat-assistant.component';
 import { ConfirmCodeComponent } from './confirm-code/confirm-code.component';
-
+import { CvService } from './services/cv.service';
 
 @NgModule({
   declarations: [
@@ -38,7 +38,6 @@ import { ConfirmCodeComponent } from './confirm-code/confirm-code.component';
     ForgotPasswordComponent,
     GestionManagersComponent,
     ChatAssistantComponent,
-    
     ConfirmCodeComponent,
   ],
   imports: [
@@ -49,9 +48,9 @@ import { ConfirmCodeComponent } from './confirm-code/confirm-code.component';
     ReactiveFormsModule,
     FormsModule
   ],
-  providers: [AuthGuard],
+  providers: [AuthGuard, CvService],
   exports: [SafePipe],
   // Ensure SafePipe is available for use in other components
-  bootstrap: [AppComponent,CreationCVComponent]
+  bootstrap: [AppComponent, CreationCVComponent]
 })
 export class AppModule { }

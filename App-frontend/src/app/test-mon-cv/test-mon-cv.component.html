@@ -2,15 +2,16 @@
   <div class="row justify-content-center">
     <div class="col-md-8">
       <div class="card p-4">
-        <h2 class="mb-3">Uploader votre CV (PDF)</h2>
+        <h2 class="mb-3">Upload and Analyze Your CV</h2>
 
+        <!-- Upload Section -->
         <input
           type="file"
           (change)="onFileSelected($event)"
           accept="application/pdf"
           class="form-control mb-3"
           id="pdfUpload"
-          aria-label="Sélectionner un fichier PDF"
+          aria-label="Select PDF file"
         />
 
         <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
@@ -21,11 +22,12 @@
           class="btn btn-primary mb-3"
           (click)="uploadCV()"
           [disabled]="!selectedFile"
-          aria-label="Uploader le CV"
+          aria-label="Upload CV"
         >
-          Upload CV
+          Upload & Analyze CV
         </button>
 
+        <!-- Progress Bar -->
         <div *ngIf="uploadProgress > 0 && uploadProgress < 100" class="progress mb-3">
           <div
             class="progress-bar"
@@ -39,12 +41,109 @@
           </div>
         </div>
 
+        <!-- Analysis Results -->
+        <div *ngIf="analysisResults" class="analysis-results mt-4">
+          <h3>Analysis Results</h3>
+          
+          <!-- Skills Section -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <h4>Skills</h4>
+            </div>
+            <div class="card-body">
+              <div class="skill-tags">
+                <span class="badge bg-primary me-2 mb-2" *ngFor="let skill of analysisResults.skills">
+                  {{ skill }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scores Section -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <h4>Scores</h4>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="score-item">
+                    <h5>Skills</h5>
+                    <div class="progress">
+                      <div class="progress-bar" 
+                           [style.width.%]="analysisResults.scores.skills"
+                           [class.bg-success]="analysisResults.scores.skills >= 70"
+                           [class.bg-warning]="analysisResults.scores.skills < 70 && analysisResults.scores.skills >= 40"
+                           [class.bg-danger]="analysisResults.scores.skills < 40">
+                        {{ analysisResults.scores.skills }}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="score-item">
+                    <h5>Experience</h5>
+                    <div class="progress">
+                      <div class="progress-bar"
+                           [style.width.%]="analysisResults.scores.experience"
+                           [class.bg-success]="analysisResults.scores.experience >= 70"
+                           [class.bg-warning]="analysisResults.scores.experience < 70 && analysisResults.scores.experience >= 40"
+                           [class.bg-danger]="analysisResults.scores.experience < 40">
+                        {{ analysisResults.scores.experience }}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="score-item">
+                    <h5>Education</h5>
+                    <div class="progress">
+                      <div class="progress-bar"
+                           [style.width.%]="analysisResults.scores.education"
+                           [class.bg-success]="analysisResults.scores.education >= 70"
+                           [class.bg-warning]="analysisResults.scores.education < 70 && analysisResults.scores.education >= 40"
+                           [class.bg-danger]="analysisResults.scores.education < 40">
+                        {{ analysisResults.scores.education }}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recommendations Section -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <h4>Recommendations</h4>
+            </div>
+            <div class="card-body">
+              <div *ngIf="analysisResults.recommendations">
+                <h5>Required Skills to Improve:</h5>
+                <ul class="list-group mb-3">
+                  <li class="list-group-item" *ngFor="let skill of analysisResults.recommendations.missing_required">
+                    {{ skill }}
+                  </li>
+                </ul>
+
+                <h5>Suggested Skills:</h5>
+                <ul class="list-group">
+                  <li class="list-group-item" *ngFor="let skill of analysisResults.recommendations.missing_preferred">
+                    {{ skill }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PDF Preview -->
         <div *ngIf="pdfSrc" class="pdf-preview mt-4">
-          <h5>Aperçu du CV :</h5>
+          <h5>CV Preview:</h5>
           <ngx-extended-pdf-viewer
             [src]="pdfSrc"
             [useBrowserLocale]="true"
-            [height]="'1000px'"
+            [height]="'600px'"
             [showSidebarButton]="true"
             [showZoomButtons]="true"
             [showPrintButton]="true"
@@ -52,16 +151,6 @@
             [showPagingButtons]="true"
           ></ngx-extended-pdf-viewer>
         </div>
-
-        <!-- New Button: Get My Note -->
-        <button
-          class="btn btn-success mt-3"
-          (click)="getMyNote()"
-          [disabled]="!pdfisupdated"
-          aria-label="Get My Note"
-        >
-          Get My Note
-        </button>
       </div>
     </div>
   </div>
