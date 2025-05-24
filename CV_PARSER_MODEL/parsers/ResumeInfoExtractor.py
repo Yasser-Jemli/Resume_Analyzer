@@ -205,73 +205,102 @@ class ResumeInfoExtractor:
         return cleaned_sections if cleaned_sections else ["No experience found"]
 
     def extract_education(self):
-        """Extract education information using keywords from JSON file"""
-        education_sections = []
-        current_section = []
-        in_education_section = False
+        """Extract education information with improved pattern matching"""
+        education = {
+            "total_institutions": 0,
+            "institutions": [],
+            "entries": []
+        }
         
-        lines = self.text.split('\n')
+        # Get education section text
+        edu_text = self._get_education_section()
+        if not edu_text:
+            return education
+
+        # Track processed institutions to avoid duplicates
+        processed = {}
         
-        for line in lines:
-            line = line.strip()
-            if not line:
-                continue
-            
-            # Check section headers
-            if any(header.lower() in line.lower() 
-                   for header in self.education_keywords['section_headers']):
-                in_education_section = True
-                if current_section:
-                    education_sections.append(' '.join(current_section))
-                    current_section = []
-                continue
-            
-            # Check if we've hit another major section
-            if line.isupper() and len(line) > 2 and not any(header.lower() in line.lower() 
-                   for header in self.education_keywords['section_headers']):
-                if in_education_section:
-                    if current_section:
-                        education_sections.append(' '.join(current_section))
-                    in_education_section = False
-                continue
-            
-            # Collect education information
-            if in_education_section:
-                # Check for degree types
-                is_education_line = False
-                for degree_type, keywords in self.education_keywords['degree_types'].items():
-                    if any(keyword.lower() in line.lower() for keyword in keywords):
-                        is_education_line = True
-                        break
-                
-                # Check for educational institutions
-                if any(inst.lower() in line.lower() for inst in self.education_keywords['institutions']):
-                    is_education_line = True
-                
-                # Check for fields of study
-                if any(field.lower() in line.lower() for field in self.education_keywords['fields']):
-                    is_education_line = True
-                
-                if is_education_line:
-                    if current_section:
-                        education_sections.append(' '.join(current_section))
-                    current_section = [line]
-                else:
-                    current_section.append(line)
+        # Process each paragraph
+        paragraphs = [p.strip() for p in edu_text.split('\n') if p.strip()]
         
-        # Add final section
-        if current_section and in_education_section:
-            education_sections.append(' '.join(current_section))
+        for i, text in enumerate(paragraphs):
+            # Look for institutions in each education level
+            for level, level_data in self.education_keywords["education_levels"].items():
+                for inst_name, inst_data in level_data["institutions"].items():
+                    if self._matches_institution(text, inst_data["keywords"]):
+                        # Skip if already processed
+                        if inst_name in processed:
+                            continue
+                            
+                        # Create new entry
+                        entry = {
+                            "institution": inst_data["name"],
+                            "type": inst_data["type"],
+                            "category": level,
+                            "degree": None,
+                            "period": None
+                        }
+                        
+                        # Look ahead for degree and period
+                        context = ' '.join(paragraphs[i:i+3])
+                        
+                        # Match degree
+                        entry["degree"] = self._match_degree(context, inst_data["degrees"])
+                        
+                        # Match period
+                        entry["period"] = self._match_date(context)
+                        
+                        processed[inst_name] = entry
+                        if inst_data["name"] not in education["institutions"]:
+                            education["institutions"].append(inst_data["name"])
         
-        # Clean and format sections
-        cleaned_sections = []
-        for section in education_sections:
-            cleaned = ' '.join(section.split())
-            cleaned = re.sub(r'---\s*Paragraph\s*\d+\s*---', '', cleaned)
-            if cleaned:
-                cleaned_sections.append(cleaned)
+        education["entries"] = list(processed.values())
+        education["total_institutions"] = len(education["institutions"])
+        return education
+
+    def _get_education_section(self):
+        """Extract education section text"""
+        text = ' '.join(self.paragraphs)
+        start_idx = -1
         
-        return cleaned_sections if cleaned_sections else ["No education found"]
+        # Find start marker
+        for marker in self.education_keywords["section_markers"]["start"]:
+            idx = text.lower().find(marker.lower())
+            if idx != -1 and (start_idx == -1 or idx < start_idx):
+                start_idx = idx
+        
+        if start_idx == -1:
+            return None
+        
+        # Find end marker
+        end_idx = len(text)
+        for marker in self.education_keywords["section_markers"]["end"]:
+            idx = text.lower().find(marker.lower(), start_idx)
+            if idx != -1 and idx < end_idx:
+                end_idx = idx
+        
+        return text[start_idx:end_idx].strip()
+
+    def _matches_institution(self, text, keywords):
+        """Check if text matches institution keywords"""
+        text_lower = text.lower()
+        return any(keyword.lower() in text_lower for keyword in keywords)
+
+    def _match_degree(self, text, degrees):
+        """Match degree from text using degree keywords"""
+        text_lower = text.lower()
+        for degree in degrees:
+            if all(keyword.lower() in text_lower for keyword in degree["keywords"]):
+                return degree["name"]
+        return None
+
+    def _match_date(self, text):
+        """Extract date from text using patterns"""
+        for pattern in self.education_keywords["date_patterns"]:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                return match.group()
+        return None
 
     def extract_all(self):
         """Extract all information from the resume"""
