@@ -62,6 +62,46 @@
         >
           Get My Note
         </button>
+
+        <!-- Progress bar for Get My Note -->
+        <div *ngIf="isGettingNote" class="progress mt-3 mb-3">
+          <div
+            class="progress-bar progress-bar-striped progress-bar-animated"
+            role="progressbar"
+            [style.width.%]="getNoteProgress"
+            [attr.aria-valuenow]="getNoteProgress"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+            {{ getNoteProgress }}%
+          </div>
+        </div>
+
+        <!-- Display Scores -->
+        <div *ngIf="customScore || pyresScore" class="mt-4">
+          <h4>Custom Analyzer</h4>
+          <div *ngIf="customScore">
+            <p><strong>Total Score:</strong> {{ customScore.total_score }}</p>
+            <p><strong>Skills:</strong> {{ customScore.detailed_scores.skills }}</p>
+            <p><strong>Experience:</strong> {{ customScore.detailed_scores.experience }}</p>
+            <p><strong>Education:</strong> {{ customScore.detailed_scores.education }}</p>
+            <p><strong>Experience Metrics:</strong> {{ customScore.experience_metrics.details }}</p>
+            <ul>
+              <li *ngFor="let fb of customScore.feedback">{{ fb }}</li>
+            </ul>
+          </div>
+          <h4 class="mt-3">Pyres Analyzer</h4>
+          <div *ngIf="pyresScore">
+            <p><strong>Total Score:</strong> {{ pyresScore.total_score }}</p>
+            <p><strong>Skills:</strong> {{ pyresScore.detailed_scores.skills }}</p>
+            <p><strong>Experience:</strong> {{ pyresScore.detailed_scores.experience }}</p>
+            <p><strong>Education:</strong> {{ pyresScore.detailed_scores.education }}</p>
+            <p><strong>Experience Metrics:</strong> {{ pyresScore.experience_metrics.details }}</p>
+            <ul>
+              <li *ngFor="let fb of pyresScore.feedback">{{ fb }}</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </div>

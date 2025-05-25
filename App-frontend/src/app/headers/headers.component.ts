@@ -7,6 +7,8 @@ import { Router } from '@angular/router';
   styleUrls: ['./headers.component.css']
 })
 export class HeadersComponent {
+  showMenu = false;
+
   constructor(private router: Router) {}
 
   isLoggedIn(): boolean {
@@ -16,9 +18,18 @@ export class HeadersComponent {
   isAdmin(): boolean {
     return localStorage.getItem('username') === 'admin';
   }
+  isManager(): void {
+    const email = localStorage.getItem('email');
+    // Check if the email ends with '@actia-engineering.tn'
+    //return !!email && email.endsWith('@actia-engineering.tn');
+  }
 
   logout(): void {
     localStorage.removeItem('token');
     this.router.navigate(['/log-in']);
+  }
+
+  getUsername(): string | null {
+    return localStorage.getItem('username');
   }
 }

@@ -20,6 +20,8 @@ import { AuthGuard } from './auth.guard';
 import { GestionManagersComponent } from './gestion-managers/gestion-managers.component';
 import { ChatAssistantComponent } from './chat-assistant/chat-assistant.component';
 import { ConfirmCodeComponent } from './confirm-code/confirm-code.component';
+import { UserProfileComponent } from './user-profile/user-profile.component';
+import { UpdatePasswordComponent } from './update-password/update-password.component';
 
 
 @NgModule({
@@ -40,6 +42,8 @@ import { ConfirmCodeComponent } from './confirm-code/confirm-code.component';
     ChatAssistantComponent,
     
     ConfirmCodeComponent,
+    UserProfileComponent,
+    UpdatePasswordComponent,
   ],
   imports: [
     BrowserModule,

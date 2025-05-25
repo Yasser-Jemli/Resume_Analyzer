@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router'; // <-- Add this import
 
-interface JobPost {
-  title: string;
-  description: string;
-  skills: string[];
-  budget: number;
-  date_created: string;
+interface JiraIssue {
+  key: string;
+  fields: {
+    summary: string;
+    description: string;
+    customfield_10056?: string; // responsibilities
+    customfield_10057?: string; // skills
+    customfield_10055?: string; // description
+  };
 }
 
 @Component({
@@ -15,28 +19,33 @@ interface JobPost {
   styleUrls: ['./nouveauter.component.css']
 })
 export class NouveauterComponent implements OnInit {
-  jobPosts: JobPost[] = [];
-  private apiUrl = 'https://www.upwork.com/api/jobs/v1/jobs'; // Upwork API endpoint
-  private apiKey = 'YOUR_UPWORK_API_KEY'; // Replace with your Upwork API key
+  issues: JiraIssue[] = [];
+  skillsList: string[] = [];
+  // Update the URL to your running json-server endpoint
+  private apiUrl = 'http://localhost:8081/issues';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {} // <-- Inject Router
 
   ngOnInit() {
-    this.getRecentJobPosts();
-  }
-
-  getRecentJobPosts() {
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${this.apiKey}`
-    });
-
-    this.http.get<JobPost[]>(this.apiUrl, { headers }).subscribe(
-      (data: any) => {
-        this.jobPosts = data.jobs; // Adjust based on the API response structure
+    this.http.get<JiraIssue[]>(this.apiUrl).subscribe(
+      data => {
+        this.issues = data;
+        console.log('Issues:', this.issues); // Check what you get
       },
       error => {
-        console.error('Error fetching job posts:', error);
+        console.error('Error fetching issues from json-server:', error);
       }
     );
   }
+
+  goToTestMonCV() {
+    this.router.navigate(['/test-mon-cv']);
+  }
 }
+
+
+
+
+
+
+

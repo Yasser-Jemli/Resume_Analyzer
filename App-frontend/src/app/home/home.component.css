@@ -3,8 +3,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 80vh; /* Full height of the viewport */
-  width: 100vw; /* Full width of the viewport */
+  height: 50vh; /* Full height of the viewport */
+  width: 350vw; /* Full width of the viewport */
   margin: 0;
   padding: 0;
   background-color: #f9f9f9; /* Optional: Add a background color */
@@ -12,25 +12,19 @@
 
 /* Image styling */
 .logo-img {
-  max-width: 50%; /* Adjust size as needed */
-  max-height: 50%;
+  max-width: 100%; /* Adjust size as needed */
+  max-height: 100%;
   object-fit: contain;
 }
 
 /* Animation for the image */
 .animated-image {
   animation: bounce 2s infinite; /* Apply bounce animation */
+  opacity: 1;
+  transition: opacity 0.5s;
 }
 
-/* Keyframes for bounce animation */
-@keyframes bounce {
-  0%, 20%, 50%, 80% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-30px);
-  }
-  60% {
-    transform: translateY(-15px);
-  }
+.animated-image:not(.fade-in) {
+  opacity: 0;
 }
+
