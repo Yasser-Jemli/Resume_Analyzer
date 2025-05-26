@@ -14,7 +14,6 @@ export class ForgotPasswordComponent {
   successMessage: string | null = null;
   errorMessage: string | null = null;
 
-  constructor(private fb: FormBuilder, private userService: UserService) {
   constructor(private fb: FormBuilder, private http: HttpClient, private router: Router) {
     this.forgotPasswordForm = this.fb.group({
       email: ['test@example.com', [Validators.required, Validators.email]] // email statique pour test

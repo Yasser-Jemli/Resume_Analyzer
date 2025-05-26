@@ -22,6 +22,10 @@ export class GestionManagersComponent implements OnInit {
   showAddForm: boolean = false;
   newManager = { username: '', email: '' };
 
+  managers: any[] = [];
+  showAddForm: boolean = false;
+  newManager = { username: '', email: '' };
+
   constructor(private http: HttpClient) {
     const username = localStorage.getItem('username');
     this.isAdmin = username === 'admin';
