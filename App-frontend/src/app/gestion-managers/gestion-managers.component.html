@@ -1,0 +1,58 @@
+<p class="title">Manager Management</p>
+<button *ngIf="isAdmin && !showAddForm" class="add-btn" (click)="toggleAddForm()">Add Manager</button>
+
+<!-- Add Manager Form -->
+<div *ngIf="showAddForm" class="add-manager-form">
+  <input
+    type="text"
+    placeholder="Manager Email (before @)"
+    [(ngModel)]="newManager.email"
+    name="email"
+    class="input-field"
+    style="width: 30%; display: inline-block;"
+  />
+  <span style="display: inline-block; font-weight: bold;">@actia-engineering.tn</span>
+  <input
+    type="text"
+    placeholder="Manager Username"
+    [(ngModel)]="newManager.username"
+    name="username"
+    class="input-field"
+    style="margin-top: 10px;"
+  />
+  <button class="add-btn" (click)="addManager()">Save</button>
+  <button class="cancel-btn" (click)="toggleAddForm()">Cancel</button>
+</div>
+
+<table *ngIf="isAdmin" class="modern-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Password</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let manager of managers; let i = index">
+      <td>{{ manager.username }}</td>
+      <td>{{ manager.email }}</td>
+      <td>
+        <span *ngIf="!manager.showPassword">••••••
+          <button class="eye-btn" (click)="manager.showPassword = true" type="button">
+            <i class="bi bi-eye"></i>
+          </button>
+        </span>
+        <span *ngIf="manager.showPassword">
+          {{ manager.password }}
+          <button class="eye-btn" (click)="manager.showPassword = false" type="button">
+            <i class="bi bi-eye-slash"></i>
+          </button>
+        </span>
+      </td>
+      <td>
+        <button class="delete-btn" (click)="deleteManager(manager)">Delete</button>
+      </td>
+    </tr>
+  </tbody>
+</table>

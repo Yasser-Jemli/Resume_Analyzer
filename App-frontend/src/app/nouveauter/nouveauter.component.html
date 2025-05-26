@@ -1,23 +1,36 @@
 <div class="container mt-4">
-  <h2 class="text-center">Latest Job Posts from Upwork</h2>
-  <div *ngIf="jobPosts.length > 0; else noJobs">
+  <h2 class="text-center">Latest Job Offers from Jira</h2>
+  <div *ngIf="issues && issues.length > 0; else noJobs">
     <div class="row">
-      <div class="col-md-4" *ngFor="let job of jobPosts">
+      <div class="col-md-6" *ngFor="let issue of issues">
         <div class="card mb-3">
-          <div class="card-header">
-            <h5 class="card-title">{{ job.title }}</h5>
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">{{ issue.fields.summary }} ({{ issue.key }})</h5>
+            <button class="btn btn-primary btn-sm" (click)="goToTestMonCV()">Submit</button>
           </div>
-          <div class="card-body">
-            <p><strong>Description:</strong> {{ job.description }}</p>
-            <p><strong>Skills:</strong> {{ job.skills.join(', ') }}</p>
-            <p><strong>Budget:</strong> ${{ job.budget }}</p>
-            <p><strong>Date Posted:</strong> {{ job.date_created }}</p>
+          <div class="card-body p-0">
+            <table class="table mb-0">
+              <tbody>
+                <tr>
+                  <th scope="row">Description</th>
+                  <td>{{ issue.fields.customfield_10055 || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Responsibilities</th>
+                  <td>{{ issue.fields.customfield_10056 || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Skills</th>
+                  <td>{{ issue.fields.customfield_10057 || 'N/A' }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
     </div>
   </div>
   <ng-template #noJobs>
-    <p class="text-center">No job posts available at the moment.</p>
+    <p class="text-center">No job offers available at the moment.</p>
   </ng-template>
 </div>

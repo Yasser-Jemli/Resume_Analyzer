@@ -13,6 +13,7 @@ export class LogInComponent implements OnInit {
   loginForm: FormGroup;
   errorMessage: string | null = null;
   loading: boolean = false;
+  showPassword: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -61,10 +62,15 @@ export class LogInComponent implements OnInit {
       next: (response) => {
         console.log('✅ Connexion réussie :', response);
         this.loading = false;
-
-        // ✅ Stockage du token
+        localStorage.clear();
+        // ✅ Stockage du token, rôle, username et email
         localStorage.setItem('token', response.token);
-
+        localStorage.setItem('userRole', response.role);
+        localStorage.setItem('username', response.username); // <-- always from backend
+        localStorage.setItem('email', response.email);       // <-- always from backend
+        localStorage.setItem('lastCvName', response.lastcvName); // <-- always from backend
+        localStorage.setItem('cvNote', response.CV_Note || '0'); // <-- always from backend
+        
         if (rememberMe) {
           // Exemple : stocker dans localStorage pour persistance (déjà fait ci-dessus)
           console.log('📝 Session persistante activée');
@@ -86,17 +92,41 @@ export class LogInComponent implements OnInit {
    */
   private authenticateUser(credentials: { username: string; password: string }): Observable<any> {
     return new Observable((observer) => {
-      const staticUsername = 'admin';
-      const staticPassword = 'admin123';
+      // Static admin check
+      if (credentials.username === 'admin' && credentials.password === 'admin123') {
+        observer.next({ token: 'fake-jwt-token', role: 'admin', username: 'admin', email: 'admin@actia-engineering.tn' });
+        observer.complete();
+        return;
+      }
 
-      setTimeout(() => {
-        if (credentials.username === staticUsername && credentials.password === staticPassword) {
-          observer.next({ token: 'fake-jwt-token' });
-          observer.complete();
-        } else {
-          observer.error({ status: 401, message: 'Identifiants invalides' });
-        }
-      }, 1000);
+      // Helper to check a collection (users or managers)
+      const checkCollection = (collection: string) => {
+        const url = `http://localhost:8081/${collection}?${credentials.username.includes('@') ? 'email' : 'username'}=${credentials.username}&password=${credentials.password}`;
+        this.http.get<any[]>(url).subscribe({
+          next: (results) => {
+            if (results.length > 0) {
+              observer.next({
+                token: 'fake-jwt-token',
+                role: collection === 'managers' ? 'manager' : 'user',
+                username: results[0].username,
+                email: results[0].email
+              });
+              observer.complete();
+            } else if (collection === 'users') {
+              // If not found in users, check managers
+              checkCollection('managers');
+            } else {
+              observer.error({ status: 401, message: 'Identifiants invalides' });
+            }
+          },
+          error: (err) => {
+            observer.error({ status: 500, message: 'Erreur serveur' });
+          }
+        });
+      };
+
+      // Start by checking users, then managers if not found
+      checkCollection('users');
     });
   }
 }

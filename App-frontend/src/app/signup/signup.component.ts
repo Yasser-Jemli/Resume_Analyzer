@@ -55,8 +55,8 @@ export class SignupComponent {
     this.errorMessage = null;
     const { username, email, password } = this.signupForm.value;
 
-    // Send data to backend
-    const apiUrl = 'http://localhost:8081/api/signup'; // Replace with your backend URL
+    // Send data to json-server to add user
+    const apiUrl = 'http://localhost:8081/users'; // json-server users endpoint
     const signupData = { username, email, password };
 
     this.http.post(apiUrl, signupData).subscribe({
@@ -64,6 +64,7 @@ export class SignupComponent {
         console.log('Signup successful:', response);
         this.successMessage = 'Signup successful! Please log in.';
         this.errorMessage = null;
+        this.signupForm.reset();
       },
       error: (error) => {
         console.error('Signup failed:', error);

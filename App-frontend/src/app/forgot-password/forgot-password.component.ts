@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-forgot-password',
@@ -11,7 +13,7 @@ export class ForgotPasswordComponent {
   successMessage: string | null = null;
   errorMessage: string | null = null;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private http: HttpClient, private router: Router) {
     this.forgotPasswordForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
@@ -32,17 +34,23 @@ export class ForgotPasswordComponent {
     this.errorMessage = null;
     const email = this.forgotPasswordForm.value.email;
 
-    console.log('Password reset request submitted for email:', email);
-
-    // Simulate a backend call
-    setTimeout(() => {
-      if (email === 'test@example.com') {
-        this.successMessage = 'A password reset link has been sent to your email.';
-        this.errorMessage = null;
-      } else {
-        this.errorMessage = 'Email address not found.';
+    // Chercher l'email dans le json-server
+    this.http.get<any[]>(`http://localhost:8081/users?email=${email}`).subscribe({
+      next: (users) => {
+        if (users.length > 0) {
+          // Générer un mot de passe aléatoire de 6 caractères
+          const randomPassword = Math.random().toString(36).slice(-6);
+          // Rediriger vers la page de mise à jour du mot de passe avec l'email en paramètre
+          this.router.navigate(['/update-password'], { queryParams: { email, code: randomPassword } });
+        } else {
+          this.errorMessage = 'Email address not found.';
+          this.successMessage = null;
+        }
+      },
+      error: () => {
+        this.errorMessage = 'Erreur lors de la recherche de l\'email.';
         this.successMessage = null;
       }
-    }, 1000); // Simulate a delay
+    });
   }
 }

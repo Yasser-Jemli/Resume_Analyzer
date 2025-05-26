@@ -46,7 +46,11 @@ def main():
     print("Installing dependencies with --legacy-peer-deps...")
     run_command("npm install --legacy-peer-deps")
 
-    # Step 2: Serve the Angular application
+    # Step 2: Install bootstrap-icons
+    print("Installing bootstrap-icons...")
+    run_command("npm install bootstrap-icons --legacy-peer-deps")
+
+    # Step 3: Serve the Angular application
     print("Starting Angular application...")
     run_command("ng serve -o")
 

@@ -1,0 +1,81 @@
+.title {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 18px;
+  color: #1976d2;
+  text-align: center;
+}
+
+.add-btn {
+  background-color: #43a047;
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 18px;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.add-btn:hover {
+  background-color: #2e7d32;
+}
+
+.delete-btn {
+  background-color: #e53935;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.delete-btn:hover {
+  background-color: #b71c1c;
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 auto;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.modern-table th, .modern-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: left;
+}
+
+.modern-table th {
+  background: #f5f5f5;
+  font-weight: bold;
+  color: #1976d2;
+}
+
+.modern-table tr:last-child td {
+  border-bottom: none;
+}
+
+.modern-table tr:hover {
+  background: #f0f7fa;
+}
+    
+.eye-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #1976d2;
+  margin-left: 5px;
+  font-size: 1.1em;
+  vertical-align: middle;
+}
+
+.eye-btn:focus {
+  outline: none;
+}

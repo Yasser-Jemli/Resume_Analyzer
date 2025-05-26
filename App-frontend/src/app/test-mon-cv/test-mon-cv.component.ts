@@ -13,6 +13,11 @@ export class TestMonCvComponent {
   uploadProgress = 0;
   errorMessage: string | null = null;
   pdfisupdated: boolean = false;
+  customScore: any = null;
+  pyresScore: any = null;
+  getNoteProgress = 0;
+  isGettingNote = false;
+  Cv_Note: any = null;
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
@@ -58,6 +63,8 @@ export class TestMonCvComponent {
       console.log(`⏳ Progression : ${this.uploadProgress}%`);
       if (this.uploadProgress >= 100) {
         clearInterval(progressInterval);
+        this.incrementNbrPosts();
+        console.log('✅ Téléchargement terminé !');
         this.displayPDF();
         this.notifyBackendCVUpload();
       }
@@ -120,6 +127,9 @@ export class TestMonCvComponent {
         this.cdr.detectChanges();
       }
     });
+
+    // Always increment Nbr_Posts, regardless of backend result
+    this.incrementNbrPosts();
   }
 
   // Send API request to backend
@@ -129,7 +139,92 @@ export class TestMonCvComponent {
   }
 
   getMyNote(): void {
-    console.log('📄 Get My Note button clicked!');
-    // TODO: Implement logic to fetch or calculate the note for the uploaded CV and send to yasser jemli 
+    this.getNoteProgress = 0;
+    this.isGettingNote = true;
+    const interval = setInterval(() => {
+      if (this.getNoteProgress < 100) {
+        this.getNoteProgress += 10;
+      } else {
+        clearInterval(interval);
+        this.http.get<any>('http://localhost:8081/scores').subscribe({
+          next: (scores) => {
+            this.customScore = scores.custom;
+            this.pyresScore = scores.pyres;
+            this.isGettingNote = false;
+
+            // Update all user info in the user table with pyresScore
+            const email = localStorage.getItem('email');
+            if (email && this.pyresScore && this.pyresScore.total_score !== undefined) {
+              this.http.get<any[]>(`http://localhost:8081/users?email=${email}`).subscribe({
+                next: (users) => {
+                  if (users.length > 0) {
+                    const user = users[0];
+                    // PATCH all relevant fields
+                    this.http.patch(`http://localhost:8081/users/${user.id}`, {
+                      Cv_Note: this.pyresScore.total_score,
+                      customScore: {
+                        total_score: this.customScore.total_score,
+                        detailed_scores: this.customScore.detailed_scores,
+                        experience_metrics: this.customScore.experience_metrics,
+                        feedback: this.customScore.feedback
+                      }
+                    }).subscribe({
+                      next: (res) => {
+                        console.log('✅ User info updated in backend:', res);
+                      },
+                      error: (err) => {
+                        console.error('❌ Failed to update user info:', err);
+                      }
+                    });
+                  }
+                }
+              });
+            }
+          },
+          error: (err) => {
+            this.errorMessage = 'Failed to fetch scores.';
+            this.customScore = null;
+            this.pyresScore = null;
+            this.isGettingNote = false;
+          }
+        });
+      }
+    }, 100);
+  }
+
+  private incrementNbrPosts(): void {
+    const email = localStorage.getItem('email');
+    if (!email) {
+      console.warn('No email in localStorage');
+      return;
+    }
+
+    this.http.get<any[]>(`http://localhost:8081/users?email=${email}`).subscribe({
+      next: (users) => {
+        if (users.length > 0) {
+          const user = users[0];
+          
+          const newNbrPosts = (user.Nbr_Posts || 0) + 1;
+          const lastcvName = this.selectedFile ? this.selectedFile.name : user.lastcvName;
+          //const custom.total_score = user.Cv_Note || 0;
+          console.log('User found:', user);
+          this.http.patch(`http://localhost:8081/users/${user.id}`, { Nbr_Posts: newNbrPosts, lastcvName}).subscribe({
+            next: (res) => {
+              console.log('PATCH response:', res);
+              console.log('✅ Nbr_Posts incremented:', newNbrPosts);
+              console.log('✅ lastcvName updated:', lastcvName);
+            },
+            error: (err) => {
+              console.error('❌ Failed to update Nbr_Posts or lastcvName:', err);
+            }
+          });
+        } else {
+          console.warn('No user found with email:', email);
+        }
+      },
+      error: (err) => {
+        console.error('❌ Failed to fetch user:', err);
+      }
+    });
   }
 }

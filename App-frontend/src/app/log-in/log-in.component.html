@@ -31,15 +31,26 @@
             <!-- Password Field -->
             <div class="mb-3">
               <label for="password" class="form-label">Mot de passe</label>
-              <input
-                type="password"
-                id="password"
-                class="form-control"
-                formControlName="password"
-                placeholder="Entrez votre mot de passe"
-                [class.is-invalid]="password?.invalid && (password?.dirty || password?.touched)"
-                aria-describedby="passwordError"
-              />
+              <div class="input-group">
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
+                  id="password"
+                  class="form-control"
+                  formControlName="password"
+                  placeholder="Entrez votre mot de passe"
+                  [class.is-invalid]="password?.invalid && (password?.dirty || password?.touched)"
+                  aria-describedby="passwordError"
+                />
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="showPassword = !showPassword"
+                  tabindex="-1"
+                  style="border-top-left-radius: 0; border-bottom-left-radius: 0;"
+                >
+                  <i [ngClass]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                </button>
+              </div>
               <div
                 *ngIf="password?.invalid && (password?.dirty || password?.touched)"
                 id="passwordError"
