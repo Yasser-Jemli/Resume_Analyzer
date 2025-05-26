@@ -43,14 +43,16 @@ export class SignupComponent {
     this.errorMessage = null;
     const { username, email, password } = this.signupForm.value;
 
-    // Log the data being sent to the backend
-    console.log('Sending to backend:', { username, email, password });
+    // Send data to json-server to add user
+    const apiUrl = 'http://localhost:8081/users'; // json-server users endpoint
+    const signupData = { username, email, password };
 
     this.userService.addUser({ username, email, password }).subscribe({
       next: (response) => {
         console.log('Signup successful:', response);
-        // Redirect to confirmation page with email as query param
-        this.router.navigate(['/confirm-code'], { queryParams: { email } });
+        this.successMessage = 'Signup successful! Please log in.';
+        this.errorMessage = null;
+        this.signupForm.reset();
       },
       error: (error) => {
         console.error('Signup failed:', error);

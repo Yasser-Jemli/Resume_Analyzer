@@ -1,18 +1,5 @@
 <div class="chat-bot-container">
-  <h2>Chat Bot</h2>
-
-  <!-- Score cumulé -->
-  <div class="final-score-container">
-    <span class="final-score-icon">🏆</span>
-    Score cumulé : {{ finalScore }} / {{ questionCount * 20 }}
-  </div>
-
-  <!-- Compteur de questions -->
-  <div class="question-counter">
-    {{ questionLabel }}
-  </div>
-
-  <!-- Fenêtre de discussion -->
+  <h2>chat interview</h2>
   <div class="chat-window">
     <div *ngFor="let m of messages"
          [ngClass]="{
