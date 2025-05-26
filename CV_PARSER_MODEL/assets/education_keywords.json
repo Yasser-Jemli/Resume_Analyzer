@@ -1,187 +1,227 @@
 {
     "section_headers": [
-        "education",
-        "academic background",
-        "qualifications",
-        "studies",
-        "academic history"
+      "education",
+      "academic background",
+      "qualifications",
+      "studies",
+      "academic history"
     ],
     "section_markers": {
-        "start": "education",
-        "end": ["experience", "expertise", "skills", "projects"]
+      "start": "education",
+      "end": [
+        "experience",
+        "expertise",
+        "skills",
+        "projects"
+      ]
     },
     "degree_types": {
-        "bachelor": [
-            "bachelor",
-            "b.s.",
-            "b.a.",
-            "bs",
-            "ba",
-            "undergraduate",
-            "licence"
-        ],
-        "master": [
-            "master",
-            "m.s.",
-            "m.a.",
-            "ms",
-            "ma",
-            "msc",
-            "graduate"
-        ],
-        "engineering": [
-            "engineering diploma",
-            "engineer",
-            "embedded systems engineer"
-        ],
-        "phd": [
-            "phd",
-            "ph.d",
-            "doctorate",
-            "doctoral"
-        ]
+      "bachelor": [
+        "bachelor",
+        "b.s.",
+        "b.a.",
+        "bs",
+        "ba",
+        "undergraduate",
+        "licence"
+      ],
+      "master": [
+        "master",
+        "m.s.",
+        "m.a.",
+        "ms",
+        "ma",
+        "msc",
+        "graduate"
+      ],
+      "engineering": [
+        "engineering diploma",
+        "engineer",
+        "embedded systems engineer"
+      ],
+      "phd": [
+        "phd",
+        "ph.d",
+        "doctorate",
+        "doctoral"
+      ]
     },
     "education_levels": {
-        "higher_education": {
-            "patterns": [
-                "university",
-                "institute",
-                "school of engineering"
+      "higher_education": {
+        "patterns": [
+          "university",
+          "institute",
+          "school of engineering"
+        ],
+        "institutions": {
+          "ESPRIT": {
+            "name": "ESPRIT - Private School of Engineering and Technology",
+            "keywords": [
+              "ESPRIT",
+              "Engineering",
+              "Work Study",
+              "Technology"
             ],
-            "institutions": {
-                "ESPRIT": {
-                    "name": "ESPRIT - Private School of Engineering and Technology",
-                    "keywords": [
-                        "ESPRIT",
-                        "Engineering",
-                        "Work Study",
-                        "Technology"
-                    ],
-                    "type": "private",
-                    "degrees": [
-                        {
-                            "name": "Embedded systems engineer",
-                            "keywords": ["embedded systems", "engineer"]
-                        },
-                        {
-                            "name": "Engineering Diploma",
-                            "keywords": ["engineering", "diploma"]
-                        }
-                    ]
-                },
-                "ISIMM": {
-                    "name": "Higher Institute of Computer Science and Mathematics in Monastir",
-                    "keywords": [
-                        "Higher Institute",
-                        "Computer Science",
-                        "Mathematics",
-                        "Monastir"
-                    ],
-                    "type": "public",
-                    "degrees": [
-                        {
-                            "name": "License in Computer Science",
-                            "keywords": ["license", "computer science"]
-                        }
-                    ]
-                }
-            }
-        },
-        "secondary_education": {
-            "patterns": [
-                "high school",
-                "lycee",
-                "technical"
+            "type": "private",
+            "degrees": [
+              {
+                "name": "Embedded systems engineer",
+                "keywords": [
+                  "embedded systems",
+                  "engineer"
+                ]
+              },
+              {
+                "name": "Engineering Diploma",
+                "keywords": [
+                  "engineering",
+                  "diploma"
+                ]
+              }
+            ]
+          },
+          "ISIMM": {
+            "name": "Higher Institute of Computer Science and Mathematics in Monastir",
+            "keywords": [
+              "Higher Institute",
+              "Computer Science",
+              "Mathematics",
+              "Monastir"
             ],
-            "institutions": {
-                "Technical_Sousse": {
-                    "name": "Technical 2 mars 1934 of Sousse high school",
-                    "keywords": [
-                        "Technical",
-                        "2 mars 1934",
-                        "Sousse"
-                    ],
-                    "type": "public",
-                    "degrees": [
-                        {
-                            "name": "Technical baccalaureate",
-                            "keywords": ["technical", "baccalaureate"]
-                        }
-                    ]
-                }
-            }
+            "type": "public",
+            "degrees": [
+              {
+                "name": "License in Computer Science",
+                "keywords": [
+                  "license",
+                  "computer science"
+                ]
+              }
+            ]
+          }
         }
+      },
+      "secondary_education": {
+        "patterns": [
+          "high school",
+          "lycee",
+          "technical"
+        ],
+        "institutions": {
+          "Technical_Sousse": {
+            "name": "Technical 2 mars 1934 of Sousse high school",
+            "keywords": [
+              "Technical",
+              "2 mars 1934",
+              "Sousse"
+            ],
+            "type": "public",
+            "degrees": [
+              {
+                "name": "Technical baccalaureate",
+                "keywords": [
+                  "technical",
+                  "baccalaureate"
+                ]
+              }
+            ]
+          }
+        }
+      }
     },
     "fields": {
-        "computer_science": [
-            "computer science",
-            "software engineering",
-            "information technology"
-        ],
-        "engineering": [
-            "embedded systems",
-            "electronic engineering",
-            "electrical engineering"
-        ],
-        "sciences": [
-            "mathematics",
-            "physics",
-            "electronics"
-        ]
+      "computer_science": [
+        "computer science",
+        "software engineering",
+        "information technology"
+      ],
+      "engineering": [
+        "embedded systems",
+        "electronic engineering",
+        "electrical engineering"
+      ],
+      "sciences": [
+        "mathematics",
+        "physics",
+        "electronics"
+      ]
     },
     "institutions": [
-        {
-            "type": "engineering_school",
+      {
+        "type": "engineering_school",
+        "patterns": [
+          "school of engineering",
+          "engineering and technology",
+          "work study program"
+        ],
+        "keywords": [
+          "ESPRIT",
+          "engineering",
+          "technology"
+        ],
+        "name_format": "{} - Private School of Engineering and Technology",
+        "degrees": [
+          {
+            "name": "Embedded systems engineer",
             "patterns": [
-                "school of engineering",
-                "engineering and technology",
-                "work study program"
-            ],
-            "keywords": ["ESPRIT", "engineering", "technology"],
-            "name_format": "{} - Private School of Engineering and Technology",
-            "degrees": [
-                {
-                    "name": "Embedded systems engineer",
-                    "patterns": ["embedded systems", "engineer"]
-                }
+              "embedded systems",
+              "engineer"
             ]
-        },
-        {
-            "type": "university",
+          }
+        ]
+      },
+      {
+        "type": "university",
+        "patterns": [
+          "higher institute",
+          "computer science",
+          "mathematics"
+        ],
+        "keywords": [
+          "ISIMM",
+          "Higher Institute",
+          "Monastir"
+        ],
+        "name_format": "Higher Institute of Computer Science and Mathematics in {}",
+        "degrees": [
+          {
+            "name": "License in computer science",
             "patterns": [
-                "higher institute",
-                "computer science",
-                "mathematics"
-            ],
-            "keywords": ["ISIMM", "Higher Institute", "Monastir"],
-            "name_format": "Higher Institute of Computer Science and Mathematics in {}",
-            "degrees": [
-                {
-                    "name": "License in computer science",
-                    "patterns": ["license", "computer science"]
-                }
+              "license",
+              "computer science"
             ]
-        },
-        {
-            "type": "high_school",
+          }
+        ]
+      },
+      {
+        "type": "high_school",
+        "patterns": [
+          "technical",
+          "high school",
+          "2 mars 1934"
+        ],
+        "keywords": [
+          "Technical",
+          "Sousse",
+          "high school"
+        ],
+        "name_format": "Technical {} of Sousse high school",
+        "degrees": [
+          {
+            "name": "Technical baccalaureate",
             "patterns": [
-                "technical",
-                "high school",
-                "2 mars 1934"
-            ],
-            "keywords": ["Technical", "Sousse", "high school"],
-            "name_format": "Technical {} of Sousse high school",
-            "degrees": [
-                {
-                    "name": "Technical baccalaureate",
-                    "patterns": ["technical", "baccalaureate"]
-                }
+              "technical",
+              "baccalaureate"
             ]
-        }
+          }
+        ]
+      }
     ],
     "date_patterns": [
-        "\\d{4}\\s*-\\s*(?:present|\\d{4})",
-        "(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\\s+\\d{4}\\s*-\\s*(?:present|[a-z]+\\s+\\d{4})",
-        "\\d{4}\\s*-\\s*[a-z]+\\s+\\d{4}"
+    "\\b\\d{4}\\s*-\\s*(?:present|\\d{4})\\b",
+    "\\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre|sept|oct|nov|dec|juin|mai|juil|aout|sep|oct|nov|dec)\\s+\\d{4}\\s*-\\s*(?:present|[a-zéû]+\\s+\\d{4})\\b",
+    "\\b\\d{4}\\s*-\\s*(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre|sept|oct|nov|dec)\\s+\\d{4}\\b",
+    "\\b(?:sept|oct|nov|dec|juin|mai|juil|aout)\\s+\\d{4}\\s*-\\s*(?:juin|mai|juil|aout|sept|oct|nov|dec)\\s+\\d{4}\\b"
     ]
-}
+  }
+  

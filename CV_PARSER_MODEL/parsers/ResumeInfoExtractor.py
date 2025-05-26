@@ -223,36 +223,26 @@ class ResumeInfoExtractor:
         # Process each paragraph
         paragraphs = [p.strip() for p in edu_text.split('\n') if p.strip()]
         
-        for i, text in enumerate(paragraphs):
-            # Look for institutions in each education level
+        # Process each paragraph with a 2-paragraph lookahead for context
+        for i in range(len(paragraphs)):
+            context = ' '.join(paragraphs[i:i+3])
+            
             for level, level_data in self.education_keywords["education_levels"].items():
                 for inst_name, inst_data in level_data["institutions"].items():
-                    if self._matches_institution(text, inst_data["keywords"]):
-                        # Skip if already processed
+                    if self._matches_institution(context, inst_data["keywords"]):
                         if inst_name in processed:
                             continue
-                            
-                        # Create new entry
                         entry = {
                             "institution": inst_data["name"],
                             "type": inst_data["type"],
                             "category": level,
-                            "degree": None,
-                            "period": None
+                            "degree": self._match_degree(context, inst_data["degrees"]),
+                            "period": self._match_date(context)
                         }
-                        
-                        # Look ahead for degree and period
-                        context = ' '.join(paragraphs[i:i+3])
-                        
-                        # Match degree
-                        entry["degree"] = self._match_degree(context, inst_data["degrees"])
-                        
-                        # Match period
-                        entry["period"] = self._match_date(context)
-                        
                         processed[inst_name] = entry
                         if inst_data["name"] not in education["institutions"]:
                             education["institutions"].append(inst_data["name"])
+
         
         education["entries"] = list(processed.values())
         education["total_institutions"] = len(education["institutions"])
@@ -295,8 +285,13 @@ class ResumeInfoExtractor:
         return None
 
     def _match_date(self, text):
-        """Extract date from text using patterns"""
-        for pattern in self.education_keywords["date_patterns"]:
+        """Extract date or date range from text"""
+        patterns = [
+            r'\b(19|20)\d{2}\s*[-to]{1,3}\s*(19|20)\d{2}\b',  # 2010-2014 or 2010 to 2014
+            r'\b(19|20)\d{2}\b',                              # Single year
+            r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s*(19|20)\d{2}',  # Month Year
+        ]
+        for pattern in patterns:
             match = re.search(pattern, text, re.IGNORECASE)
             if match:
                 return match.group()
