@@ -51,3 +51,8 @@ Notes:
 - The backend runs by default on http://localhost:8081.
 - Update CORS settings if you access the backend from a different domain/port.
 - For production, configure security and environment variables properly.
+
+
+
+Dependencies:
+--------------sudo apt install xterm konsole xfce4-terminal -y
