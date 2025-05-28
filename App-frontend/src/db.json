@@ -113,9 +113,17 @@
   "managers": [
     {
       "id": "616d",
+      "role": "manager",
       "username": "nader",
       "password": "plu5rw5t",
       "email": "nader@actia-engineering.tn"
+    },
+    {
+      "id": "9bd1",
+      "username": "imed",
+      "password": "sffede4h",
+      "email": "imed@actia-engineering.tn",
+      "role": "manager"
     }
   ],
   "extraction_methods": {

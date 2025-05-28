@@ -48,7 +48,8 @@ export class GestionManagersComponent implements OnInit {
     const managerToAdd = {
       username: this.newManager.username,
       password: randomPassword,
-      email: email
+      email: email,
+      role: 'manager' 
     };
 
     this.http.post('http://localhost:8081/managers', managerToAdd).subscribe({

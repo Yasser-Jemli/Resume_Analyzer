@@ -18,11 +18,16 @@
           Welcome : {{ getUsername() }}
         </button>
         <ul class="dropdown-list" *ngIf="showMenu">
-          <li><a routerLink="/profile" (click)="showMenu = false">View Profile</a></li>
-          <li><a (click)="logout(); showMenu = false">Log out</a></li>
+          <li>
+            <a routerLink="/manager-profile" (click)="showMenu = false">View Profile</a>
+          </li>
+          <li>
+            <a (click)="logout(); showMenu = false">Log out</a>
+          </li>
         </ul>
       </div>
-      <button class="nav-button" routerLink="/showCV">Users Posted</button>
+      <button class="nav-button" routerLink="/showCVuser">Users Posted</button>
+      <button class="nav-button" routerLink="/Mypost">My post</button>
     </ng-container>
 
     <!-- Non-manager navigation -->

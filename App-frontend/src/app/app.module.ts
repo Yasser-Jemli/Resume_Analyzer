@@ -20,6 +20,9 @@ import { AuthGuard } from './auth.guard';
 import { GestionManagersComponent } from './gestion-managers/gestion-managers.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { UpdatePasswordComponent } from './update-password/update-password.component';
+import { ManagerProfileComponent } from './manager-profile/manager-profile.component';
+import { ShowCvuserComponent } from './show-cvuser/show-cvuser.component';
+import { MypostComponent } from './mypost/mypost.component';
 
 
 @NgModule({
@@ -39,6 +42,9 @@ import { UpdatePasswordComponent } from './update-password/update-password.compo
     GestionManagersComponent,
     UserProfileComponent,
     UpdatePasswordComponent,
+    ManagerProfileComponent,
+    ShowCvuserComponent,
+    MypostComponent,
   ],
   imports: [
     BrowserModule,
