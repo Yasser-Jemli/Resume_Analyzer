@@ -1,4 +1,4 @@
-package org.example.Cv_Parser.Security;
+package org.example.Cv_Parser.authentification;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -16,12 +17,17 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
-    private final PasswordEncoder passwordEncoder;
 
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter, UserDetailsService userDetailsService , PasswordEncoder passwordEncoder) {
+    // Constructor for dependency injection
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, UserDetailsService userDetailsService) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.userDetailsService = userDetailsService;
-        this.passwordEncoder = passwordEncoder;
+    }
+
+    // Bean for PasswordEncoder
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     // Security Filter Chain configuration
@@ -31,14 +37,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/api/auth/login", "/api/users").permitAll() // Public endpoints
-                                // Restricted to SYSADMIN
-                                .requestMatchers("/api/admin/**").hasRole("SYSADMIN")
-
-                                // Restricted to MANAGER
-                                .requestMatchers("/api/manager/**").hasRole("MANAGER")
-
-                                // Restricted to CANDIDATE
-                                .requestMatchers("/api/candidate/**").hasRole("CANDIDATE")
+                                .requestMatchers("/api/admin/**").hasRole("SYSADMIN") // Restricted to SYSADMIN
+                                .requestMatchers("/api/manager/**").hasRole("MANAGER") // Restricted to MANAGER
+                                .requestMatchers("/api/candidate/**").hasRole("CANDIDATE") // Restricted to CANDIDATE
                                 .anyRequest().authenticated() // Secured endpoints
                 )
                 .csrf(AbstractHttpConfigurer::disable) // Disable CSRF protection (if using JWT)
@@ -46,6 +47,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
     // Authentication Manager configuration
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
@@ -54,7 +56,7 @@ public class SecurityConfig {
 
         authenticationManagerBuilder
                 .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder);
+                .passwordEncoder(passwordEncoder()); // Use the PasswordEncoder bean
 
         return authenticationManagerBuilder.build();
     }

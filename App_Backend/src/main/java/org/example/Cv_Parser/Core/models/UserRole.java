@@ -1,4 +1,4 @@
-package org.example.Cv_Parser.models;
+package org.example.Cv_Parser.Core.models;
 
     public enum UserRole {
         MANAGER,

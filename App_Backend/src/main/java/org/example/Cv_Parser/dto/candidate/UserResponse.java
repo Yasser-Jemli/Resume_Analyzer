@@ -1,6 +1,6 @@
-package org.example.Cv_Parser.dto;
+package org.example.Cv_Parser.dto.candidate;
 import lombok.Data;
-import org.example.Cv_Parser.models.UserRole;
+import org.example.Cv_Parser.Core.models.UserRole;
 
 @Data // Lombok will generate getters, setters, and other utility methods
 public class UserResponse {

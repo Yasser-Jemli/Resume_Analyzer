@@ -1,12 +1,11 @@
-package org.example.Cv_Parser.services;
+package org.example.Cv_Parser.Core.services;
 
 import lombok.RequiredArgsConstructor;
-import org.example.Cv_Parser.dto.CreateUserRequest;
-import org.example.Cv_Parser.dto.UserResponse;
-import org.example.Cv_Parser.models.User;
-import org.example.Cv_Parser.repositories.UserRepository;
+import org.example.Cv_Parser.dto.candidate.CreateUserRequest;
+import org.example.Cv_Parser.dto.candidate.UserResponse;
+import org.example.Cv_Parser.Core.models.User;
+import org.example.Cv_Parser.Core.repositories.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
