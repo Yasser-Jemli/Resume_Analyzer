@@ -1,4 +1,4 @@
-package org.example.Cv_Parser.dto;
+package org.example.Cv_Parser.dto.common;
 
 
 import lombok.Data;

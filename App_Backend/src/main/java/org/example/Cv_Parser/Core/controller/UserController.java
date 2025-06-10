@@ -1,9 +1,9 @@
-package org.example.Cv_Parser.controllers;
+package org.example.Cv_Parser.Core.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.Cv_Parser.dto.CreateUserRequest;
-import org.example.Cv_Parser.dto.UserResponse;
-import org.example.Cv_Parser.services.UserServices;
+import org.example.Cv_Parser.dto.candidate.CreateUserRequest;
+import org.example.Cv_Parser.dto.candidate.UserResponse;
+import org.example.Cv_Parser.Core.services.UserServices;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

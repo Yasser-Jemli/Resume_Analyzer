@@ -1,7 +1,9 @@
-package org.example.Cv_Parser.services;
+package org.example.Cv_Parser.Core.services;
 
-import org.example.Cv_Parser.models.User;
-import org.example.Cv_Parser.repositories.UserRepository;
+import org.example.Cv_Parser.authentification.JwtUtil;
+import org.example.Cv_Parser.Core.models.User;
+import org.example.Cv_Parser.Core.repositories.UserRepository;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,11 +19,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final JwtUtil jwtUtil;
     public CustomUserDetailsService(UserRepository userRepository,
-                                    PasswordEncoder passwordEncoder) {
+                                    @Lazy PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -37,7 +40,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-                authorities
-        );
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole())));
     }
 }

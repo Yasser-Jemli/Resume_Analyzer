@@ -1,9 +1,10 @@
-package org.example.Cv_Parser.controllers;
+package org.example.Cv_Parser.authentification.controller;
 
-import org.example.Cv_Parser.Security.JwtUtil;
-import org.example.Cv_Parser.dto.AuthRequest;
-import org.example.Cv_Parser.models.UserRole;
-import org.example.Cv_Parser.services.CustomUserDetailsService;
+import org.example.Cv_Parser.authentification.JwtUtil;
+import org.example.Cv_Parser.dto.common.AuthRequest;
+import org.example.Cv_Parser.Core.models.UserRole;
+import org.example.Cv_Parser.authentification.service.AuthService;
+import org.example.Cv_Parser.Core.services.CustomUserDetailsService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
-
+    private AuthService authService;
     public AuthController(AuthenticationManager authenticationManager,
                           JwtUtil jwtUtil,
                           CustomUserDetailsService userDetailsService) {

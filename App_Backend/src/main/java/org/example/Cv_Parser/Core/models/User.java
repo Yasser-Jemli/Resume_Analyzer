@@ -1,4 +1,4 @@
-package org.example.Cv_Parser.models;
+package org.example.Cv_Parser.Core.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,6 +26,7 @@ public class User {
     private String email;
 
     private String password;
+    private boolean passwordChanged = false;
     @Column(name = "role",nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole role;
