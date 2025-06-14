@@ -19,19 +19,67 @@
         }
     },
     "experience": {
-        "minimum_years": 2,
-        "preferred_years": 4,
-        "relevant_keywords": [
-            "software",
-            "developer",
-            "engineer",
-            "lead",
-            "manager",
-            "architect"
-        ],
+        "requirements": {
+            "minimum_years": 2,
+            "preferred_years": 4
+        },
+        "levels": {
+            "junior": {
+                "min_years": 0,
+                "max_years": 2,
+                "score_multiplier": 0.8
+            },
+            "mid": {
+                "min_years": 2,
+                "max_years": 5,
+                "score_multiplier": 1.0
+            },
+            "senior": {
+                "min_years": 5,
+                "max_years": 8,
+                "score_multiplier": 1.2
+            },
+            "lead": {
+                "min_years": 8,
+                "score_multiplier": 1.5
+            }
+        },
+        "keywords": {
+            "technical": [
+                "developed",
+                "implemented",
+                "designed",
+                "architected",
+                "programmed",
+                "engineered"
+            ],
+            "leadership": [
+                "led",
+                "managed",
+                "supervised",
+                "coordinated",
+                "mentored"
+            ],
+            "domain": [
+                "embedded",
+                "automotive",
+                "software",
+                "testing",
+                "automation"
+            ],
+            "roles": [
+                "software",
+                "developer",
+                "engineer",
+                "lead",
+                "manager",
+                "architect"
+            ]
+        },
         "weights": {
             "years": 1.5,
-            "relevance": 1.0
+            "relevance": 1.0,
+            "leadership": 0.8
         }
     },
     "education": {
@@ -43,6 +91,109 @@
         ],
         "weights": {
             "degree": 1.0
+        }
+    },
+    "positions": {
+        "sw_designer": {
+            "skills": {
+                "required": [
+                    "python",
+                    "c",
+                    "c++",
+                    "git",
+                    "linux"
+                ],
+                "preferred": [
+                    "rust",
+                    "android",
+                    "docker",
+                    "kubernetes",
+                    "jenkins",
+                    "jira"
+                ],
+                "weights": {
+                    "required": 2.0,
+                    "preferred": 1.0,
+                    "bonus_leadership": 0.5
+                }
+            }
+        },
+        "embedded_engineer": {
+            "skills": {
+                "required": [
+                    "c",
+                    "c++",
+                    "linux",
+                    "rtos"
+                ],
+                "preferred": [
+                    "python",
+                    "rust",
+                    "arm",
+                    "autosar"
+                ],
+                "weights": {
+                    "required": 2.0,
+                    "preferred": 1.0,
+                    "bonus_embedded": 0.5
+                }
+            }
+        }
+    },
+    "education": {
+        "degrees": {
+            "bachelor": {
+                "score": 70,
+                "relevant_fields": [
+                    "computer science",
+                    "software engineering",
+                    "computer engineering",
+                    "electrical engineering",
+                    "electronics"
+                ]
+            },
+            "master": {
+                "score": 85,
+                "relevant_fields": [
+                    "computer science",
+                    "software engineering",
+                    "embedded systems",
+                    "robotics",
+                    "artificial intelligence"
+                ]
+            },
+            "phd": {
+                "score": 100,
+                "relevant_fields": [
+                    "computer science",
+                    "robotics",
+                    "artificial intelligence",
+                    "embedded systems"
+                ]
+            }
+        },
+        "certifications": {
+            "professional": ["AWS", "Azure", "CKA", "PMP"],
+            "technical": ["ISTQB", "AUTOSAR", "Embedded C"],
+            "score_bonus": 10
+        },
+        "weights": {
+            "degree": 1.0,
+            "field_relevance": 0.8,
+            "certifications": 0.5
+        }
+    },
+    "scoring": {
+        "weights": {
+            "skills": 0.4,
+            "experience": 0.35,
+            "education": 0.25
+        },
+        "thresholds": {
+            "excellent": 85,
+            "good": 70,
+            "average": 50,
+            "poor": 30
         }
     }
 }
