@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UserService } from '../services/user.service'; // Import your service
-import { Router } from '@angular/router'; // Import Router
+import { UserServiceService } from '../service/user-service.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-signup',
@@ -13,7 +13,11 @@ export class SignupComponent {
   errorMessage: string | null = null;
   successMessage: string | null = null;
 
-  constructor(private fb: FormBuilder, private userService: UserService, private router: Router) { // Inject Router
+  constructor(
+    private fb: FormBuilder,
+    private userService: UserServiceService,
+    private router: Router
+  ) {
     this.signupForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
@@ -34,31 +38,68 @@ export class SignupComponent {
   get confirmPassword() { return this.signupForm.get('confirmPassword'); }
 
   onSubmit(): void {
-    if (this.signupForm.invalid) {
-      this.errorMessage = 'Please correct the errors in the form.';
-      this.signupForm.markAllAsTouched();
-      return;
-    }
-
-    this.errorMessage = null;
-    const { username, email, password } = this.signupForm.value;
-
-    // Send data to json-server to add user
-    const apiUrl = 'http://localhost:8081/users'; // json-server users endpoint
-    const signupData = { username, email, password };
-
-    this.userService.addUser({ username, email, password }).subscribe({
-      next: (response) => {
-        console.log('Signup successful:', response);
-        this.successMessage = 'Signup successful! Please log in.';
-        this.errorMessage = null;
-        this.signupForm.reset();
-      },
-      error: (error) => {
-        console.error('Signup failed:', error);
-        this.errorMessage = 'Signup failed. Please try again.';
-        this.successMessage = null;
-      }
-    });
+  if (this.signupForm.invalid) {
+    this.errorMessage = 'Please correct the errors in the form.';
+    this.signupForm.markAllAsTouched();
+    return;
   }
+
+  this.errorMessage = null;
+  const { username, email, password } = this.signupForm.value;
+
+  // Vérifier unicité email puis username avant de poursuivre
+  this.userService.getUserByEmail(email).subscribe({
+    next: (usersByEmail) => {
+      if (usersByEmail.length > 0) {
+        this.errorMessage = 'This email is already used.';
+        return;
+      }
+
+      // Vérifier username dans users
+      this.userService.getUserByUsername(username).subscribe({
+        next: (usersByUsername) => {
+          if (usersByUsername.length > 0) {
+            this.errorMessage = 'This username is already taken.';
+            return;
+          }
+
+          // Vérifier username dans managers
+          this.userService.getManagerByUsername(username).subscribe({
+            next: (managersByUsername) => {
+              if (managersByUsername.length > 0) {
+                this.errorMessage = 'This username is already taken.';
+                return;
+              }
+
+              // Stocker les infos en localStorage pour la confirmation
+              localStorage.setItem('pendingUser', JSON.stringify({
+                username,
+                email,
+                password,
+                endPost: null,
+                lastcvName: null,
+                customScore: null,
+                total_score: null,
+                detailed_scores: null,
+                experience_metrics: null,
+                feedback: null
+              }));
+              // Rediriger vers la page de confirmation de code avec le mode signup
+              this.router.navigate(['/confirm-code'], { queryParams: { email, mode: 'signup' } });
+            },
+            error: () => {
+              this.errorMessage = 'Error checking manager username uniqueness.';
+            }
+          });
+        },
+        error: () => {
+          this.errorMessage = 'Error checking username uniqueness.';
+        }
+      });
+    },
+    error: () => {
+      this.errorMessage = 'Error checking email uniqueness.';
+    }
+  });
+}
 }

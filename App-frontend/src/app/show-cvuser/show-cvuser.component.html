@@ -1,0 +1,21 @@
+<div class="container mt-4">
+  <h2>Users Posted</h2>
+  <table class="table table-bordered table-striped mt-3">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>CV Name</th>
+        <th>CV Note</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.username }}</td>
+        <td>{{ user.lastcvName || 'N/A' }}</td>
+        <td>
+          {{ user.customScore?.total_score ?? user.CV_Note ?? 'N/A' }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

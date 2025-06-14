@@ -1,31 +1,21 @@
-import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-@Component({
-  selector: 'app-chat-assistant',
-  templateUrl: './chat-assistant.component.html',
-  styleUrls: ['./chat-assistant.component.css']
-})
-export class ChatAssistantComponent {
-  messages: { sender: string; text: string }[] = [];
-  userInput = '';
+import { ChatAssistantComponent } from './chat-assistant.component';
 
-  constructor(private http: HttpClient) {}
+describe('ChatAssistantComponent', () => {
+  let component: ChatAssistantComponent;
+  let fixture: ComponentFixture<ChatAssistantComponent>;
 
-  sendMessage(): void {
-    const input = this.userInput.trim();
-    if (!input) return;
-
-    this.messages.push({ sender: 'Vous', text: input });
-
-    this.http.post<{ response: string }>('/entretien-ask', { user_input: input }).subscribe({
-      next: res => {
-        this.messages.push({ sender: 'Bot', text: res.response });
-        this.userInput = '';
-      },
-      error: err => {
-        this.messages.push({ sender: 'Bot', text: 'Erreur lors de la communication avec le serveur.' });
-      }
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [ChatAssistantComponent]
     });
-  }
-}
+    fixture = TestBed.createComponent(ChatAssistantComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

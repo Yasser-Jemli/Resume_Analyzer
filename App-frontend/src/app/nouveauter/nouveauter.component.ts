@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router'; // <-- Add this import
+import { Router } from '@angular/router';
+import { JiraServiceService } from '../service/jira-service.service';
+import { ChatInterviewServiceService } from '../service/chat-interview-service.service'; // <-- Import du service
 
 interface JiraIssue {
   key: string;
@@ -21,25 +22,57 @@ interface JiraIssue {
 export class NouveauterComponent implements OnInit {
   issues: JiraIssue[] = [];
   skillsList: string[] = [];
-  // Update the URL to your running json-server endpoint
-  private apiUrl = 'http://localhost:8081/issues';
+  canIncrementCV: Boolean = false;
 
-  constructor(private http: HttpClient, private router: Router) {} // <-- Inject Router
+  constructor(
+    private jiraService: JiraServiceService,
+    private chatInterviewService: ChatInterviewServiceService, // <-- Ajouté ici
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    this.http.get<JiraIssue[]>(this.apiUrl).subscribe(
+    this.jiraService.getIssues().subscribe(
       data => {
         this.issues = data;
-        console.log('Issues:', this.issues); // Check what you get
+        console.log('Issues:', this.issues);
       },
       error => {
-        console.error('Error fetching issues from json-server:', error);
+        console.error('Error fetching issues from jira server:', error);
       }
     );
   }
 
-  goToTestMonCV() {
+  goToTestMonCV(selectedIssue: JiraIssue) {
+    // Afficher toutes les informations du post sélectionné dans la console
+    console.log('Informations du post sélectionné :', selectedIssue);
+
+    // Récupérer et stocker les skills dans le localStorage
+    const skills = selectedIssue.fields.customfield_10057
+      ? selectedIssue.fields.customfield_10057.split(',').map((s: string) => s.trim())
+      : [];
+    localStorage.setItem('postSkills', JSON.stringify(skills));
+
+    // Stocker le nom du post (summary) dans le localStorage
+    localStorage.setItem('postName', selectedIssue.fields.summary);
+
+    // Envoyer les skills au chat bot via le service (mémoire + backend)
+    this.chatInterviewService.setSkills(skills);
+
+    // Vérifier la mise à jour côté backend (optionnel)
+    // this.chatInterviewService.fetchSkillsFromBackend().subscribe(response => {
+    //   console.log('Skills récupérés depuis le backend:', response.skills);
+    // });
+
+    console.log('Skills envoyés au chat bot et enregistrés dans le localStorage:', skills);
+
     this.router.navigate(['/test-mon-cv']);
+  }
+
+  onSubmit() {
+    // envoie les données de poste choisi au serveur
+    
+    // Optionnel : activer le flag canIncrementCV
+    localStorage.setItem('canIncrementCV', 'true');
   }
 }
 

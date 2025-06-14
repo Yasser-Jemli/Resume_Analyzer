@@ -1,121 +1,85 @@
 {
-  "jobs": [
-    {
-      "id": "1",
-      "title": "Développeur Frontend",
-      "company": "TechCorp",
-      "location": "Tunis",
-      "description": "Développement d'interfaces utilisateur modernes.",
-      "datePosted": "2023-10-01"
-    },
-    {
-      "id": "2",
-      "title": "Ingénieur Backend",
-      "company": "SoftSolutions",
-      "location": "Sousse",
-      "description": "Conception et maintenance des API.",
-      "datePosted": "2023-10-02"
-    }
-  ],
   "users": [
     {
-      "username": "user",
-      "password": "user123",
-      "email": "user@gmail.com",
-      "id": "1192",
-      "role": "user",
-      "CV_Note": 2,
-      "Nbr_Posts": 12,
-      "endtwoPosts": "post Ingénieur Backend, post Développeur Frontend",
-      "lastcvName": "Test Pratique Angular.pdf",
-      "customScore": {
-        "total_score": 55.48,
-        "detailed_scores": {
-          "skills": 50,
-          "experience": 65.67,
-          "education": 50
-        },
-        "experience_metrics": {
-          "years": 3,
-          "positions": 3,
-          "details": "3 years, 3 positions"
-        },
-        "feedback": [
-          "Skills: Satisfactory",
-          "Experience: Satisfactory",
-          "Education: Satisfactory"
-        ]
-      },
-      "Cv_Note": 30
-    },
-    {
-      "id": "495f",
-      "username": "user1",
-      "password": "000000",
-      "email": "user1@gmail.com",
-      "role": "user",
-      "CV_Note": 10,
-      "Nbr_Posts": 2,
-      "endtwoPosts": "post Ingénieur SWLW, post Développeur Frontend",
-      "lastcvName": null
-    },
-    {
-      "id": "0561",
-      "username": "imed",
-      "email": "imed@gmail.com",
-      "password": "imedch",
-      "role": "user",
-      "Nbr_Posts": 36,
-      "endtwoPosts": "post Ingénieur HLL, post Développeur LWLW",
-      "lastcvName": "Imed_chakhari2021.pdf",
-      "customScore": {
-        "total_score": 55.48,
-        "detailed_scores": {
-          "skills": 50,
-          "experience": 65.67,
-          "education": 50
-        },
-        "experience_metrics": {
-          "years": 3,
-          "positions": 3,
-          "details": "3 years, 3 positions"
-        },
-        "feedback": [
-          "Skills: Satisfactory",
-          "Experience: Satisfactory",
-          "Education: Satisfactory"
-        ]
-      },
-      "Cv_Note": 30
-    },
-    {
-      "id": "ef58",
-      "username": "sirine",
-      "email": "sirinebriki@gmail.com",
-      "password": "123456",
-      "role": "user",
-      "CV_Note": 15,
+      "id": "d81c",
+      "username": "test",
+      "email": "test@gmail.com",
+      "password": "test12",
       "Nbr_Posts": null,
-      "endtwoPosts": null,
-      "lastcvName": null
+      "lastPosts": "QA Engineer",
+      "lastcvName": "mon-cv (7).pdf",
+      "customScore": {
+        "total_score": 55.48,
+        "detailed_scores": {
+          "skills": 50,
+          "experience": 65.67,
+          "education": 50
+        },
+        "experience_metrics": {
+          "years": 3,
+          "positions": 3,
+          "details": "3 years, 3 positions"
+        },
+        "feedback": [
+          "Skills: Satisfactory",
+          "Experience: Satisfactory",
+          "Education: Satisfactory"
+        ]
+      },
+      "total_score": null,
+      "detailed_scores": null,
+      "experience_metrics": null,
+      "feedback": null,
+      "Cv_Note": null
     },
     {
-      "id": "4217",
-      "username": "test1",
-      "email": "test1@gmail.com",
+      "id": "b195",
+      "username": "user",
+      "email": "imedchakhari@esprit.tn",
       "password": "000000",
-      "CV_Note": 20,
-      "Nbr_Posts": 5,
-      "endtwoPosts": "post Ingénieur HLL, post Développeur LWLW",
-      "lastcvName": null
+      "lastPosts": null,
+      "lastcvName": null,
+      "customScore": null,
+      "total_score": null,
+      "detailed_scores": null,
+      "experience_metrics": null,
+      "feedback": null
+    },
+    {
+      "id": "ebb8",
+      "username": "nadera",
+      "email": "nader@gmail.com",
+      "password": "123456",
+      "endPost": null,
+      "lastcvName": null,
+      "customScore": null,
+      "total_score": null,
+      "detailed_scores": null,
+      "experience_metrics": null,
+      "feedback": null
     }
   ],
   "managers": [
     {
       "id": "616d",
+      "role": "manager",
       "username": "nader",
-      "password": "plu5rw5t",
+      "password": "000000",
       "email": "nader@actia-engineering.tn"
+    },
+    {
+      "id": "9bd1",
+      "username": "imed",
+      "password": "sffede4h",
+      "email": "imed@actia-engineering.tn",
+      "role": "manager"
+    },
+    {
+      "id": "f800",
+      "username": "nadera",
+      "password": "123456",
+      "email": "nadera@actia-engineering.tn",
+      "role": "manager"
     }
   ],
   "extraction_methods": {
