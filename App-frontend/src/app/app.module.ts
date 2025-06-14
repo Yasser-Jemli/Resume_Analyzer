@@ -18,10 +18,13 @@ import { SignupComponent } from './signup/signup.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { AuthGuard } from './auth.guard';
 import { GestionManagersComponent } from './gestion-managers/gestion-managers.component';
-import { ChatAssistantComponent } from './chat-assistant/chat-assistant.component';
-import { ConfirmCodeComponent } from './confirm-code/confirm-code.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { UpdatePasswordComponent } from './update-password/update-password.component';
+import { ManagerProfileComponent } from './manager-profile/manager-profile.component';
+import { ShowCvuserComponent } from './show-cvuser/show-cvuser.component';
+import { MypostComponent } from './mypost/mypost.component';
+import { ChatAssistantComponent } from './chat-assistant/chat-assistant.component';
+import { ConfirmCodeComponent } from './confirm-code/confirm-code.component';
 
 
 @NgModule({
@@ -39,11 +42,13 @@ import { UpdatePasswordComponent } from './update-password/update-password.compo
     SignupComponent,
     ForgotPasswordComponent,
     GestionManagersComponent,
-    ChatAssistantComponent,
-    
-    ConfirmCodeComponent,
     UserProfileComponent,
     UpdatePasswordComponent,
+    ManagerProfileComponent,
+    ShowCvuserComponent,
+    MypostComponent,
+    ChatAssistantComponent,
+    ConfirmCodeComponent,
   ],
   imports: [
     BrowserModule,

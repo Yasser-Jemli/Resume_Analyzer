@@ -72,9 +72,6 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-                    "options": {
-            "proxyConfig": "proxy.conf.json"
-          },
           "configurations": {
             "production": {
               "browserTarget": "Mission_Entreprise_Angular:build:production"
@@ -126,8 +123,5 @@
       }
     }
   },
-  "defaultProject": "Mission_Entreprise_Angular",
-  "cli": {
-    "analytics": "9bd23848-060b-42e2-8dbf-09b74760a2bc"
-  }
+  "defaultProject": "Mission_Entreprise_Angular"
 }

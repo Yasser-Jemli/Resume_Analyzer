@@ -11,7 +11,7 @@ export class UserProfileComponent implements OnInit {
   email: string | null = '';
   id: number | null = null;
   Nbr_Posts: number | null = null;
-  endtwoPosts: string | null = null;
+  lastPosts: string | null = null;
   CV_Note: number | null = null;
   showPosts = false;
   lastTwoPosts: string[] = [];
@@ -38,14 +38,13 @@ export class UserProfileComponent implements OnInit {
             this.id = user.id;
             this.username = user.username;
             this.Nbr_Posts = user.Nbr_Posts || 0;
-            this.endtwoPosts = user.endtwoPosts || null;
+            this.lastPosts = user.lastPosts || null;
             this.customScore = user.customScore || { total_score: 0 };
             this.lastcvName = user.lastcvName || '';
-            // this.Cv_Note = user.Cv_Note || 0;
           }
         },
         error: (err) => {
-          console.error('Failed to fetch user info:', err);
+          // handle error
         }
       });
     }
@@ -73,21 +72,19 @@ export class UserProfileComponent implements OnInit {
           const user = users[0];
           if (user.password === password) {
             if (confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
-              alert('Profile deleted successfully.');
-              window.location.href = '/log-in';
-
-              /* Uncomment this block to actually delete from server:
+              // Suppression du profil
               this.http.delete(`http://localhost:8081/users/${user.id}`).subscribe({
                 next: () => {
                   alert('Profile deleted successfully.');
                   localStorage.clear();
+                  // Appel logout (redirige vers /log-in)
                   window.location.href = '/log-in';
                 },
                 error: (err) => {
                   alert('Failed to delete profile.');
                   console.error('Delete error:', err);
                 }
-              }); */
+              });
             }
           } else {
             alert('Incorrect password. Profile not deleted.');
@@ -102,4 +99,33 @@ export class UserProfileComponent implements OnInit {
       }
     });
   }
+  getBadgeClass(score: number): string {
+  if (score < 50) {
+    return 'bg-danger text-light'; // Rouge
+  } else if (score < 70) {
+    return 'bg-warning text-dark'; // Jaune
+  } else {
+    return 'bg-success text-light'; // Vert
+  }
+}
+
+reloadUserData() {
+  if (this.username) {
+    this.http.get<any[]>(`http://localhost:8081/users?username=${this.username}`).subscribe({
+      next: (users) => {
+        if (users.length > 0) {
+          const user = users[0];
+          this.email = user.email;
+          this.id = user.id;
+          this.username = user.username;
+          this.Nbr_Posts = user.Nbr_Posts || 0;
+          this.lastPosts = user.lastPosts || null;
+          this.customScore = user.customScore || { total_score: 0 };
+          this.lastcvName = user.lastcvName || '';
+        }
+      }
+    });
+  }
+}
+
 }
