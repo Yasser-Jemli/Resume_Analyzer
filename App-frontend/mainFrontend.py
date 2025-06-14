@@ -2,6 +2,7 @@ import os
 import subprocess
 import sys
 import shutil
+import time
 
 # Define project directory
 PROJECT_DIR = os.path.expanduser("../App-frontend")
@@ -16,6 +17,12 @@ def run_command(command, cwd=PROJECT_DIR, shell=True):
         print(f"Error running command '{command}': {e.stderr}")
         sys.exit(1)
 
+def run_background_command(command, cwd=PROJECT_DIR):
+    """Run a command in the background and return the process."""
+    process = subprocess.Popen(command, cwd=cwd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    print(f"Started background process: {command}")
+    return process
+
 def check_prerequisites():
     """Check if required tools are installed."""
     # Check Node.js
@@ -29,6 +36,11 @@ def check_prerequisites():
     if not shutil.which("ng"):
         print("Angular CLI is not installed. Installing globally...")
         run_command("npm install -g @angular/cli")
+
+    # Check json-server
+    if not shutil.which("json-server"):
+        print("json-server is not installed. Installing globally...")
+        run_command("npm install -g json-server")
 
 def main():
     # Check prerequisites
@@ -46,9 +58,25 @@ def main():
     print("Installing dependencies with --legacy-peer-deps...")
     run_command("npm install --legacy-peer-deps")
 
-    # Step 2: Serve the Angular application
+    # Step 2: Install bootstrap-icons
+    print("Installing bootstrap-icons...")
+    run_command("npm install bootstrap-icons --legacy-peer-deps")
+
+    # Step 3: Start json-server in the background
+    print("Starting json-server on port 8081...")
+    json_server_process = run_background_command("npx json-server --watch src/db.json --port 8081")
+
+    # Give json-server a moment to start
+    time.sleep(2)
+
+    # Step 4: Serve the Angular application
     print("Starting Angular application...")
-    run_command("ng serve -o")
+    try:
+        run_command("ng serve -o")
+    finally:
+        print("Shutting down json-server...")
+        json_server_process.terminate()
+        json_server_process.wait()
 
 if __name__ == "__main__":
     main()

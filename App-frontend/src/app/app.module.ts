@@ -17,6 +17,14 @@ import { LogInComponent } from './log-in/log-in.component';
 import { SignupComponent } from './signup/signup.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { AuthGuard } from './auth.guard';
+import { GestionManagersComponent } from './gestion-managers/gestion-managers.component';
+import { UserProfileComponent } from './user-profile/user-profile.component';
+import { UpdatePasswordComponent } from './update-password/update-password.component';
+import { ManagerProfileComponent } from './manager-profile/manager-profile.component';
+import { ShowCvuserComponent } from './show-cvuser/show-cvuser.component';
+import { MypostComponent } from './mypost/mypost.component';
+import { ChatAssistantComponent } from './chat-assistant/chat-assistant.component';
+import { ConfirmCodeComponent } from './confirm-code/confirm-code.component';
 
 
 @NgModule({
@@ -33,6 +41,14 @@ import { AuthGuard } from './auth.guard';
     LogInComponent,
     SignupComponent,
     ForgotPasswordComponent,
+    GestionManagersComponent,
+    UserProfileComponent,
+    UpdatePasswordComponent,
+    ManagerProfileComponent,
+    ShowCvuserComponent,
+    MypostComponent,
+    ChatAssistantComponent,
+    ConfirmCodeComponent,
   ],
   imports: [
     BrowserModule,

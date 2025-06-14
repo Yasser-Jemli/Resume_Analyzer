@@ -1,12 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { JiraServiceService } from '../service/jira-service.service';
+import { ChatInterviewServiceService } from '../service/chat-interview-service.service'; // <-- Import du service
 
-interface JobPost {
-  title: string;
-  description: string;
-  skills: string[];
-  budget: number;
-  date_created: string;
+interface JiraIssue {
+  key: string;
+  fields: {
+    summary: string;
+    description: string;
+    customfield_10056?: string; // responsibilities
+    customfield_10057?: string; // skills
+    customfield_10055?: string; // description
+  };
 }
 
 @Component({
@@ -15,28 +20,65 @@ interface JobPost {
   styleUrls: ['./nouveauter.component.css']
 })
 export class NouveauterComponent implements OnInit {
-  jobPosts: JobPost[] = [];
-  private apiUrl = 'https://www.upwork.com/api/jobs/v1/jobs'; // Upwork API endpoint
-  private apiKey = 'YOUR_UPWORK_API_KEY'; // Replace with your Upwork API key
+  issues: JiraIssue[] = [];
+  skillsList: string[] = [];
+  canIncrementCV: Boolean = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private jiraService: JiraServiceService,
+    private chatInterviewService: ChatInterviewServiceService, // <-- Ajouté ici
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    this.getRecentJobPosts();
-  }
-
-  getRecentJobPosts() {
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${this.apiKey}`
-    });
-
-    this.http.get<JobPost[]>(this.apiUrl, { headers }).subscribe(
-      (data: any) => {
-        this.jobPosts = data.jobs; // Adjust based on the API response structure
+    this.jiraService.getIssues().subscribe(
+      data => {
+        this.issues = data;
+        console.log('Issues:', this.issues);
       },
       error => {
-        console.error('Error fetching job posts:', error);
+        console.error('Error fetching issues from jira server:', error);
       }
     );
   }
+
+  goToTestMonCV(selectedIssue: JiraIssue) {
+    // Afficher toutes les informations du post sélectionné dans la console
+    console.log('Informations du post sélectionné :', selectedIssue);
+
+    // Récupérer et stocker les skills dans le localStorage
+    const skills = selectedIssue.fields.customfield_10057
+      ? selectedIssue.fields.customfield_10057.split(',').map((s: string) => s.trim())
+      : [];
+    localStorage.setItem('postSkills', JSON.stringify(skills));
+
+    // Stocker le nom du post (summary) dans le localStorage
+    localStorage.setItem('postName', selectedIssue.fields.summary);
+
+    // Envoyer les skills au chat bot via le service (mémoire + backend)
+    this.chatInterviewService.setSkills(skills);
+
+    // Vérifier la mise à jour côté backend (optionnel)
+    // this.chatInterviewService.fetchSkillsFromBackend().subscribe(response => {
+    //   console.log('Skills récupérés depuis le backend:', response.skills);
+    // });
+
+    console.log('Skills envoyés au chat bot et enregistrés dans le localStorage:', skills);
+
+    this.router.navigate(['/test-mon-cv']);
+  }
+
+  onSubmit() {
+    // envoie les données de poste choisi au serveur
+    
+    // Optionnel : activer le flag canIncrementCV
+    localStorage.setItem('canIncrementCV', 'true');
+  }
 }
+
+
+
+
+
+
+

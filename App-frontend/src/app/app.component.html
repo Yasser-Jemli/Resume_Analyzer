@@ -1,5 +1,18 @@
-<app-headers></app-headers> <!-- Static header -->
+<!--<app-headers></app-headers>  Static header 
 
 <main>
+  <router-outlet></router-outlet> -- Routed content 
+</main>-->
+<app-headers></app-headers> <!-- Static header -->
+
+<main style="padding-bottom: 100px;"> <!-- espace en bas pour le chatbot -->
   <router-outlet></router-outlet> <!-- Routed content -->
 </main>
+
+<!-- Footer principal -->
+<footer style="background-color: #f1f1f1; padding: 10px; text-align: center;">
+  <p>&copy; 2025 - Mon Application</p>
+</footer>
+
+<!-- Chatbot flottant en bas à droite -->
+<app-chat-assistant></app-chat-assistant>

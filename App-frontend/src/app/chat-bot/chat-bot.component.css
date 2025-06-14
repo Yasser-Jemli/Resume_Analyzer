@@ -6,6 +6,11 @@
   border-radius: 8px;
   background-color: #f9f9f9;
 }
+.timer {
+  margin: 8px 0;
+  font-weight: bold;
+  color: #d9534f;   /* rouge Bootstrap */
+}
 
 .chat-window {
   max-height: 400px;
@@ -50,4 +55,82 @@
 
 .chat-input button:hover {
   background-color: #0056b3;
+}
+
+.chat-bot-container {
+  width: 400px;
+  margin: auto;
+  font-family: Arial, sans-serif;
+}
+
+.chat-window {
+  border: 1px solid #ccc;
+  height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  background: #f9f9f9;
+}
+
+.user-message {
+  text-align: right;
+  margin: 5px 0;
+}
+
+.bot-message {
+  text-align: left;
+  margin: 5px 0;
+}
+
+.score-icon {
+  margin-left: 10px;
+  font-size: 1.2em;
+  color: gold;
+}
+
+.chat-input {
+  margin-top: 10px;
+  display: flex;
+  gap: 5px;
+}
+
+.chat-input input {
+  flex-grow: 1;
+  padding: 5px;
+  font-size: 1em;
+}
+
+.countdown {
+  font-style: italic;
+  margin-top: 5px;
+  color: #666;
+}
+
+.final-score-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #2e7d32;
+}
+
+.final-score-icon {
+  margin-right: 6px;
+  font-size: 1.5em;
+}
+
+/* ... (styles déjà présents : chat-window, user-message, bot-message, etc.) ... */
+
+.score-icon {
+  margin-left: 8px;
+  font-size: 1.2em;
+  color: gold;
+}
+.final-score-container {
+  margin-bottom: 0.5rem;
+}
+
+.question-counter {
+  font-weight: bold;
+  margin-bottom: 1rem;
 }

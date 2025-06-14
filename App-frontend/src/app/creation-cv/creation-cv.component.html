@@ -1,113 +1,129 @@
-<div class="cv-container" #cvContent>
-  <h2 class="text-primary text-center mb-2">Création de CV</h2>
-  <p class="text-muted text-center">Remplissez les informations ci-dessous pour générer votre CV</p>
-  <form [formGroup]="cvForm">
-    
-    <section>
-      <h4 class="section-title">Informations personnelles</h4>
-      <div class="row g-3">
-        <div class="col-md-6">
-          <input class="form-control" formControlName="personalInfo.nom" placeholder="Nom">
-        </div>
-        <div class="col-md-6">
-          <input class="form-control" formControlName="personalInfo.prenom" placeholder="Prénom">
-        </div>
-        <div class="col-md-6">
-          <input class="form-control" formControlName="personalInfo.email" placeholder="Email">
-        </div>
-        <div class="col-md-6">
-          <input class="form-control" formControlName="personalInfo.telephone" placeholder="Téléphone">
-        </div>
-        <div class="col-12">
-          <input class="form-control" formControlName="personalInfo.adresse" placeholder="Adresse">
-        </div>
-        <div class="col-md-6">
-          <input type="date" class="form-control" formControlName="personalInfo.dateNaissance">
+<div class="container-fluid py-4 bg-light min-vh-100">
+  <div class="row">
+    <!-- Left: Form -->
+    <div class="col-lg-7">
+      <div class="card shadow border-0 mb-4">
+        <div class="card-body">
+          <h4 class="text-primary text-center">Create CV</h4>
+          <form [formGroup]="cvForm" (ngSubmit)="generateCV()">
+            <!-- ℹ️ Infos personnelles -->
+            <div formGroupName="personalInfo" class="mb-4">
+              <div class="row g-2">
+                <div class="col-md-6"><input formControlName="prenom" class="form-control" placeholder="Prénom" /></div>
+                <div class="col-md-6"><input formControlName="nom" class="form-control" placeholder="Nom" /></div>
+                <div class="col-md-6"><input formControlName="email" class="form-control" placeholder="Email" /></div>
+                <div class="col-md-6"><input formControlName="telephone" class="form-control" placeholder="Téléphone" /></div>
+                <div class="col-md-6"><input formControlName="adresse" class="form-control" placeholder="Adresse" /></div>
+                <div class="col-md-6"><input formControlName="dateNaissance" type="date" class="form-control" /></div>
+              </div>
+            </div>
+
+            <!-- 🎓 Formations -->
+            <div formArrayName="formation" class="mb-4">
+              <h5>Formations</h5>
+              <div *ngFor="let group of sections[0].getControls(); let i = index" [formGroupName]="i" class="rounded border p-3 mb-3">
+                <input formControlName="diplome" class="form-control mb-2" placeholder="Diplôme" />
+                <input formControlName="etablissement" class="form-control mb-2" placeholder="Établissement" />
+                <input formControlName="dateDebut" type="date" class="form-control mb-2" />
+                <input formControlName="dateFin" type="date" class="form-control mb-2" />
+                <textarea formControlName="description" class="form-control mb-2" rows="2" placeholder="Description"></textarea>
+                <button type="button" class="btn btn-sm btn-danger" (click)="sections[0].remove(i)">Supprimer</button>
+              </div>
+              <button type="button" class="btn btn-outline-primary" (click)="sections[0].add()">+ Ajouter une formation</button>
+            </div>
+
+            <!-- 💼 Expériences -->
+            <div formArrayName="experience" class="mb-4">
+              <h5>Expériences</h5>
+              <div *ngFor="let group of sections[1].getControls(); let i = index" [formGroupName]="i" class="rounded border p-3 mb-3">
+                <input formControlName="poste" class="form-control mb-2" placeholder="Poste" />
+                <input formControlName="entreprise" class="form-control mb-2" placeholder="Entreprise" />
+                <input formControlName="dateDebut" type="date" class="form-control mb-2" />
+                <input formControlName="dateFin" type="date" class="form-control mb-2" />
+                <textarea formControlName="description" class="form-control mb-2" rows="2" placeholder="Description"></textarea>
+                <button type="button" class="btn btn-sm btn-danger" (click)="sections[1].remove(i)">Supprimer</button>
+              </div>
+              <button type="button" class="btn btn-outline-primary" (click)="sections[1].add()">+ Ajouter une expérience</button>
+            </div>
+
+            <!-- 🛠 Compétences -->
+            <div formArrayName="competences" class="mb-4">
+              <h5>Compétences</h5>
+              <div *ngFor="let group of sections[2].getControls(); let i = index" [formGroupName]="i" class="rounded border p-3 mb-3">
+                <input formControlName="nom" class="form-control mb-2" placeholder="Compétence" />
+                <input formControlName="niveau" class="form-control mb-2" placeholder="Niveau" />
+                <button type="button" class="btn btn-sm btn-danger" (click)="sections[2].remove(i)">Supprimer</button>
+              </div>
+              <button type="button" class="btn btn-outline-primary" (click)="sections[2].add()">+ Ajouter une compétence</button>
+            </div>
+
+            <!-- 🌍 Langues -->
+            <div formArrayName="langues" class="mb-4">
+              <h5>Langues</h5>
+              <div *ngFor="let group of sections[3].getControls(); let i = index" [formGroupName]="i" class="rounded border p-3 mb-3">
+                <input formControlName="langue" class="form-control mb-2" placeholder="Langue" />
+                <input formControlName="niveau" class="form-control mb-2" placeholder="Niveau" />
+                <button type="button" class="btn btn-sm btn-danger" (click)="sections[3].remove(i)">Supprimer</button>
+              </div>
+              <button type="button" class="btn btn-outline-primary" (click)="sections[3].add()">+ Ajouter une langue</button>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+              <button type="submit" class="btn btn-success">Générer le CV</button>
+            </div>
+          </form>
         </div>
       </div>
-    </section>
-
-    <section>
-      <h4 class="section-title">Formations</h4>
-      <div class="rounded-section" *ngFor="let formationGroup of getFormationControls(); let i = index" [formGroup]="formationGroup">
-        <input formControlName="diplome" class="form-control mb-2" placeholder="Diplôme">
-        <input formControlName="etablissement" class="form-control mb-2" placeholder="Établissement">
-        <div class="row">
-          <div class="col-md-6"><input formControlName="dateDebut" type="date" class="form-control mb-2"></div>
-          <div class="col-md-6"><input formControlName="dateFin" type="date" class="form-control mb-2"></div>
-        </div>
-        <textarea formControlName="description" class="form-control" rows="3" placeholder="Description"></textarea>
-        <div class="text-end mt-2">
-          <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeFormation(i)">Supprimer</button>
-        </div>
-      </div>
-      <button type="button" class="btn btn-outline-primary" (click)="addFormation()">+ Ajouter une formation</button>
-    </section>
-
-    <section>
-      <h4 class="section-title">Expériences professionnelles</h4>
-      <div class="rounded-section" *ngFor="let experienceGroup of getExperienceControls(); let i = index" [formGroup]="experienceGroup">
-        <input formControlName="poste" class="form-control mb-2" placeholder="Poste">
-        <input formControlName="entreprise" class="form-control mb-2" placeholder="Entreprise">
-        <div class="row">
-          <div class="col-md-6"><input formControlName="dateDebut" type="date" class="form-control mb-2"></div>
-          <div class="col-md-6"><input formControlName="dateFin" type="date" class="form-control mb-2"></div>
-        </div>
-        <textarea formControlName="description" class="form-control" rows="3" placeholder="Description"></textarea>
-        <div class="text-end mt-2">
-          <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeExperience(i)">Supprimer</button>
-        </div>
-      </div>
-      <button type="button" class="btn btn-outline-primary" (click)="addExperience()">+ Ajouter une expérience</button>
-    </section>
-
-    <section>
-      <h4 class="section-title">Compétences</h4>
-      <div class="rounded-section row g-3" *ngFor="let competenceGroup of getCompetencesControls(); let i = index" [formGroup]="competenceGroup">
-        <div class="col-md-6">
-          <input formControlName="nom" class="form-control" placeholder="Nom de la compétence">
-        </div>
-        <div class="col-md-6">
-          <select formControlName="niveau" class="form-select">
-            <option value="Débutant">Débutant</option>
-            <option value="Intermédiaire">Intermédiaire</option>
-            <option value="Avancé">Avancé</option>
-            <option value="Expert">Expert</option>
-          </select>
-        </div>
-        <div class="text-end mt-2">
-          <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeCompetence(i)">Supprimer</button>
-        </div>
-      </div>
-      <button type="button" class="btn btn-outline-primary" (click)="addCompetence()">+ Ajouter une compétence</button>
-    </section>
-
-    <section>
-      <h4 class="section-title">Langues</h4>
-      <div class="rounded-section row g-3" *ngFor="let langueGroup of getLanguesControls(); let i = index" [formGroup]="langueGroup">
-        <div class="col-md-6">
-          <input formControlName="langue" class="form-control" placeholder="Langue">
-        </div>
-        <div class="col-md-6">
-          <select formControlName="niveau" class="form-select">
-            <option value="A1">A1 - Débutant</option>
-            <option value="A2">A2 - Élémentaire</option>
-            <option value="B1">B1 - Intermédiaire</option>
-            <option value="B2">B2 - Intermédiaire supérieur</option>
-            <option value="C1">C1 - Avancé</option>
-            <option value="C2">C2 - Maîtrise</option>
-          </select>
-        </div>
-        <div class="text-end mt-2">
-          <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeLangue(i)">Supprimer</button>
-        </div>
-      </div>
-      <button type="button" class="btn btn-outline-primary" (click)="addLangue()">+ Ajouter une langue</button>
-    </section>
-
-    <div class="text-center">
-      <button type="button" class="btn btn-primary btn-lg mt-4 px-5" (click)="generateCV()">Générer le CV</button>
     </div>
 
-  </form>
+    <!-- Right: CV Preview -->
+    <div class="col-lg-5">
+      <div class="card shadow border-0 h-100">
+        <div class="card-body" #cvContent>
+          <h4 class="text-center text-primary mb-3"></h4>
+          <div *ngIf="cvForm">
+            <h5>{{ cvForm.value?.personalInfo?.prenom || '' }} {{ cvForm.value?.personalInfo?.nom || '' }}</h5>
+            <p *ngIf="cvForm.value?.personalInfo?.email">📧 {{ cvForm.value.personalInfo.email }}</p>
+            <p *ngIf="cvForm.value?.personalInfo?.telephone">📞 {{ cvForm.value.personalInfo.telephone }}</p>
+            <p *ngIf="cvForm.value?.personalInfo?.adresse">🏠 {{ cvForm.value.personalInfo.adresse }}</p>
+            <p *ngIf="cvForm.value?.personalInfo?.dateNaissance">
+              🎂 {{ cvForm.value.personalInfo.dateNaissance }}
+            </p>
+            <hr />
+
+            <h6 *ngIf="cvForm.value?.formation?.length">🎓 Formations</h6>
+            <div *ngFor="let f of cvForm.value.formation">
+              <strong>{{ f.diplome }}</strong><br />
+              <small>
+                <span *ngIf="f.etablissement">🏫 {{ f.etablissement }}</span>
+                <span *ngIf="f.dateDebut || f.dateFin">
+                  ({{ f.dateDebut }} - {{ f.dateFin }})
+                </span>
+              </small><br />
+              <p>{{ f.description }}</p>
+            </div>
+
+            <h6 *ngIf="cvForm.value?.experience?.length">💼 Expériences</h6>
+            <div *ngFor="let e of cvForm.value.experience">
+              <strong>{{ e.poste }}</strong><br />
+              <small>
+                {{ e.entreprise }} ({{ e.dateDebut }} - {{ e.dateFin }})</small><br />
+              <p>{{ e.description }}</p>
+            </div>
+
+            <h6 *ngIf="cvForm.value?.competences?.length">🛠 Compétences</h6>
+            <ul>
+              <li *ngFor="let c of cvForm.value.competences">{{ c.nom }} - {{ c.niveau }}</li>
+            </ul>
+
+            <h6 *ngIf="cvForm.value?.langues?.length">🌍 Langues</h6>
+            <ul>
+              <li *ngFor="let l of cvForm.value.langues">{{ l.langue }} - {{ l.niveau }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

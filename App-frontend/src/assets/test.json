@@ -1,0 +1,316 @@
+{
+    "extraction_methods": {
+        "pdfminer": "--- Paragraph 1 ---\nYasser Jemli\n\n--- Paragraph 2 ---\nSW Designer\n\n--- Paragraph 3 ---\nI would introduce myself in seven words. Passionate coder, responsible ,\nbest colleague ever. That pretty much sums it up, though at least the last\none my former colleagues have to confirm. I try to do a good job in all\nroles I have in life, and I enjoy the process immensely.\n\n--- Paragraph 4 ---\n+216 53206925\n\n--- Paragraph 5 ---\nyasserjamli37@gmail.com\n\n--- Paragraph 6 ---\nhttps://github.com/Yasser-\nJemli\n\n--- Paragraph 7 ---\nhttps://www.linkedin.com/in/y\nasser-jamli-718582206/\n\n--- Paragraph 8 ---\nEducation\nESPRIT - Private School of\nEngineering and\nTechnology - Work Study\nProgram\nEmbedded systems  engineer\n\n--- Paragraph 9 ---\n2022 - juin 2026\n\n--- Paragraph 10 ---\nHigher Institute of\nComputer Science and\nMathematics in Monastir\n\n--- Paragraph 11 ---\nLicense in computer science &\nelectronic\n\n--- Paragraph 12 ---\nsept 2017 - juin 2021\n\n--- Paragraph 13 ---\nTechnical  2 mars 1934 of\nSousse high school\n\n--- Paragraph 14 ---\nTechnical baccalaureate\nsept 2016 - may 2017\n\n--- Paragraph 15 ---\nExpertise\n\n--- Paragraph 16 ---\nLeadership /Solution oriented\n\n--- Paragraph 17 ---\nJIRA / Git / Gitlab / Github\n\n--- Paragraph 18 ---\nC /  C++ / Rust / python\n\n--- Paragraph 19 ---\nEmbedded Android / AOSP / AAOS\n\n--- Paragraph 20 ---\nLanguage\n\n--- Paragraph 21 ---\nArabic\n\n--- Paragraph 22 ---\nFrench\n\n--- Paragraph 23 ---\nEnglish\n\n--- Paragraph 24 ---\nInterest\n\n--- Paragraph 25 ---\nReading\n\n--- Paragraph 26 ---\nWriting in arabic\n\n--- Paragraph 27 ---\nSports\n\n--- Paragraph 28 ---\nExperiance\nSW Designer \nACTIA Engineering Services\nAndroid In-Vehicle Infotainment System (A-IVI) Testing and Diagnosis\nfor Automotive Manufacturing\n\n--- Paragraph 29 ---\nMay 2022 - present\n\n--- Paragraph 30 ---\nAnalyze and review software customers' specifications and requirement\nspecifications.\nCreate detailed, comprehensive, and well-structured test plans and test cases\nto cover the requirements of the specification.\nSetting up of the test environment.\nEvaluate, prioritize, plan and coordinate test activities.\nReport defects that occurred during the test in JIRA.\nReporting test results and defects respecting deadlines and testing schedules\nof projects.\nDevelop and apply testing processes for new and existing products to meet\ncustomer needs.\nDebugging with crash Dumps ( System Logs + Tombstones ) \nVulnerability Analysis ( Determining Root cause ) \nDaily scrum meeting with testers & project lead.\n\n--- Paragraph 31 ---\nEmbedded Sytem Developer\nSASTEC group\n\n--- Paragraph 32 ---\nFebruary 2022\n\n--- Paragraph 33 ---\nDesign and simulate a bored electronic circuit (PCB)\nResponsible for 3D printing models for the product\n3D printer maintenance ( ENDER-3-PRO )\n\n--- Paragraph 34 ---\nProjects \n  \nStudy and realization of a Human Follower-assistant Robots (The\nFamilaire V1.0): \nThe main objective of our work was to describe and manufacture a robot capable\nof following the target. To simplify things, a label\nsingle transmitting 2.4Ghz frequency signal has been placed on the individual the\nrobot is to follow\nSkills : Proteus / Solidworks / Python / Raspberry Pi / EasyEDA / C / C++\n\n--- Paragraph 35 ---\nBMS ( battery management system ) :\nis an electronic system allowing the control and charging of the various elements\nof a storage battery .\nskills : Electronic / EasyEDA / Proteus / C",
+        "pymupdf": "--- Paragraph 1 ---\nhttps://github.com/Yasser-\n\n--- Paragraph 2 ---\nJemli\n\n--- Paragraph 3 ---\nTechnical  2 mars 1934 of\n\n--- Paragraph 4 ---\nSousse high school\n\n--- Paragraph 5 ---\nTechnical baccalaureate\n\n--- Paragraph 6 ---\nsept 2016 - may 2017\n\n--- Paragraph 7 ---\nYasser Jemli\n\n--- Paragraph 8 ---\n+216 53206925\n\n--- Paragraph 9 ---\nyasserjamli37@gmail.com\n\n--- Paragraph 10 ---\nEducation\n\n--- Paragraph 11 ---\nExpertise\n\n--- Paragraph 12 ---\nExperiance\n\n--- Paragraph 13 ---\nProjects\n\n--- Paragraph 14 ---\nHigher Institute of\n\n--- Paragraph 15 ---\nComputer Science and\n\n--- Paragraph 16 ---\nMathematics in Monastir\n\n--- Paragraph 17 ---\nLicense in computer science &\n\n--- Paragraph 18 ---\nelectronic\n\n--- Paragraph 19 ---\nStudy and realization of a Human Follower-assistant Robots (The\n\n--- Paragraph 20 ---\nFamilaire V1.0):\n\n--- Paragraph 21 ---\nThe main objective of our work was to describe and manufacture a robot capable\n\n--- Paragraph 22 ---\nof following the target. To simplify things, a label\n\n--- Paragraph 23 ---\nsingle transmitting 2.4Ghz frequency signal has been placed on the individual the\n\n--- Paragraph 24 ---\nrobot is to follow\n\n--- Paragraph 25 ---\nSkills : Proteus / Solidworks / Python / Raspberry Pi / EasyEDA / C / C++\n\n--- Paragraph 26 ---\nBMS ( battery management system ) :\n\n--- Paragraph 27 ---\nis an electronic system allowing the control and charging of the various elements\n\n--- Paragraph 28 ---\nof a storage battery .\n\n--- Paragraph 29 ---\nskills : Electronic / EasyEDA / Proteus / C\n\n--- Paragraph 30 ---\nsept 2017 - juin 2021\n\n--- Paragraph 31 ---\nLeadership /Solution oriented\n\n--- Paragraph 32 ---\nJIRA / Git / Gitlab / Github\n\n--- Paragraph 33 ---\nC /  C++ / Rust / python\n\n--- Paragraph 34 ---\nEmbedded Android / AOSP / AAOS\n\n--- Paragraph 35 ---\nSW Designer\n\n--- Paragraph 36 ---\nLanguage\n\n--- Paragraph 37 ---\nArabic\n\n--- Paragraph 38 ---\nFrench\n\n--- Paragraph 39 ---\nEnglish\n\n--- Paragraph 40 ---\nInterest\n\n--- Paragraph 41 ---\nReading\n\n--- Paragraph 42 ---\nWriting in arabic\n\n--- Paragraph 43 ---\nSports\n\n--- Paragraph 44 ---\nEmbedded Sytem Developer\n\n--- Paragraph 45 ---\nSASTEC group\n\n--- Paragraph 46 ---\nFebruary 2022\n\n--- Paragraph 47 ---\nDesign and simulate a bored electronic circuit (PCB)\n\n--- Paragraph 48 ---\nResponsible for 3D printing models for the product\n\n--- Paragraph 49 ---\n3D printer maintenance ( ENDER-3-PRO )\n\n--- Paragraph 50 ---\nhttps://www.linkedin.com/in/y\n\n--- Paragraph 51 ---\nasser-jamli-718582206/\n\n--- Paragraph 52 ---\nSW Designer\n\n--- Paragraph 53 ---\nACTIA Engineering Services\n\n--- Paragraph 54 ---\nMay 2022 - present\n\n--- Paragraph 55 ---\nAnalyze and review software customers' specifications and requirement\n\n--- Paragraph 56 ---\nspecifications.\n\n--- Paragraph 57 ---\nCreate detailed, comprehensive, and well-structured test plans and test cases\n\n--- Paragraph 58 ---\nto cover the requirements of the specification.\n\n--- Paragraph 59 ---\nSetting up of the test environment.\n\n--- Paragraph 60 ---\nEvaluate, prioritize, plan and coordinate test activities.\n\n--- Paragraph 61 ---\nReport defects that occurred during the test in JIRA.\n\n--- Paragraph 62 ---\nReporting test results and defects respecting deadlines and testing schedules\n\n--- Paragraph 63 ---\nof projects.\n\n--- Paragraph 64 ---\nDevelop and apply testing processes for new and existing products to meet\n\n--- Paragraph 65 ---\ncustomer needs.\n\n--- Paragraph 66 ---\nDebugging with crash Dumps ( System Logs + Tombstones )\n\n--- Paragraph 67 ---\nVulnerability Analysis ( Determining Root cause )\n\n--- Paragraph 68 ---\nDaily scrum meeting with testers & project lead.\n\n--- Paragraph 69 ---\nAndroid In-Vehicle Infotainment System (A-IVI) Testing and Diagnosis\n\n--- Paragraph 70 ---\nfor Automotive Manufacturing\n\n--- Paragraph 71 ---\nESPRIT - Private School of\n\n--- Paragraph 72 ---\nEngineering and\n\n--- Paragraph 73 ---\nTechnology - Work Study\n\n--- Paragraph 74 ---\nProgram\n\n--- Paragraph 75 ---\nEmbedded systems  engineer\n\n--- Paragraph 76 ---\n2022 - juin 2026\n\n--- Paragraph 77 ---\nI would introduce myself in seven words. Passionate coder, responsible ,\n\n--- Paragraph 78 ---\nbest colleague ever. That pretty much sums it up, though at least the last\n\n--- Paragraph 79 ---\none my former colleagues have to confirm. I try to do a good job in all\n\n--- Paragraph 80 ---\nroles I have in life, and I enjoy the process immensely."
+    },
+    "parsers": {
+        "custom": {
+            "Name": "Yasser Jemli",
+            "Email": [
+                "yasserjamli37@gmail.com"
+            ],
+            "Phone": [
+                "+216 53206925"
+            ],
+            "Skills": [
+                "python",
+                "c",
+                "c",
+                "rust",
+                "git",
+                "scrum",
+                "jira"
+            ],
+            "Experience": [
+                "SW Designer",
+                "ACTIA Engineering Services Android In-Vehicle Infotainment System (A-IVI) Testing and Diagnosis for Automotive Manufacturing  May 2022 - present ",
+                "Analyze and review software customers' specifications and requirement specifications. Create detailed, comprehensive, and well-structured test plans and test cases to cover the requirements of the specification. Setting up of the test environment. Evaluate, prioritize, plan and coordinate test activities. Report defects that occurred during the test in JIRA. Reporting test results and defects respecting deadlines and testing schedules of projects. Develop and apply testing processes for new and existing products to meet customer needs. Debugging with crash Dumps ( System Logs + Tombstones ) Vulnerability Analysis ( Determining Root cause )",
+                "Daily scrum meeting with testers & project lead. ",
+                "Embedded Sytem Developer",
+                "SASTEC group  February 2022  Design and simulate a bored electronic circuit (PCB) Responsible for 3D printing models for the product 3D printer maintenance ( ENDER-3-PRO )  Projects Study and realization of a Human Follower-assistant Robots (The Familaire V1.0): The main objective of our work was to describe and manufacture a robot capable of following the target. To simplify things, a label single transmitting 2.4Ghz frequency signal has been placed on the individual the robot is to follow Skills : Proteus / Solidworks / Python / Raspberry Pi / EasyEDA / C / C++  BMS ( battery management system ) : is an electronic system allowing the control and charging of the various elements of a storage battery . skills : Electronic / EasyEDA / Proteus / C"
+            ],
+            "Education": [
+                "ESPRIT - Private School of",
+                "Engineering and Technology - Work Study Program",
+                "Embedded systems engineer  2022 - juin 2026 ",
+                "Higher Institute of",
+                "Computer Science and",
+                "Mathematics in Monastir ",
+                "License in computer science & electronic  sept 2017 - juin 2021 ",
+                "Technical 2 mars 1934 of",
+                "Sousse high school ",
+                "Technical baccalaureate",
+                "sept 2016 - may 2017  Expertise  Leadership /Solution oriented  JIRA / Git / Gitlab / Github  C / C++ / Rust / python  Embedded Android / AOSP / AAOS  Language  Arabic  French  English  Interest  Reading  Writing in arabic  Sports  Experiance SW Designer",
+                "ACTIA Engineering Services Android In-Vehicle Infotainment System (A-IVI) Testing and Diagnosis",
+                "for Automotive Manufacturing ",
+                "May 2022 - present  Analyze and review software customers' specifications and requirement specifications. Create detailed, comprehensive, and well-structured test plans and test cases to cover the requirements of the specification. Setting up of the test environment. Evaluate, prioritize, plan and coordinate test activities. Report defects that occurred during the test in JIRA. Reporting test results and defects respecting deadlines and testing schedules of projects. Develop and apply testing processes for new and existing products to meet customer needs.",
+                "Debugging with crash Dumps ( System Logs + Tombstones ) Vulnerability Analysis ( Determining Root cause ) Daily scrum meeting with testers & project lead.  Embedded Sytem Developer SASTEC group  February 2022  Design and simulate a bored electronic circuit (PCB) Responsible for 3D printing models for the product",
+                "3D printer maintenance ( ENDER-3-PRO )  Projects",
+                "Study and realization of a Human Follower-assistant Robots (The Familaire V1.0):",
+                "The main objective of our work was to describe and manufacture a robot capable of following the target. To simplify things, a label single transmitting 2.4Ghz frequency signal has been placed on the individual the robot is to follow Skills : Proteus / Solidworks / Python / Raspberry Pi / EasyEDA / C / C++ ",
+                "BMS ( battery management system ) : is an electronic system allowing the control and charging of the various elements",
+                "of a storage battery . skills : Electronic / EasyEDA / Proteus / C"
+            ]
+        },
+        "pyres": {
+            "Name": "Yasser Jemli",
+            "Email": "yasserjamli37@gmail.com",
+            "Phone": "216 5320692",
+            "Skills": [
+                "Reporting",
+                "Testing",
+                "Design",
+                "Computer science",
+                "Debugging",
+                "Technical",
+                "Analyze",
+                "Writing",
+                "Github",
+                "Test cases",
+                "Jira",
+                "Engineering",
+                "Python",
+                "System",
+                "Plan",
+                "Schedules",
+                "Robot",
+                "Android",
+                "French",
+                "Scrum",
+                "Process",
+                "Solidworks",
+                "Analysis",
+                "English",
+                "Sports",
+                "Mathematics",
+                "Specifications",
+                "C++",
+                "Try",
+                "C"
+            ],
+            "Experience": null
+        }
+    },
+    "skill_recommendations": {
+        "status": "success",
+        "position": "sw_designer",
+        "current_skills": [
+            "python",
+            "c",
+            "c",
+            "rust",
+            "git",
+            "scrum",
+            "jira"
+        ],
+        "recommendations": {
+            "missing_required": [
+                "c++"
+            ],
+            "missing_preferred": [
+                "android",
+                "linux"
+            ],
+            "related_skills": [
+                "bitbucket",
+                "django",
+                "cargo",
+                "github",
+                "tokio",
+                "pytest",
+                "gitlab",
+                "fastapi",
+                "actix",
+                "flask"
+            ],
+            "skill_path": [
+                {
+                    "skill": "c++",
+                    "priority": "high",
+                    "reason": "Required for position"
+                },
+                {
+                    "skill": "android",
+                    "priority": "medium",
+                    "reason": "Preferred for position"
+                },
+                {
+                    "skill": "linux",
+                    "priority": "medium",
+                    "reason": "Preferred for position"
+                },
+                {
+                    "skill": "docker",
+                    "priority": "low",
+                    "reason": "Enhances skillset"
+                },
+                {
+                    "skill": "kubernetes",
+                    "priority": "low",
+                    "reason": "Enhances skillset"
+                },
+                {
+                    "skill": "jenkins",
+                    "priority": "low",
+                    "reason": "Enhances skillset"
+                }
+            ]
+        }
+    },
+    "learning_path": {
+        "status": "success",
+        "high_priority": {
+            "c++": {
+                "udemy": [
+                    {
+                        "title": "Beginning C Plus Plus Programming",
+                        "url": "https://www.udemy.com/course/beginning-c-plus-plus-programming"
+                    },
+                    {
+                        "title": "Learn Advanced C Programming",
+                        "url": "https://www.udemy.com/course/learn-advanced-c-programming"
+                    }
+                ],
+                "coursera": [
+                    {
+                        "title": "Cpp Programming",
+                        "url": "https://www.coursera.org/learn/cpp-programming"
+                    },
+                    {
+                        "title": "Advanced Cpp Specialization",
+                        "url": "https://www.coursera.org/learn/advanced-cpp-specialization"
+                    }
+                ],
+                "youtube": [
+                    "the-cherno",
+                    "cppcon",
+                    "code-beauty"
+                ],
+                "certificates": [
+                    "C++ Institute CPA",
+                    "Microsoft C++ Certification"
+                ]
+            }
+        },
+        "medium_priority": {
+            "android": {
+                "udemy": [
+                    {
+                        "title": "Android App Development With Kotlin",
+                        "url": "https://www.udemy.com/course/android-app-development-with-kotlin"
+                    },
+                    {
+                        "title": "Complete Android Developer Course",
+                        "url": "https://www.udemy.com/course/complete-android-developer-course"
+                    }
+                ],
+                "coursera": [
+                    {
+                        "title": "Android App Development",
+                        "url": "https://www.coursera.org/learn/android-app-development"
+                    },
+                    {
+                        "title": "Android Developer Specialization",
+                        "url": "https://www.coursera.org/learn/android-developer-specialization"
+                    }
+                ],
+                "youtube": [
+                    "coding-in-flow",
+                    "android-developers"
+                ],
+                "certificates": [
+                    "Google Associate Android Developer",
+                    "Android ATC Certification"
+                ]
+            },
+            "linux": {
+                "udemy": [
+                    {
+                        "title": "Complete Linux Training",
+                        "url": "https://www.udemy.com/course/complete-linux-training"
+                    },
+                    {
+                        "title": "Linux Administration Bootcamp",
+                        "url": "https://www.udemy.com/course/linux-administration-bootcamp"
+                    }
+                ],
+                "coursera": [
+                    {
+                        "title": "Linux Server Management",
+                        "url": "https://www.coursera.org/learn/linux-server-management"
+                    },
+                    {
+                        "title": "Linux Systems Programming",
+                        "url": "https://www.coursera.org/learn/linux-systems-programming"
+                    }
+                ],
+                "youtube": [
+                    "linux-foundation",
+                    "networkchuck"
+                ],
+                "certificates": [
+                    "Linux Foundation LFCS",
+                    "Red Hat RHCSA"
+                ]
+            }
+        },
+        "additional_learning": {
+            "bitbucket": {
+                "udemy": [],
+                "coursera": [],
+                "youtube": [],
+                "certificates": []
+            },
+            "django": {
+                "udemy": [],
+                "coursera": [],
+                "youtube": [],
+                "certificates": []
+            },
+            "cargo": {
+                "udemy": [],
+                "coursera": [],
+                "youtube": [],
+                "certificates": []
+            }
+        }
+    },
+    "scores": {
+        "custom": {
+            "total_score": 55.48,
+            "detailed_scores": {
+                "skills": 50.0,
+                "experience": 65.67,
+                "education": 50.0
+            },
+            "experience_metrics": {
+                "years": 3,
+                "positions": 3,
+                "details": "3 years, 3 positions"
+            },
+            "feedback": [
+                "Skills: Satisfactory",
+                "Experience: Satisfactory",
+                "Education: Satisfactory"
+            ]
+        },
+        "pyres": {
+            "total_score": 30.0,
+            "detailed_scores": {
+                "skills": 75.0,
+                "experience": 0,
+                "education": 0
+            },
+            "experience_metrics": {
+                "years": 0,
+                "positions": 0,
+                "details": "No experience found"
+            },
+            "feedback": [
+                "Skills: Excellent",
+                "Experience: Needs improvement",
+                "Education: Needs improvement"
+            ]
+        }
+    }
+}

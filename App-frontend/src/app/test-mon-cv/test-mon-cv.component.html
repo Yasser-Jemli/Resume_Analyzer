@@ -1,68 +1,185 @@
-<div class="container mt-4">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card p-4">
-        <h2 class="mb-3">Uploader votre CV (PDF)</h2>
+<div class="container-fluid p-4 bg-light min-vh-100">
+  <div class="card shadow-lg border-0 mx-auto" style="max-width: 1200px;">
+    <div class="card-body">
 
-        <input
-          type="file"
-          (change)="onFileSelected($event)"
-          accept="application/pdf"
-          class="form-control mb-3"
-          id="pdfUpload"
-          aria-label="Sélectionner un fichier PDF"
-        />
+      <h2 class="mb-4 text-center text-primary"><i class="bi bi-download"></i> Uploader votre CV (PDF)</h2>
 
-        <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
-          {{ errorMessage }}
+      <!-- Upload -->
+      <div class="row g-3 align-items-center mb-4">
+        <div class="col-md-9">
+          <input
+            type="file"
+            class="form-control"
+            accept="application/pdf"
+            (change)="onFileSelected($event)"
+            id="pdfUpload"
+          />
         </div>
-
-        <button
-          class="btn btn-primary mb-3"
-          (click)="uploadCV()"
-          [disabled]="!selectedFile"
-          aria-label="Uploader le CV"
-        >
-          Upload CV
-        </button>
-
-        <div *ngIf="uploadProgress > 0 && uploadProgress < 100" class="progress mb-3">
-          <div
-            class="progress-bar"
-            role="progressbar"
-            [style.width.%]="uploadProgress"
-            [attr.aria-valuenow]="uploadProgress"
-            aria-valuemin="0"
-            aria-valuemax="100"
-          >
-            {{ uploadProgress }}%
-          </div>
+        <div class="col-md-3 text-end">
+          <button class="btn btn-primary w-100" (click)="uploadCV()" [disabled]="!selectedFile">
+            <i class="bi bi-cloud-download"></i> Upload CV
+          </button>
         </div>
+      </div>
 
-        <div *ngIf="pdfSrc" class="pdf-preview mt-4">
-          <h5>Aperçu du CV :</h5>
+      <!-- Message d'erreur -->
+      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+      <!-- Progression Upload -->
+      <div *ngIf="uploadProgress > 0 && uploadProgress < 100" class="progress mb-4">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+             [style.width.%]="uploadProgress">
+          {{ uploadProgress }}%
+        </div>
+      </div>
+
+      <!-- Contenu principal -->
+      <div class="row">
+        <!-- Aperçu PDF -->
+        <div class="col-lg-6 mb-4">
+          <h5 class="mb-3"><i class="bi bi-file-earmark-pdf"></i> Aperçu du CV</h5>
           <ngx-extended-pdf-viewer
             [src]="pdfSrc"
+            *ngIf="pdfSrc"
+            [height]="'700px'"
             [useBrowserLocale]="true"
-            [height]="'1000px'"
             [showSidebarButton]="true"
-            [showZoomButtons]="true"
-            [showPrintButton]="true"
-            [showDownloadButton]="true"
-            [showPagingButtons]="true"
           ></ngx-extended-pdf-viewer>
         </div>
 
-        <!-- New Button: Get My Note -->
-        <button
-          class="btn btn-success mt-3"
-          (click)="getMyNote()"
-          [disabled]="!pdfisupdated"
-          aria-label="Get My Note"
-        >
-          Get My Note
-        </button>
-      </div>
+        <!-- Résultats -->
+        <div class="col-lg-6">
+          <div class="d-grid gap-3">
+
+            <!-- Ligne des boutons -->
+            <div class="row g-2">
+              <div class="col">
+                <button class="btn btn-success w-100" (click)="getMyNote()" [disabled]="!pdfisupdated">
+                  <i class="bi bi-graph-up-arrow"></i> Get My Note
+                </button>
+              </div>
+              <div class="col" *ngIf="customScore?.total_score > 50">
+                <button class="btn btn-outline-primary w-100" (click)="goToChat()">
+                  <i class="bi bi-chat-dots"></i> Go to Chat Interview
+                </button>
+              </div>
+            </div>
+
+            <!-- Progression Analyse -->
+            <div *ngIf="isGettingNote && getNoteProgress < 100" class="progress">
+              <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                   [style.width.%]="getNoteProgress">
+                {{ getNoteProgress }}%
+              </div>
+            </div>
+
+            <!-- Résultats de l'analyse -->
+            <div *ngIf="customScore" class="card border-0 shadow-sm">
+              <div class="card-body">
+                <h4 class="text-primary mb-3"><i class="bi bi-bar-chart"></i> Résultats de l'analyse</h4>
+                <p>
+                  <strong>Total Score:</strong>
+                  <span [ngClass]="getBadgeClass(customScore.total_score)">
+                    {{ customScore.total_score }}
+                  </span>
+                </p>
+                <p>
+                  <strong>Compétences:</strong>
+                  <span [ngClass]="getBadgeClass(customScore.detailed_scores.skills)">
+                    {{ customScore.detailed_scores.skills }}
+                  </span>
+                </p>
+                <p>
+                  <strong>Expérience:</strong>
+                  <span [ngClass]="getBadgeClass(customScore.detailed_scores.experience)">
+                    {{ customScore.detailed_scores.experience }}
+                  </span>
+                </p>
+                <p>
+                  <strong>Éducation:</strong>
+                  <span [ngClass]="getBadgeClass(customScore.detailed_scores.education)">
+                    {{ customScore.detailed_scores.education }}
+                  </span>
+                </p>
+                <p>
+                  <strong>Expérience détaillée :</strong><br>
+                  <span class="text-muted">{{ customScore.experience_metrics.details }}</span>
+                </p>
+
+                <!-- Feedback -->
+                <div *ngIf="customScore.feedback?.length">
+                  <strong>Feedback :</strong>
+                  <ul class="list-group list-group-flush">
+                    <li *ngFor="let fb of customScore.feedback" class="list-group-item">
+                      {{ fb }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Skill Recommendations -->
+            <div *ngIf="showResults && skillRecommendations" class="card border-0 shadow-sm mt-4">
+              <div class="card-body">
+                <h5 class="text-primary mb-3"><i class="bi bi-lightbulb"></i> Skill Recommendations</h5>
+
+                <div *ngIf="skillRecommendations.missing_required?.length">
+                  <strong>Missing Required Skills:</strong>
+                  <ul><li *ngFor="let s of skillRecommendations.missing_required">{{ s }}</li></ul>
+                </div>
+
+                <div *ngIf="skillRecommendations.missing_preferred?.length">
+                  <strong>Missing Preferred Skills:</strong>
+                  <ul><li *ngFor="let s of skillRecommendations.missing_preferred">{{ s }}</li></ul>
+                </div>
+
+                <div *ngIf="skillRecommendations.related_skills?.length">
+                  <strong>Related Skills:</strong>
+                  <ul><li *ngFor="let s of skillRecommendations.related_skills">{{ s }}</li></ul>
+                </div>
+
+                <div *ngIf="skillRecommendations.skill_path?.length">
+                  <strong>Skill Path:</strong>
+                  <ul>
+                    <li *ngFor="let path of skillRecommendations.skill_path">
+                      {{ path.skill }} ({{ path.priority }}) - {{ path.reason }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Learning Path -->
+            <div *ngIf="showResults && learningPath" class="card border-0 shadow-sm mt-4">
+              <div class="card-body">
+                <h5 class="text-primary mb-3"><i class="bi bi-journal-bookmark"></i> Learning Path</h5>
+                <ng-container *ngFor="let priority of ['medium_priority', 'additional_learning']">
+                  <div *ngIf="learningPath[priority]">
+                    <h6 class="mt-3 text-capitalize">{{ priority.replace('_', ' ') }}</h6>
+                    <div *ngFor="let skill of getKeys(learningPath[priority])">
+                      <strong>{{ skill }}</strong>
+                      <ul>
+                        <li *ngFor="let c of learningPath[priority][skill].udemy">
+                          Udemy: <a [href]="c.url" target="_blank">{{ c.title }}</a>
+                        </li>
+                        <li *ngFor="let c of learningPath[priority][skill].coursera">
+                          Coursera: <a [href]="c.url" target="_blank">{{ c.title }}</a>
+                        </li>
+                        <li *ngFor="let yt of learningPath[priority][skill].youtube">
+                          YouTube: {{ yt }}
+                        </li>
+                        <li *ngFor="let cert of learningPath[priority][skill].certificates">
+                          Certificate: {{ cert }}
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> <!-- end row -->
     </div>
   </div>
 </div>

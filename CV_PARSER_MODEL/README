@@ -1,0 +1,36 @@
+LIB used : 
+
+# PDF Processing
+PyMuPDF==1.23.8
+pdfminer.six==20221105
+pyresparser==1.0.6
+
+# File Operations
+pathlib>=1.0.1
+
+# Logging
+python-json-logger>=2.0.7
+
+# Core Dependencies
+datetime
+json
+re
+logging
+os
+sys
+getpass
+time
+platform
+
+
+# Save JSON only, no output
+python3 main.py parse_cv --path ~/Downloads/CV_Yasser_Jamli.pdf --save
+
+# Save JSON and log to file
+python3 main.py parse_cv --path ~/Downloads/CV_Yasser_Jamli.pdf --save --logging
+
+# Save JSON and show console output
+python3 main.py parse_cv --path ~/Downloads/CV_Yasser_Jamli.pdf --save --console
+
+# Full output (save JSON, log to file, show console)
+python3 main.py parse_cv --path ~/Downloads/CV_Yasser_Jamli.pdf --save --logging --console

@@ -7,14 +7,27 @@ import { Router } from '@angular/router';
   styleUrls: ['./headers.component.css']
 })
 export class HeadersComponent {
+  showMenu = false;
+
   constructor(private router: Router) {}
 
   isLoggedIn(): boolean {
     return localStorage.getItem('token') !== null;
   }
 
+  isAdmin(): boolean {
+    return localStorage.getItem('username') === 'admin';
+  }
+  isManager(): boolean {
+    return localStorage.getItem('userRole') === 'manager';
+  }
+
   logout(): void {
     localStorage.removeItem('token');
-    this.router.navigate(['/home']);
+    this.router.navigate(['/log-in']);
+  }
+
+  getUsername(): string | null {
+    return localStorage.getItem('username');
   }
 }
