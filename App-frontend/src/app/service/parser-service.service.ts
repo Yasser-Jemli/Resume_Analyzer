@@ -7,18 +7,18 @@ import { Observable } from 'rxjs';
 })
 export class ParserServiceService {
 
-  private apiUrl = 'http://localhost:8081/scores';
+  private apiUrl = 'http://localhost:8081';
 
   constructor(private http: HttpClient) { }
 
   // Service pour récupérer les scores (utilisé dans getMyNote)
   getScores(): Observable<any> {
-    return this.http.get<any>('http://localhost:8081/scores');
+    return this.http.get<any>(`${this.apiUrl}/scores`);
   }
   getLearningPath(): Observable<any> {
-    return this.http.get<any>('http://localhost:8081/learning_path');
+    return this.http.get<any>(`${this.apiUrl}/learning_path`);
   }
   getSkillRecommendations(): Observable<any> {
-    return this.http.get<any>('http://localhost:8081/skill_recommendations');
+    return this.http.get<any>(`${this.apiUrl}/skill_recommendations`);
   }
 }

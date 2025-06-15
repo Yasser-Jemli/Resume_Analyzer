@@ -25,6 +25,7 @@ import { ShowCvuserComponent } from './show-cvuser/show-cvuser.component';
 import { MypostComponent } from './mypost/mypost.component';
 import { ChatAssistantComponent } from './chat-assistant/chat-assistant.component';
 import { ConfirmCodeComponent } from './confirm-code/confirm-code.component';
+import { UpdatepasswordManagerComponent } from './updatepassword-manager/updatepassword-manager.component';
 
 
 @NgModule({
@@ -49,6 +50,7 @@ import { ConfirmCodeComponent } from './confirm-code/confirm-code.component';
     MypostComponent,
     ChatAssistantComponent,
     ConfirmCodeComponent,
+    UpdatepasswordManagerComponent,
   ],
   imports: [
     BrowserModule,

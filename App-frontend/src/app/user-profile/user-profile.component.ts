@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { UserServiceService } from '../service/user-service.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 export class UserProfileComponent implements OnInit {
   username: string | null = '';
   email: string | null = '';
-  id: number | null = null;
+  id: string | null = null;
   Nbr_Posts: number | null = null;
   lastPosts: string | null = null;
   CV_Note: number | null = null;
@@ -18,19 +18,18 @@ export class UserProfileComponent implements OnInit {
   lastcvName: string | null = '';
   customScore: any = null;
 
-  // New: visibility toggles for score sections
   showDetails = {
     detailedScores: false,
     experienceMetrics: false,
     feedback: false
   };
 
-  constructor(private http: HttpClient) {}
+  constructor(private userService: UserServiceService) {}
 
   ngOnInit(): void {
     this.username = localStorage.getItem('username');
     if (this.username) {
-      this.http.get<any[]>(`http://localhost:8081/users?username=${this.username}`).subscribe({
+      this.userService.getUserByUsername(this.username).subscribe({
         next: (users) => {
           if (users.length > 0) {
             const user = users[0];
@@ -49,15 +48,15 @@ export class UserProfileComponent implements OnInit {
       });
     }
   }
-  showTab(tabName: 'detailedScores' | 'experienceMetrics' | 'feedback') {
-  this.showDetails = {
-    detailedScores: false,
-    experienceMetrics: false,
-    feedback: false
-  };
-  this.showDetails[tabName] = true;
-}
 
+  showTab(tabName: 'detailedScores' | 'experienceMetrics' | 'feedback') {
+    this.showDetails = {
+      detailedScores: false,
+      experienceMetrics: false,
+      feedback: false
+    };
+    this.showDetails[tabName] = true;
+  }
 
   deleteMyProfile(): void {
     const password = prompt('Please enter your password to confirm profile deletion:');
@@ -66,66 +65,109 @@ export class UserProfileComponent implements OnInit {
       return;
     }
 
-    this.http.get<any[]>(`http://localhost:8081/users?username=${this.username}`).subscribe({
-      next: (users) => {
-        if (users.length > 0) {
-          const user = users[0];
-          if (user.password === password) {
-            if (confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
-              // Suppression du profil
-              this.http.delete(`http://localhost:8081/users/${user.id}`).subscribe({
-                next: () => {
-                  alert('Profile deleted successfully.');
-                  localStorage.clear();
-                  // Appel logout (redirige vers /log-in)
-                  window.location.href = '/log-in';
-                },
-                error: (err) => {
-                  alert('Failed to delete profile.');
-                  console.error('Delete error:', err);
-                }
-              });
+    if (this.username) {
+      this.userService.getUserByUsername(this.username).subscribe({
+        next: (users) => {
+          if (users.length > 0) {
+            const user = users[0];
+            if (user.password === password) {
+              if (confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
+                this.userService.deleteUser(user.id).subscribe({
+                  next: () => {
+                    alert('Profile deleted successfully.');
+                    localStorage.clear();
+                    window.location.href = '/log-in';
+                  },
+                  error: (err) => {
+                    alert('Failed to delete profile.');
+                    console.error('Delete error:', err);
+                  }
+                });
+              }
+            } else {
+              alert('Incorrect password. Profile not deleted.');
             }
           } else {
-            alert('Incorrect password. Profile not deleted.');
+            alert('User not found.');
           }
-        } else {
-          alert('User not found.');
+        },
+        error: (err) => {
+          alert('Error verifying password.');
+          console.error('Fetch user error:', err);
         }
-      },
-      error: (err) => {
-        alert('Error verifying password.');
-        console.error('Fetch user error:', err);
-      }
-    });
+      });
+    }
   }
+
   getBadgeClass(score: number): string {
-  if (score < 50) {
-    return 'bg-danger text-light'; // Rouge
-  } else if (score < 70) {
-    return 'bg-warning text-dark'; // Jaune
-  } else {
-    return 'bg-success text-light'; // Vert
+    if (score < 50) {
+      return 'bg-danger text-light';
+    } else if (score < 70) {
+      return 'bg-warning text-dark';
+    } else {
+      return 'bg-success text-light';
+    }
   }
-}
 
-reloadUserData() {
-  if (this.username) {
-    this.http.get<any[]>(`http://localhost:8081/users?username=${this.username}`).subscribe({
-      next: (users) => {
-        if (users.length > 0) {
-          const user = users[0];
-          this.email = user.email;
-          this.id = user.id;
-          this.username = user.username;
-          this.Nbr_Posts = user.Nbr_Posts || 0;
-          this.lastPosts = user.lastPosts || null;
-          this.customScore = user.customScore || { total_score: 0 };
-          this.lastcvName = user.lastcvName || '';
+  reloadUserData() {
+    if (this.username) {
+      this.userService.getUserByUsername(this.username).subscribe({
+        next: (users) => {
+          if (users.length > 0) {
+            const user = users[0];
+            this.email = user.email;
+            this.id = user.id;
+            this.username = user.username;
+            this.Nbr_Posts = user.Nbr_Posts || 0;
+            this.lastPosts = user.lastPosts || null;
+            this.customScore = user.customScore || { total_score: 0 };
+            this.lastcvName = user.lastcvName || '';
+          }
         }
-      }
-    });
+      });
+    }
   }
-}
 
+  updatePassword(): void {
+    const oldPassword = prompt('Entrez votre mot de passe actuel :');
+    if (!oldPassword) {
+      alert('Changement annulé.');
+      return;
+    }
+
+    const newPassword = prompt('Entrez le nouveau mot de passe (min 6 caractères) :');
+    if (!newPassword || newPassword.length < 6) {
+      alert('Le nouveau mot de passe doit contenir au moins 6 caractères.');
+      return;
+    }
+
+    if (this.username) {
+      this.userService.getUserByUsername(this.username).subscribe({
+        next: (users) => {
+          if (users.length > 0) {
+            const user = users[0];
+            if (user.password === oldPassword) {
+              this.userService.updateUser(user.id, { password: newPassword }).subscribe({
+                next: () => {
+                  alert('Mot de passe mis à jour avec succès.');
+                },
+                error: (err) => {
+                  alert('Erreur lors de la mise à jour du mot de passe.');
+                  console.error('Update error:', err);
+                }
+              });
+            } else {
+              alert('Mot de passe actuel incorrect.');
+            }
+          } else {
+            alert('Utilisateur introuvable.');
+          }
+        },
+        error: (err) => {
+          alert('Erreur lors de la vérification du mot de passe.');
+          console.error('Fetch user error:', err);
+        }
+      });
+    }
+  }
 }

@@ -19,6 +19,7 @@ import { ManagerProfileComponent } from './manager-profile/manager-profile.compo
 import { ShowCvuserComponent } from './show-cvuser/show-cvuser.component';
 import { MypostComponent } from './mypost/mypost.component';
 import { ConfirmCodeComponent } from './confirm-code/confirm-code.component';
+import { UpdatepasswordManagerComponent } from './updatepassword-manager/updatepassword-manager.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/log-in', pathMatch: 'full' },
@@ -35,10 +36,11 @@ const routes: Routes = [
   { path: 'update-password', component: UpdatePasswordComponent },
   {path : 'confirm-code', component: ConfirmCodeComponent}, 
   { path: 'not-found', component: NotFoundComponent },
-  { path: 'profile', component: UserProfileComponent, canActivate: [AuthGuard] },
-  { path: 'manager-profile', component: ManagerProfileComponent, canActivate: [AuthGuard] },
+  { path: 'profile/:id', component: UserProfileComponent, canActivate: [AuthGuard] },
+  { path: 'manager-profile/:id', component: ManagerProfileComponent, canActivate: [AuthGuard] },
   { path: 'showCVuser', component: ShowCvuserComponent },
   { path: 'Mypost', component: MypostComponent },
+  { path : 'update-password-manager', component: UpdatepasswordManagerComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '/not-found' }
 ];
 

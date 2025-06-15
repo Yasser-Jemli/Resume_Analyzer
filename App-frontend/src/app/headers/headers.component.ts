@@ -19,7 +19,7 @@ export class HeadersComponent {
     return localStorage.getItem('username') === 'admin';
   }
   isManager(): boolean {
-    return localStorage.getItem('userRole') === 'manager';
+    return localStorage.getItem('userRole') === 'MANAGER';
   }
 
   logout(): void {
@@ -29,5 +29,9 @@ export class HeadersComponent {
 
   getUsername(): string | null {
     return localStorage.getItem('username');
+  }
+
+  getUserId(): string | null {
+    return localStorage.getItem('id');
   }
 }
