@@ -63,34 +63,16 @@ export class SignupComponent {
             return;
           }
 
-          // Vérifier username dans managers
-          this.userService.getManagerByUsername(username).subscribe({
-            next: (managersByUsername) => {
-              if (managersByUsername.length > 0) {
-                this.errorMessage = 'This username is already taken.';
-                return;
-              }
+          // Stocker uniquement les infos nécessaires en localStorage pour la confirmation
+          localStorage.setItem('pendingUser', JSON.stringify({
+            username,
+            email,
+            password,
+            role: 'CANDIDATE'
+          }));
 
-              // Stocker les infos en localStorage pour la confirmation
-              localStorage.setItem('pendingUser', JSON.stringify({
-                username,
-                email,
-                password,
-                endPost: null,
-                lastcvName: null,
-                customScore: null,
-                total_score: null,
-                detailed_scores: null,
-                experience_metrics: null,
-                feedback: null
-              }));
-              // Rediriger vers la page de confirmation de code avec le mode signup
-              this.router.navigate(['/confirm-code'], { queryParams: { email, mode: 'signup' } });
-            },
-            error: () => {
-              this.errorMessage = 'Error checking manager username uniqueness.';
-            }
-          });
+          // Rediriger vers la page de confirmation de code avec le mode signup
+          this.router.navigate(['/confirm-code'], { queryParams: { email, mode: 'signup' } });
         },
         error: () => {
           this.errorMessage = 'Error checking username uniqueness.';

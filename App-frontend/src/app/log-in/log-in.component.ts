@@ -4,7 +4,6 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { UserServiceService } from '../service/user-service.service';
-import { ManagerServiceService } from '../service/manager-service.service';
 
 @Component({
   selector: 'app-log-in',
@@ -22,7 +21,6 @@ export class LogInComponent implements OnInit {
     private http: HttpClient,
     private router: Router,
     private userService: UserServiceService,
-    private managerService: ManagerServiceService
   ) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
@@ -60,28 +58,31 @@ export class LogInComponent implements OnInit {
 
     const { username, password, rememberMe } = this.loginForm.value;
 
-    console.log('🔐 Tentative de connexion :', { username, rememberMe });
-
     this.authenticateUser({ username, password }).subscribe({
       next: (response) => {
-        console.log('✅ Connexion réussie :', response);
         this.loading = false;
         localStorage.clear();
-        // ✅ Stockage du token, rôle, username et email
+        localStorage.setItem('id', response.id);
+        localStorage.setItem('username', response.username);
         localStorage.setItem('token', response.token);
         localStorage.setItem('userRole', response.role);
-        localStorage.setItem('username', response.username); // <-- always from backend
-        localStorage.setItem('email', response.email);       // <-- always from backend
-        localStorage.setItem('lastCvName', response.lastcvName); // <-- always from backend
-        localStorage.setItem('cvNote', response.CV_Note || '0'); // <-- always from backend
-        
-        if (rememberMe) {
-          // Exemple : stocker dans localStorage pour persistance (déjà fait ci-dessus)
-          console.log('📝 Session persistante activée');
-        }
+        localStorage.setItem('ChangePassword', response.ChangePassword);
 
-        // Rediriger vers la page d'accueil
-        this.router.navigate(['/home']);
+        // Après authentification réussie
+        const user = {
+          role: response.role,
+          username: response.username,
+          id: response.id,
+          mustChangePassword: response.mustChangePassword // ou passwordChanged: response.passwordChanged
+        };
+        console.log('User role is:', user.role , );
+        console.log('password change', user.mustChangePassword);
+        // Rediriger vers la page de connexion
+        if (user.role === 'MANAGER' && user.mustChangePassword) {
+          this.router.navigate(['/update-password-manager'], { queryParams: { username: user.username } });
+        } else {
+          this.router.navigate(['/home']);
+        }
       },
       error: (error) => {
         console.error('❌ Échec de connexion :', error);
@@ -96,41 +97,42 @@ export class LogInComponent implements OnInit {
    */
   private authenticateUser(credentials: { username: string; password: string }): Observable<any> {
     return new Observable((observer) => {
-      // Static admin check
+      // Static admin check (exemple pour SYSADMIN)
       if (credentials.username === 'admin' && credentials.password === 'admin123') {
-        observer.next({ token: 'fake-jwt-token', role: 'admin', username: 'admin', email: 'admin@actia-engineering.tn' });
+        observer.next({ 
+          token: 'fake-jwt-token', 
+          role: 'SYSADMIN', 
+          username: 'admin', 
+          email: 'admin@actia-engineering.tn' 
+        });
         observer.complete();
         return;
       }
 
-      // Helper to check a collection (users or managers)
-      const checkCollection = (collection: string) => {
-        const url = `http://localhost:8081/${collection}?${credentials.username.includes('@') ? 'email' : 'username'}=${credentials.username}&password=${credentials.password}`;
-        this.http.get<any[]>(url).subscribe({
-          next: (results) => {
-            if (results.length > 0) {
-              observer.next({
-                token: 'fake-jwt-token',
-                role: collection === 'managers' ? 'manager' : 'user',
-                username: results[0].username,
-                email: results[0].email
-              });
-              observer.complete();
-            } else if (collection === 'users') {
-              // If not found in users, check managers
-              checkCollection('managers');
-            } else {
-              observer.error({ status: 401, message: 'Identifiants invalides' });
-            }
-          },
-          error: (err) => {
-            observer.error({ status: 500, message: 'Erreur serveur' });
+      // Vérifier uniquement dans la collection users
+      const url = `http://localhost:8081/users?${credentials.username.includes('@') ? 'email' : 'username'}=${credentials.username}&password=${credentials.password}`;
+      this.http.get<any[]>(url).subscribe({
+        next: (results) => {
+          if (results.length > 0) {
+            observer.next({
+              token: 'fake-jwt-token',
+              role: results[0].role,
+              username: results[0].username,
+              email: results[0].email,
+              mustChangePassword: results[0].mustChangePassword,
+              id: results[0].id // <-- AJOUTE CETTE LIGNE
+            });
+            observer.complete();
+          } else {
+            observer.error({ status: 401, message: 'Identifiants invalides' });
           }
-        });
-      };
-
-      // Start by checking users, then managers if not found
-      checkCollection('users');
+        },
+        error: (err) => {
+          observer.error({ status: 500, message: 'Erreur serveur' });
+        }
+      });
     });
   }
+
+ 
 }

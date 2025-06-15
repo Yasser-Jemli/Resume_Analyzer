@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ChatInterviewServiceService {
 
-  private apiUrl = 'http://localhost:8081/chat-interview'; // URL de l'API pour les interviews
+  private apiUrl = 'http://172.0.0.196:5000'; // URL de l'API pour les interviews
 
   // Subject pour partager les skills sélectionnées avec le chatbot
   private skillsSubject = new BehaviorSubject<string[] | null>(null);
