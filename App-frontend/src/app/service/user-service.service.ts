@@ -56,15 +56,32 @@ export class UserServiceService {
   // Vérifier le code de confirmation
   verifyCode(data: { email: string; code: string }): Observable<any> {
     // À adapter selon ton backend, ici exemple avec /verify-code
-    return this.http.post<any>('http://localhost:8081/verify-code', data);
+    return this.http.post<any>(`${this.apiUrl}+/verify-code`, data);
   }
 
   // Renvoyer le code de confirmation
   resendConfirmationCode(email: string): Observable<any> {
     // À adapter selon ton backend, ici exemple avec /resend-code
-    return this.http.post<any>('http://localhost:8081/resend-code', { email });
+    return this.http.post<any>(`${this.apiUrl}+/resend-code`, { email });
   }
-  getManagerByUsername(username: string): Observable<any[]> {
-  return this.http.get<any[]>(`http://localhost:8081/managers?username=${username}`);
-}
+
+  // Récupérer tous les utilisateurs
+  getAllUsers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}`);
+  }
+
+  // Récupérer les utilisateurs par rôle (MANAGER ou CANDIDATE)
+  getUsersByRole(role: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}?role=${role}`);
+  }
+
+  // Changer la valeur de ChangePassword pour un utilisateur
+  changePasswordFlag(id: string, value: boolean): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/${id}`, { mustChangePassword: value });
+  }
+
+  // Récupérer un utilisateur par ID
+  getUserById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
+  }
 }

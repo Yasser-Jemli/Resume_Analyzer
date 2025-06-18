@@ -18,7 +18,7 @@
         </button>
         <ul class="dropdown-list" *ngIf="showMenu">
           <li>
-            <a routerLink="/manager-profile" (click)="showMenu = false">View Profile</a>
+            <a [routerLink]="['/manager-profile', getUserId()]" (click)="showMenu = false">View Profile</a>
           </li>
           <li>
             <a (click)="logout(); showMenu = false">Log out</a>
@@ -35,7 +35,7 @@
         <button class="nav-button" (click)="showMenu = !showMenu" type="button">log in : {{ getUsername() }}
         </button>
         <ul class="dropdown-list" *ngIf="showMenu">
-          <li><a routerLink="/profile" (click)="showMenu = false">View Profile</a></li>
+          <li><a [routerLink]="['/profile', getUserId()]" (click)="showMenu = false">View Profile</a></li>
           <li><a (click)="logout(); showMenu = false">Log out</a></li>
         </ul>
       </div>
@@ -44,7 +44,7 @@
       <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/test-mon-cv">CV score</button>
       <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/creation-cv">CREATE CV</button>
       <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/chat-bot">Chat interview</button>
-      <button *ngIf="isLoggedIn() && isAdmin()" class="nav-button" routerLink="/gestion-managers">MANAGER MANAGMENT</button>
+      <button *ngIf="isLoggedIn() && isAdmin()" class="nav-button" routerLink="/gestion-managers">USERS MANAGMENT</button>
       <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/about-nous">US</button>
     </ng-template>
   </nav>

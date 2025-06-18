@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { UserServiceService } from '../service/user-service.service';
 
 @Component({
   selector: 'app-manager-profile',
@@ -7,18 +8,21 @@ import { Router } from '@angular/router';
   styleUrls: ['./manager-profile.component.css']
 })
 export class ManagerProfileComponent implements OnInit {
-  username: string | null = '';
-  email: string | null = '';
+  username = '';
+  email = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private userService: UserServiceService
+  ) {}
 
   ngOnInit(): void {
-    const role = localStorage.getItem('userRole');
-    if (role !== 'manager') {
-      // Not a manager, redirect to home or login
-      this.router.navigate(['/home']);
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.userService.getUserById(id).subscribe(user => {
+        this.username = user.username;
+        this.email = user.email;
+      });
     }
-    this.username = localStorage.getItem('username');
-    this.email = localStorage.getItem('email');
   }
 }
