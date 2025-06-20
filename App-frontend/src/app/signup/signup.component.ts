@@ -68,8 +68,14 @@ export class SignupComponent {
             username,
             email,
             password,
-            role: 'CANDIDATE'
+            role : "CANDIDATE" // Role par défaut pour les nouveaux utilisateurs
           }));
+          console.log('Pending user data stored in localStorage:', {
+            username,
+            email,
+            password,
+            role: 'CANDIDATE'
+          });
 
           // Rediriger vers la page de confirmation de code avec le mode signup
           this.router.navigate(['/confirm-code'], { queryParams: { email, mode: 'signup' } });

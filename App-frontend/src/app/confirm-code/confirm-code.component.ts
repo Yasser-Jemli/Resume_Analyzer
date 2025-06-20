@@ -57,7 +57,7 @@ export class ConfirmCodeComponent implements OnInit {
     if (this.code === this.generatedCode) {
       if (this.mode === 'signup') {
         const userData = JSON.parse(localStorage.getItem('pendingUser') || '{}');
-        if (userData && userData.username && userData.email && userData.password) {
+        if (userData && userData.username && userData.email && userData.password && userData.role) {
           this.userService.createUser(userData).subscribe({
             next: () => {
               localStorage.removeItem('pendingUser');

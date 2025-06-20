@@ -24,16 +24,7 @@ export class GestionManagersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadManagers();
     this.loadAllUsers();
-  }
-
-  loadManagers() {
-    // Charger uniquement les utilisateurs avec le rôle MANAGER
-    this.userService.getUsersByRole('MANAGER').subscribe({
-      next: (data) => this.managers = data,
-      error: (err) => console.error('Failed to load managers:', err)
-    });
   }
 
   loadAllUsers() {
@@ -65,7 +56,6 @@ export class GestionManagersComponent implements OnInit {
       return;
     }
 
-    // Vérifier si le username existe déjà chez les users
     this.userService.getUserByUsername(this.newManager.username).subscribe({
       next: (users) => {
         if (users.length > 0) {
@@ -73,22 +63,22 @@ export class GestionManagersComponent implements OnInit {
           return;
         }
 
-        // Always append the fixed domain
         const email = `${this.newManager.email}@actia-engineering.tn`;
+        const generatedPassword = this.generatePassword(8);
 
         const managerToAdd = {
           username: this.newManager.username,
           email: email,
           role: 'MANAGER',
-          passwordChanged: false,
+          mustChangePassword: true,
+          password: generatedPassword
         };
 
         this.userService.createUser(managerToAdd).subscribe({
           next: (response) => {
             this.toggleAddForm();
-            this.loadManagers();
-            // Supposons que le backend retourne { password: '...' }
-            alert(`Manager added! Password: ${response.password}`);
+            this.loadAllUsers();
+            alert(`Manager added! Password: ${generatedPassword}`);
           },
           error: (err) => alert('Failed to add manager: ' + err.message)
         });
@@ -112,5 +102,14 @@ export class GestionManagersComponent implements OnInit {
 
   togglePassword(username: string) {
     this.showPassword[username] = !this.showPassword[username];
+  }
+
+  generatePassword(length: number = 8): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let password = '';
+    for (let i = 0; i < length; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
   }
 }

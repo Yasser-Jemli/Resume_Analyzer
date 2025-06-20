@@ -28,6 +28,12 @@ export class UserProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.username = localStorage.getItem('username');
+    this.email = localStorage.getItem('email');
+    this.id = localStorage.getItem('id'); 
+    this.Nbr_Posts = Number(localStorage.getItem('Nbr_Posts')) || 0;
+    this.lastPosts = localStorage.getItem('lastPosts');
+    this.lastcvName = localStorage.getItem('lastcvName') || '';
+    this.customScore = JSON.parse(localStorage.getItem('customScore') || '{}') || { total_score: 0 };
     if (this.username) {
       this.userService.getUserByUsername(this.username).subscribe({
         next: (users) => {
@@ -114,6 +120,7 @@ export class UserProfileComponent implements OnInit {
       this.userService.getUserByUsername(this.username).subscribe({
         next: (users) => {
           if (users.length > 0) {
+            console.log('Reloaded user data:', users);
             const user = users[0];
             this.email = user.email;
             this.id = user.id;
@@ -142,30 +149,33 @@ export class UserProfileComponent implements OnInit {
     }
 
     if (this.username) {
-      this.userService.getUserByUsername(this.username).subscribe({
-        next: (users) => {
-          if (users.length > 0) {
-            const user = users[0];
-            if (user.password === oldPassword) {
-              this.userService.updateUser(user.id, { password: newPassword }).subscribe({
-                next: () => {
-                  alert('Mot de passe mis à jour avec succès.');
-                },
-                error: (err) => {
-                  alert('Erreur lors de la mise à jour du mot de passe.');
-                  console.error('Update error:', err);
-                }
-              });
-            } else {
-              alert('Mot de passe actuel incorrect.');
-            }
-          } else {
-            alert('Utilisateur introuvable.');
+      const userId = localStorage.getItem('id');
+      if (!userId) {
+        alert('Utilisateur introuvable.');
+        return;
+      }
+
+      // Utilisation du service getPassword
+      this.userService.getPassword(userId).subscribe({
+        next: (response) => {
+          const storedPassword = response.password;
+          if (storedPassword !== oldPassword) {
+            alert('Mot de passe actuel incorrect.');
+            return;
           }
+          this.userService.updatePassword(userId, newPassword).subscribe({
+            next: () => {
+              alert('Mot de passe mis à jour avec succès.');
+            },
+            error: (err) => {
+              alert('Erreur lors de la mise à jour du mot de passe.');
+              console.error('Update error:', err);
+            }
+          });
         },
         error: (err) => {
-          alert('Erreur lors de la vérification du mot de passe.');
-          console.error('Fetch user error:', err);
+          alert('Erreur lors de la récupération du mot de passe.');
+          console.error('Get password error:', err);
         }
       });
     }
