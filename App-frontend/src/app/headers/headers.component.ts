@@ -24,6 +24,10 @@ export class HeadersComponent {
 
   logout(): void {
     localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('id');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('ChangePassword');
     this.router.navigate(['/log-in']);
   }
 

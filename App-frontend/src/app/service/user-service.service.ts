@@ -14,11 +14,11 @@ export class UserServiceService {
 
   constructor(private http: HttpClient) {}
 
-  // Authentification utilisateur (login)
-  login(username: string, password: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}?username=${username}&password=${password}`);
+  // Authentification utilisateur (login) via POST
+  login(credentials: { username?: string; email?: string; password: string }): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, credentials);
   }
-
+  
   // Récupérer un utilisateur par email
   getUserByEmail(email: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}?email=${email}`);
