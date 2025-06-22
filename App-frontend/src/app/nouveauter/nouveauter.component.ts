@@ -1,18 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { JiraServiceService } from '../service/jira-service.service';
-import { ChatInterviewServiceService } from '../service/chat-interview-service.service'; // <-- Import du service
-
-interface JiraIssue {
-  key: string;
-  fields: {
-    summary: string;
-    description: string;
-    customfield_10056?: string; // responsibilities
-    customfield_10057?: string; // skills
-    customfield_10055?: string; // description
-  };
-}
+import { PostService } from '../service/post-service.service';
+import { ChatInterviewServiceService } from '../service/chat-interview-service.service';
+import { Post } from '../models/post.model'; // Use shared model
 
 @Component({
   selector: 'app-nouveauter',
@@ -20,65 +10,45 @@ interface JiraIssue {
   styleUrls: ['./nouveauter.component.css']
 })
 export class NouveauterComponent implements OnInit {
-  issues: JiraIssue[] = [];
-  skillsList: string[] = [];
-  canIncrementCV: Boolean = false;
+  posts: Post[] = [];
+  filteredPosts: Post[] = [];
 
   constructor(
-    private jiraService: JiraServiceService,
-    private chatInterviewService: ChatInterviewServiceService, // <-- Ajouté ici
+    private postService: PostService,
+    private chatInterviewService: ChatInterviewServiceService,
     private router: Router
   ) {}
 
-  ngOnInit() {
-    this.jiraService.getIssues().subscribe(
-      data => {
-        this.issues = data;
-        console.log('Issues:', this.issues);
+  ngOnInit(): void {
+    this.postService.getPosts().subscribe({
+      next: (data: Post[]) => {
+        this.posts = data;
+
+        // ✅ Only include posts with status 'Opened' or 'InProgress'
+        this.filteredPosts = this.posts.filter(
+          post => post.status === 'Opened' || post.status === 'InProgress'
+        );
+
+        console.log('Filtered Posts:', this.filteredPosts);
       },
-      error => {
-        console.error('Error fetching issues from jira server:', error);
+      error: (err) => {
+        console.error('Failed to load posts:', err);
       }
-    );
+    });
   }
 
-  goToTestMonCV(selectedIssue: JiraIssue) {
-    // Afficher toutes les informations du post sélectionné dans la console
-    console.log('Informations du post sélectionné :', selectedIssue);
+  goToTestMonCV(post: Post): void {
+    // Optional: use a real field like post.skills instead of content
+    const skills = post.content?.split(',').map(s => s.trim()) || [];
 
-    // Récupérer et stocker les skills dans le localStorage
-    const skills = selectedIssue.fields.customfield_10057
-      ? selectedIssue.fields.customfield_10057.split(',').map((s: string) => s.trim())
-      : [];
     localStorage.setItem('postSkills', JSON.stringify(skills));
+    localStorage.setItem('postName', post.title);
 
-    // Stocker le nom du post (summary) dans le localStorage
-    localStorage.setItem('postName', selectedIssue.fields.summary);
-
-    // Envoyer les skills au chat bot via le service (mémoire + backend)
     this.chatInterviewService.setSkills(skills);
-
-    // Vérifier la mise à jour côté backend (optionnel)
-    // this.chatInterviewService.fetchSkillsFromBackend().subscribe(response => {
-    //   console.log('Skills récupérés depuis le backend:', response.skills);
-    // });
-
-    console.log('Skills envoyés au chat bot et enregistrés dans le localStorage:', skills);
-
     this.router.navigate(['/test-mon-cv']);
   }
 
-  onSubmit() {
-    // envoie les données de poste choisi au serveur
-    
-    // Optionnel : activer le flag canIncrementCV
+  onSubmit(): void {
     localStorage.setItem('canIncrementCV', 'true');
   }
 }
-
-
-
-
-
-
-

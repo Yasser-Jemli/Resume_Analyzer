@@ -49,8 +49,8 @@ export class SignupComponent {
 
   // Vérifier unicité email puis username avant de poursuivre
   this.userService.getUserByEmail(email).subscribe({
-    next: (usersByEmail) => {
-      if (usersByEmail.length > 0) {
+    next: (response) => {
+      if (response.exists) {
         this.errorMessage = 'This email is already used.';
         return;
       }
@@ -68,7 +68,7 @@ export class SignupComponent {
             username,
             email,
             password,
-            role : "CANDIDATE" // Role par défaut pour les nouveaux utilisateurs
+            role: "CANDIDATE" // Role par défaut pour les nouveaux utilisateurs
           }));
           console.log('Pending user data stored in localStorage:', {
             username,

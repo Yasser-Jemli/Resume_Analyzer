@@ -23,9 +23,9 @@ export class UserServiceService {
   }
   
   // Récupérer un utilisateur par email
-  getUserByEmail(email: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl+'/check-email'}?email=${email}`);
-  }
+ getUserByEmail(email: string): Observable<{ exists: boolean }> {
+  return this.http.get<{ exists: boolean }>(`${this.apiUrl}/check-email?email=${email}`);
+}
 
   // Récupérer un utilisateur par username
   getUserByUsername(username: string): Observable<any[]> {
@@ -57,15 +57,15 @@ export class UserServiceService {
   }
 
   // Vérifier le code de confirmation
-  verifyCode(data: { email: string; code: string }): Observable<any> {
-    // À adapter selon ton backend, ici exemple avec /verify-code
-    return this.http.post<any>(`${this.apiUrl}+/verify-code`, data);
-  }
+ verifyCode(data: { email: string; code: string }): Observable<any> {
+  return this.http.post<any>(`${this.apiUrl}/verify-code`, data);
+}
+
 
   // Renvoyer le code de confirmation
   resendConfirmationCode(email: string): Observable<any> {
-    // À adapter selon ton backend, ici exemple avec /resend-code
-    return this.http.post<any>(`${this.apiUrl}+/resend-code`, { email });
+    // Corrige ici : enlève le + dans l'URL
+    return this.http.post<any>(`${this.apiUrl}/resend-code`, { email });
   }
 
   // Récupérer tous les utilisateurs
@@ -96,5 +96,8 @@ export class UserServiceService {
   // Récupérer le mot de passe d'un utilisateur par son id
   getPassword(id: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/getPassword/${id}`);
+  }
+   checkUsernameExists(username: string): Observable<{ exists: boolean }> {
+    return this.http.get<{ exists: boolean }>(`${this.apiUrl}/check-username?username=${username}`);
   }
 }

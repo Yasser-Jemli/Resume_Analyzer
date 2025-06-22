@@ -9,7 +9,6 @@ import { UserServiceService } from '../service/user-service.service';
 export class ConfirmCodeComponent implements OnInit {
   email: string = '';
   code: string = '';
-  generatedCode: string = ''; // <-- Ajouté
   errorMessage: string | null = null;
   resendSuccessMessage: string | null = null;
   loading: boolean = false;
@@ -36,13 +35,11 @@ export class ConfirmCodeComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    // Générer et stocker le code de confirmation aléatoire
-    this.generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log('Code de confirmation généré :', this.generatedCode);
+  ngOnInit(): void {
+    // Le code est désormais généré et envoyé depuis le backend, plus besoin de générer ici
   }
 
-  onSubmit() {
+  onSubmit(): void {
     this.errorMessage = null;
     this.codeInvalid = false;
 
@@ -53,38 +50,42 @@ export class ConfirmCodeComponent implements OnInit {
 
     this.loading = true;
 
-    // Vérification dynamique du code
-    if (this.code === this.generatedCode) {
-      if (this.mode === 'signup') {
-        const userData = JSON.parse(localStorage.getItem('pendingUser') || '{}');
-        if (userData && userData.username && userData.email && userData.password && userData.role) {
-          this.userService.createUser(userData).subscribe({
-            next: () => {
-              localStorage.removeItem('pendingUser');
-              this.loading = false;
-              this.router.navigate(['/log-in']);
-            },
-            error: () => {
-              this.loading = false;
-              this.errorMessage = 'Signup failed. Please try again.';
-            }
-          });
-        } else {
+    this.userService.verifyCode({ email: this.email, code: this.code }).subscribe({
+      next: () => {
+        if (this.mode === 'signup') {
+          const userData = JSON.parse(localStorage.getItem('pendingUser') || '{}');
+          if (userData && userData.username && userData.email && userData.password && userData.role) {
+            this.userService.createUser(userData).subscribe({
+              next: () => {
+                localStorage.removeItem('pendingUser');
+                this.loading = false;
+                this.router.navigate(['/log-in']);
+              },
+              error: () => {
+                this.loading = false;
+                this.errorMessage = 'Signup failed. Please try again.';
+              }
+            });
+          } else {
+            this.loading = false;
+            this.router.navigate(['/log-in']);
+          }
+        } else if (this.mode === 'forget') {
+          const forgetUser = JSON.parse(localStorage.getItem('pendingForgetUser') || '{}');
           this.loading = false;
-          this.router.navigate(['/log-in']);
+          this.router.navigate(['/update-password'], {
+            queryParams: { email: this.email, id: forgetUser.id }
+          });
         }
-      } else if (this.mode === 'forget') {
-        const forgetUser = JSON.parse(localStorage.getItem('pendingForgetUser') || '{}');
+      },
+      error: () => {
         this.loading = false;
-        this.router.navigate(['/update-password'], { queryParams: { email: this.email, id: forgetUser.id } });
+        this.errorMessage = 'Code de confirmation invalide. Veuillez réessayer.';
       }
-    } else {
-      this.loading = false;
-      this.errorMessage = 'Code de confirmation invalide. Veuillez réessayer.';
-    }
+    });
   }
 
-  resendCode(event: Event) {
+  resendCode(event: Event): void {
     event.preventDefault();
     this.resendSuccessMessage = null;
     this.errorMessage = null;
@@ -99,7 +100,7 @@ export class ConfirmCodeComponent implements OnInit {
     });
   }
 
-  updatePassword(user: any, newPassword: string) {
+  updatePassword(user: any, newPassword: string): void {
     this.userService.updateUser(user.id, { password: newPassword }).subscribe({
       next: () => {
         this.router.navigate(['/log-in']);

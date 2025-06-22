@@ -82,9 +82,7 @@ const routes: Routes = [
   
   { 
     path: 'update-password', 
-    component: UpdatePasswordComponent,
-    canActivate: [AuthGuard],
-    data: { roles: ['CANDIDATE']} },
+    component: UpdatePasswordComponent},
   { 
     path : 'confirm-code', 
     component: ConfirmCodeComponent

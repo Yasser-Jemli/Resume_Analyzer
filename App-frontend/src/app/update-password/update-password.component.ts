@@ -50,11 +50,12 @@ export class UpdatePasswordComponent implements OnInit {
     console.log('Attempting to update password for:', this.email, 'New password:', newPassword);
 
     // Utilise l'id pour mettre à jour l'utilisateur
-    this.userService.updateUser(this.userId, { password: newPassword }).subscribe({
+    this.userService.updatePassword(this.userId, newPassword).subscribe({
       next: (res) => {
         console.log('Password update response:', res);
         this.successMessage = 'Password updated successfully!';
         this.errorMessage = null;
+        localStorage.removeItem('pendingForgetUser');
         setTimeout(() => this.router.navigate(['/log-in']), 1500);
       },
       error: (err) => {

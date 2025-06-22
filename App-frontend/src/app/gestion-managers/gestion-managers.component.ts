@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UserServiceService } from '../service/user-service.service'; // Ajoutez cet import
+import { UserServiceService } from '../service/user-service.service';
 
 @Component({
   selector: 'app-gestion-managers',
@@ -14,11 +14,11 @@ export class GestionManagersComponent implements OnInit {
 
   allUsers: any[] = [];
   filteredUsers: any[] = [];
-  selectedRole: string = 'ALL'; // 'ALL', 'MANAGER', 'CANDIDATE'
+  selectedRole: string = 'ALL';
 
   showPassword: { [username: string]: boolean } = {};
 
-  constructor(private userService: UserServiceService) { // Utilisez UserServiceService
+  constructor(private userService: UserServiceService) {
     const username = localStorage.getItem('username');
     this.isAdmin = username === 'admin';
   }
@@ -27,7 +27,7 @@ export class GestionManagersComponent implements OnInit {
     this.loadAllUsers();
   }
 
-  loadAllUsers() {
+  loadAllUsers(): void {
     this.userService.getAllUsers().subscribe({
       next: (data) => {
         this.allUsers = data;
@@ -37,7 +37,7 @@ export class GestionManagersComponent implements OnInit {
     });
   }
 
-  filterUsers() {
+  filterUsers(): void {
     if (this.selectedRole === 'ALL') {
       this.filteredUsers = this.allUsers;
     } else {
@@ -45,20 +45,20 @@ export class GestionManagersComponent implements OnInit {
     }
   }
 
-  toggleAddForm() {
+  toggleAddForm(): void {
     this.showAddForm = !this.showAddForm;
     this.newManager = { username: '', email: '' };
   }
 
-  addManager() {
+  addManager(): void {
     if (!this.newManager.username || !this.newManager.email) {
       alert('Please enter both username and email.');
       return;
     }
 
-    this.userService.getUserByUsername(this.newManager.username).subscribe({
-      next: (users) => {
-        if (users.length > 0) {
+    this.userService.checkUsernameExists(this.newManager.username).subscribe({
+      next: (response) => {
+        if (response.exists) {
           alert('This username is already taken.');
           return;
         }
@@ -75,7 +75,7 @@ export class GestionManagersComponent implements OnInit {
         };
 
         this.userService.createUser(managerToAdd).subscribe({
-          next: (response) => {
+          next: () => {
             this.toggleAddForm();
             this.loadAllUsers();
             alert(`Manager added! Password: ${generatedPassword}`);
@@ -83,24 +83,23 @@ export class GestionManagersComponent implements OnInit {
           error: (err) => alert('Failed to add manager: ' + err.message)
         });
       },
-      error: (err) => alert('Error checking username in users: ' + err.message)
+      error: (err) => alert('Error checking username: ' + err.message)
     });
   }
 
-  deleteUser(user: any) {
+  deleteUser(user: any): void {
     this.userService.deleteUser(user.id).subscribe({
       next: () => this.loadAllUsers(),
       error: (err) => alert('Failed to delete user: ' + err.message)
     });
   }
 
-  // À appeler quand le filtre change (ex: via un select dans le template)
-  onRoleFilterChange(role: string) {
+  onRoleFilterChange(role: string): void {
     this.selectedRole = role;
     this.filterUsers();
   }
 
-  togglePassword(username: string) {
+  togglePassword(username: string): void {
     this.showPassword[username] = !this.showPassword[username];
   }
 
