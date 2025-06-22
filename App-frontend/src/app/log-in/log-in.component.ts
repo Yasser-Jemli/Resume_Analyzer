@@ -46,59 +46,56 @@ export class LogInComponent implements OnInit {
     return this.loginForm.get('password');
   }
 
-  onSubmit(): void {
-    if (this.loginForm.invalid) {
-      this.errorMessage = 'Veuillez corriger les erreurs dans le formulaire.';
-      this.loginForm.markAllAsTouched();
-      return;
-    }
-
-    this.errorMessage = null;
-    this.loading = true;
-
-    const { username, password, rememberMe } = this.loginForm.value;
-
-    this.authenticateUser({ username, password }).subscribe({
-      next: (response) => {
-        this.loading = false;
-        localStorage.clear();
-        localStorage.setItem('id', response.id);
-        localStorage.setItem('username', response.username);
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('userRole', response.role);
-        localStorage.setItem('ChangePassword', response.ChangePassword);
-
-        // Après authentification réussie
-        const user = {
-          role: response.role,
-          username: response.username,
-          id: response.id,
-          mustChangePassword: response.mustChangePassword // ou passwordChanged: response.passwordChanged
-        };
-        console.log('User role is:', user.role , );
-        console.log('password change', user.mustChangePassword);
-        // Rediriger vers la page de connexion
-        if (user.role === 'MANAGER' && user.mustChangePassword) {
-          this.router.navigate(['/update-password-manager'], { queryParams: { username: user.username } });
-        } else {
-          this.router.navigate(['/home']);
-        }
-      },
-      error: (error) => {
-        console.error('❌ Échec de connexion :', error);
-        this.errorMessage = 'Identifiants incorrects ou erreur serveur. Veuillez réessayer.';
-        this.loading = false;
-      }
-    });
+ onSubmit(): void {
+  if (this.loginForm.invalid) {
+    this.errorMessage = 'Veuillez corriger les erreurs dans le formulaire.';
+    this.loginForm.markAllAsTouched();
+    return;
   }
+
+  this.errorMessage = null;
+  this.loading = true;
+
+  const { username = '', password, rememberMe } = this.loginForm.value;
+
+  this.userService.login({ 
+    username: username.includes('@') ? undefined : username,
+    email: username.includes('@') ? username : undefined,
+    password
+  }).subscribe({
+    next: (response) => {
+      this.loading = false;
+      localStorage.clear();
+      localStorage.setItem('id', response.id);
+      localStorage.setItem('username', response.username);
+      localStorage.setItem('email', response.email);
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('role', response.role);
+      //localStorage.setItem('password', response.password);
+      localStorage.setItem('mustChangePassword', response.mustChangePassword);
+
+      if (response.role === 'MANAGER' && response.mustChangePassword) {
+        this.router.navigate(['/update-password-manager'], { queryParams: { username: response.username } });
+      } else {
+        this.router.navigate(['/home']);
+      }
+    },
+    error: (error) => {
+      console.error('❌ Échec de connexion :', error);
+      this.errorMessage = 'Identifiants incorrects ou erreur serveur. Veuillez réessayer.';
+      this.loading = false;
+    }
+  });
+}
+
 
   /**
    * 🔐 Simule une authentification vers un backend (remplace cette méthode par un appel réel à ton API)
    */
-  private authenticateUser(credentials: { username: string; password: string }): Observable<any> {
+  /* private authenticateUser(credentials: { username: string; password: string }): Observable<any> {
     return new Observable((observer) => {
       // Static admin check (exemple pour SYSADMIN)
-     /* if (credentials.username === 'admin' && credentials.password === 'admin123') {
+     if (credentials.username === 'admin' && credentials.password === 'admin123') {
         observer.next({
           token: 'fake-jwt-token', 
           role: 'SYSADMIN', 
@@ -107,7 +104,7 @@ export class LogInComponent implements OnInit {
         });
         observer.complete();
         return;
-      }*/
+      }
 
       // Vérifier uniquement dans la collection users
       const url = `http://localhost:8081/users?${credentials.username.includes('@') ? 'email' : 'username'}=${credentials.username}&password=${credentials.password}`;
@@ -132,7 +129,7 @@ export class LogInComponent implements OnInit {
         }
       });
     });
-  }
+  }*/
 
  
 }

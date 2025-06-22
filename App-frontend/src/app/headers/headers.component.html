@@ -2,7 +2,7 @@
   <div class="logo-section">
     <div class="logo">
       <a routerLink="/home">
-        <img src="../../assets/logo.png" alt="ESPRIT Logo" class="logo-img">
+        <img src="../../assets/1logo.png" alt="ESPRIT Logo" class="logo-img">
       </a>
     </div>
   </div>
@@ -32,7 +32,7 @@
     <!-- Non-admin navigation -->
     <ng-template #notAdminNav>
       <!-- MANAGER navigation -->
-      <ng-container *ngIf="isManager(); else candidateNav">
+      <ng-container *ngIf=" isLoggedIn() && isManager(); else candidateNav">
         <div class="profile-dropdown"
              (mouseenter)="showMenu = true"
              (mouseleave)="showMenu = false">
@@ -46,6 +46,7 @@
             </li>
           </ul>
         </div>
+        <button class="nav-button" routerLink="/home">HOME</button>
         <button class="nav-button" routerLink="/showCVuser">Users Posted</button>
         <button class="nav-button" routerLink="/Mypost">My post</button>
       </ng-container>

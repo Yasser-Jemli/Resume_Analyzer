@@ -1,40 +1,18 @@
-<div class="container mt-4">
-  <h2 class="text-center"></h2>
-  <div *ngIf="issues && issues.length > 0; else noJobs">
-    <div class="row">
-      <div class="col-md-6" *ngFor="let issue of issues">
-        <div class="card mb-3">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">{{ issue.fields.summary }} ({{ issue.key }})</h5>
-          </div>
-          <div class="card-body p-0">
-            <table class="table mb-0">
-              <tbody>
-                <tr>
-                  <th scope="row">Description</th>
-                  <td>{{ issue.fields.customfield_10055 || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <th scope="row">Responsibilities</th>
-                  <td>{{ issue.fields.customfield_10056 || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <th scope="row">Skills</th>
-                  <td>{{ issue.fields.customfield_10057 || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <td colspan="3">
-                    <button class="btn btn-success btn-sm" (click)="goToTestMonCV(issue)">Submit</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+<div class="container py-4">
+  <h2 class="text-primary text-center">📌 Available Posts</h2>
+
+  <div *ngFor="let post of filteredPosts" class="card mb-3 shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title">title : {{ post.title }}</h5>
+      <p class="card-text">description : {{ post.content }}</p>
+      <p class="card-text">
+        <strong>Skills:</strong> {{ post.skills }}</p>
+      <span class="badge bg-info">Status: {{ post.status }}</span>
+      <br />
+      <small class="text-muted">Posted on {{ post.createdAt | date: 'short' }}</small>
+      <div class="mt-2">
+        <button class="btn btn-primary" (click)="goToTestMonCV(post)">Submit</button>
       </div>
     </div>
   </div>
-  <ng-template #noJobs>
-    <p class="text-center">No job offers available at the moment.</p>
-  </ng-template>
 </div>

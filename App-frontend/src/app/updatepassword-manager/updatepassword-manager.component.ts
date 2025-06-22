@@ -52,39 +52,36 @@ export class UpdatepasswordManagerComponent {
     if (this.passwordForm.invalid) return;
 
     this.loading = true;
-    this.userService.getUserByUsername(this.username).subscribe(users => {
-      if (users.length > 0) {
-        const user = users[0];
-        // Met à jour le mot de passe
-        this.userService.updateUser(user.id, {
-          password: this.newPassword?.value
-        }).subscribe({
-          next: () => {
-            // Met à jour le flag ChangePassword à true (ou passwordChanged à true)
-            this.userService.changePasswordFlag(user.id, false).subscribe({
-              next: () => {
-                this.successMessage = 'Mot de passe mis à jour avec succès !';
-                this.loading = false;
-                setTimeout(() => this.router.navigate(['/manager-profile']), 1500);
-              },
-              error: () => {
-                this.errorMessage = 'Erreur lors de la mise à jour du statut du mot de passe.';
-                this.loading = false;
-              }
-            });
-          },
-          error: () => {
-            this.errorMessage = 'Erreur lors de la mise à jour du mot de passe.';
-            this.loading = false;
+    const userId = localStorage.getItem('id');
+    if (!userId) {
+      this.errorMessage = 'Utilisateur non authentifié.';
+      this.loading = false;
+      return;
+    }
+
+    this.userService.updatePassword(userId, this.newPassword?.value).subscribe({
+      next: () => {
+        this.successMessage = 'Mot de passe mis à jour avec succès !';
+        this.loading = false;
+
+        // Récupère le rôle depuis le localStorage
+        const role = localStorage.getItem('role');
+        setTimeout(() => {
+          if (role === 'MANAGER') {
+            this.router.navigate(['/manager-profile', userId]);
+          } else if (role === 'CANDIDATE') {
+            this.router.navigate(['/profile', userId]);
+          } else if (role === 'SYSADMIN' || role === 'ADMIN') {
+            this.router.navigate(['/gestion-managers']);
+          } else {
+            this.router.navigate(['/home']);
           }
-        });
-      } else {
-        this.errorMessage = 'Utilisateur introuvable.';
+        }, 1500);
+      },
+      error: () => {
+        this.errorMessage = 'Erreur lors de la mise à jour du mot de passe.';
         this.loading = false;
       }
-    }, () => {
-      this.errorMessage = 'Erreur lors de la recherche de l\'utilisateur.';
-      this.loading = false;
     });
   }
 }

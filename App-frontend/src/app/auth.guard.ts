@@ -11,11 +11,12 @@ export class AuthGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     const token = localStorage.getItem('token');
-    const userRole = localStorage.getItem('userRole') || '';
+    const role = localStorage.getItem('role') || '';
     const allowedRoles = route.data['roles'] as string[];
-    console.log('Token:', token);
-
-    if (allowedRoles && !allowedRoles.includes(userRole)) {
+    console.log('token:', token);
+    console.log('User Role:', role);
+    console.log('Allowed Roles:', allowedRoles);
+    if (allowedRoles && !allowedRoles.includes(role)) {
       this.router.navigate(['/not-found']);
       return false;
     }
