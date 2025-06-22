@@ -2,6 +2,13 @@
   "users": [
     {
       "id": "73db",
+      "username": "admin",
+      "password": "admin123",
+      "email": "admin@actia-engineering.tn",
+      "role": "SYSADMIN"
+    },
+    {
+      "id": "73db",
       "username": "imedchakhari",
       "password": "000000",
       "email": "imed@actia-engineering.tn",

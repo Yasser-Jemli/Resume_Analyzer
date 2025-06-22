@@ -32,7 +32,7 @@ export class LogInComponent implements OnInit {
   ngOnInit(): void {
     // ✅ Si l'utilisateur est déjà connecté, rediriger vers /home
     const token = localStorage.getItem('token');
-    if (token) {
+    if (token) {  
       this.router.navigate(['/home']);
     }
   }
@@ -98,8 +98,8 @@ export class LogInComponent implements OnInit {
   private authenticateUser(credentials: { username: string; password: string }): Observable<any> {
     return new Observable((observer) => {
       // Static admin check (exemple pour SYSADMIN)
-      if (credentials.username === 'admin' && credentials.password === 'admin123') {
-        observer.next({ 
+     /* if (credentials.username === 'admin' && credentials.password === 'admin123') {
+        observer.next({
           token: 'fake-jwt-token', 
           role: 'SYSADMIN', 
           username: 'admin', 
@@ -107,7 +107,7 @@ export class LogInComponent implements OnInit {
         });
         observer.complete();
         return;
-      }
+      }*/
 
       // Vérifier uniquement dans la collection users
       const url = `http://localhost:8081/users?${credentials.username.includes('@') ? 'email' : 'username'}=${credentials.username}&password=${credentials.password}`;

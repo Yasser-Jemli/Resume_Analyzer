@@ -134,21 +134,11 @@ export class TestMonCvComponent implements OnInit {
     const uploadData = {
       username: localStorage.getItem('username'),
       usermail: localStorage.getItem('email'),
+      //filepath: this.selectedFile.name,
       fileName: this.selectedFile.name,
       fileType: this.selectedFile.type,
       fileSize: this.selectedFile.size
     };
-    // Utilise http direct ici, ou crée un service dédié si besoin
- /*   this.http.post('http://localhost:8081/api/receive_data', uploadData).subscribe({
-      next: (response) => {
-        console.log('✅ Backend notifié avec succès:', response);
-      },
-      error: (error) => {
-        console.error('❌ Erreur lors de la notification au backend:', error);
-        this.errorMessage = 'Erreur lors de la communication avec le serveur.';
-        this.cdr.detectChanges();
-      }
-    });*/
   }
 
   getMyNote(): void {
