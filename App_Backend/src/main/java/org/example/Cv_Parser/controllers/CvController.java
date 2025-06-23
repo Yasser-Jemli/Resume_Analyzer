@@ -31,7 +31,7 @@ public class CvController {
         return cv != null ? ResponseEntity.ok(convertToDto(cv)) : ResponseEntity.notFound().build();
     }
 
-    @PostMapping
+    @PostMapping("/add_cv")
     public CVDto createCV(@RequestBody CVDto cvDto) {
         Cv cv = convertToEntity(cvDto);
         Cv savedCV = cvService.saveCv(cv);
