@@ -56,9 +56,17 @@ jobs:
           body: |
             Hello,
 
-            The CV parser has finished running. Please find the result.json attached.
+            The CV parser has finished running.
+
+            **Date:** ${{ github.run_started_at }}
+            **Test file:** .github/test-data/test_cv.pdf
+            **Workflow run:** ${{ github.run_id }}
+            **Commit:** ${{ github.sha }}
+            **Execution time:** ${{ steps.timer.outputs.duration }}
+
+            Please find the result.json attached.
 
             Regards,
-            GitHub Actions -CV_PARSER_MODEL 
-            for any questions , Please contact YASSER JEMLI ( THE SENDER for this email )
+            GitHub Actions - CV_PARSER_MODEL
+            For any questions, please contact YASSER JEMLI
           attachments: CV_PARSER_MODEL/results/parsed_resume_*.json
