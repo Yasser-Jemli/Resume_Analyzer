@@ -18,6 +18,7 @@ from pathlib import Path
 from datetime import datetime
 import json
 import time
+from typing import Dict
 
 from utilis.watchdog import Watchdog
 from utilis.log_manager import LogManager
@@ -112,41 +113,18 @@ def extract_pdf_text_using_PdfMuPDF(pdf_path):
         return None
     
 def extract_pdf_text_using_PdfMiner(pdf_path):
+    """Extract text using PdfMiner with proper resource management"""
+    logger = logging.getLogger('PdfMiner')
+    
     try:
-        extractor = PDFTextExtractorPdfMiner(pdf_path)
-        paragraphs = extractor.extract_paragraphs(TEMP_FILE)
-        extractor.close()
-
-        if not paragraphs:
-            # Read from temp file as backup
-            with open(TEMP_FILE, 'r', encoding='utf-8') as f:
-                content = f.read()
-                paragraphs = [p.strip() for p in content.split('\n') if p.strip()]
-
-        if not paragraphs:
-            logger.warning("No paragraphs extracted from PDF")
-            return None
-
-        logger.info(f"Extracted {len(paragraphs)} paragraphs from PDF")
-        logger.info(f"********************************************************")
-        logger.info("******************** Printing paragraphs *****************")
-        logger.info(paragraphs)
-        logger.info(f"********************************************************")
-        print("\n\n")
-        print("================================= Using PDF MINER ================================")
-        print(f"[DEBUG] Extracted {len(paragraphs)} paragraphs")
-        print("==================================================================================")
-        print(paragraphs)
-        print("===============================================================================")
-        
-        # Create formatted output with non-empty paragraphs
-        output = "\n\n".join([f"--- Paragraph {i+1} ---\n{para}" 
-                             for i, para in enumerate(paragraphs) 
-                             if para.strip()])
-        return output if output else None
-
+        with PDFTextExtractorPdfMiner(pdf_path) as extractor:
+            paragraphs = extractor.extract_paragraphs()
+            if not paragraphs:
+                logger.error("No text extracted from PDF")
+                return None
+            return '\n\n'.join(paragraphs)
     except Exception as e:
-        logger.error(f"Failed to extract text from PDF: {str(e)}")
+        logger.error(f"Failed to extract text from PDF: {e}")
         return None
 
 def print_parser_results(results):
@@ -166,7 +144,7 @@ def print_parser_results(results):
             print(value)
 
 def compare_parsers(pdf_path):
-    """Compare results from different parser implementations"""
+    """Compare results from different parsers with improved accuracy"""
     logger = logging.getLogger('ParserComparison')
     results = {
         'extraction_methods': {},
@@ -174,43 +152,40 @@ def compare_parsers(pdf_path):
     }
     
     try:
-        # 1. Extract text using both methods
-
+        # Extract text using PDFMiner
         logger.info("Extracting text using PdfMiner...")
-        miner_text = extract_pdf_text_using_PdfMiner(pdf_path)
-        results['extraction_methods']['pdfminer'] = miner_text
+        miner_extractor = PDFTextExtractorPdfMiner(pdf_path)
+        miner_paragraphs = miner_extractor.extract_paragraphs(add_markers=True)
+        results['extraction_methods']['pdfminer'] = '\n'.join(miner_paragraphs)
         
+        # Extract text using PyMuPDF
         logger.info("Extracting text using PyMuPDF...")
-        pymupdf_text = extract_pdf_text_using_PdfMuPDF(pdf_path)
+        pymupdf_extractor = PDFTextExtractorPyMuPDF(pdf_path)
+        pymupdf_text = pymupdf_extractor.extract_text()
         results['extraction_methods']['pymupdf'] = pymupdf_text
         
-        # Use PdfMiner text as primary, fallback to PyMuPDF if needed
-        text_to_parse = miner_text if miner_text else pymupdf_text
-        
-        if not text_to_parse:
-            logger.error("Failed to extract text from PDF using both methods")
-            return False
-            
-        # 2. Parse with ResumeInfoExtractor
+        # Parse with ResumeInfoExtractor using PDFMiner text
         logger.info("Parsing with ResumeInfoExtractor...")
-        custom_parser = ResumeInfoExtractor(text_to_parse)
-        results['parsers']['custom'] = custom_parser.extract_all()
+        custom_parser = ResumeInfoExtractor('\n'.join(miner_paragraphs))
+        custom_results = custom_parser.extract_all()
         
-        # 3. Parse with PyResParser if available
+        if custom_results:
+            results['parsers']['custom'] = custom_results
+            logger.info("Successfully parsed with ResumeInfoExtractor")
+        
+        # Parse with PyResParser
         if HAS_PYRESPARSER:
             logger.info("Parsing with PyResParser...")
-            py_parser = PyResParserExtractor(pdf_path)
-            results['parsers']['pyres'] = py_parser.extract_all()
-        
-        # 4. Print comparison results
-        print("\n=== Parsing Results Comparison ===\n")
-        print_parser_results(results['parsers'])
+            pyres_parser = PyResParserExtractor(pdf_path)
+            pyres_results = pyres_parser.extract_all()
+            if pyres_results:
+                results['parsers']['pyres'] = pyres_results
         
         return results
         
     except Exception as e:
-        logger.error(f"Parser comparison failed: {str(e)}")
-        raise
+        logger.error(f"Parser comparison failed: {e}")
+        return None
 
 def score_parsed_cv(parsed_results):
     """Score CV based on parsed results"""
@@ -236,37 +211,107 @@ def measure_execution_time(func):
         return result
     return wrapper
 
+def parse_cv(pdf_path: str, save_results: bool = False) -> Dict:
+    try:
+        # Extract text using PDFMiner
+        pdf_extractor = PDFTextExtractorPdfMiner(pdf_path)
+        paragraphs = pdf_extractor.extract_paragraphs()
+
+        # Parse using custom parser
+        custom_parser = CustomParser()
+        custom_results = custom_parser.parse(paragraphs)
+
+        # Score the resume
+        scorer = ResumeScorer()
+        scores = scorer.score_resume(custom_results)
+
+        results = {
+            "parsers": {
+                "custom": custom_results
+            },
+            "scores": {
+                "custom": scores
+            }
+        }
+
+        if save_results:
+            save_results_to_json(results)
+
+        return results
+
+    except Exception as e:
+        logger.error(f"Error in parse_cv: {e}")
+        return {}
+
 @measure_execution_time
 def CV_parsing_main(pdf_path, save_results=False):
     try:
         logger.info(f"Processing PDF: {pdf_path}")
         results = compare_parsers(pdf_path)
         
-        if results:
-            # Add skill recommendations
-            custom_results = results['parsers'].get('custom', {})
-            current_skills = custom_results.get('Skills', [])
-            position = custom_results.get('Position', 'sw_designer')  # default to sw_designer if not found
+        if not results or not isinstance(results, dict):
+            logger.error("Invalid results from compare_parsers")
+            return None
             
-            # Get skill recommendations
+        # Validate parser results exist
+        if 'parsers' not in results:
+            logger.error("No parser results found")
+            return None
+            
+        # Get the custom parser results (ResumeInfoExtractor)
+        custom_results = results['parsers'].get('custom')
+        if not custom_results:
+            logger.error("No custom parser results found")
+            return None
+            
+        # Extract skills and position with defaults
+        current_skills = custom_results.get('Skills', [])
+        if not isinstance(current_skills, list):
+            current_skills = []
+        position = custom_results.get('Position', 'sw_designer')
+        
+        # Get skill recommendations
+        try:
             recommender = SkillRecommender()
             skill_recommendations = recommender.recommend_skills(position, current_skills)
-            
-            # Get course recommendations
+            if not skill_recommendations:
+                logger.warning("No skill recommendations generated")
+                skill_recommendations = {"status": "error", "message": "No recommendations generated"}
+        except Exception as e:
+            logger.error(f"Error generating skill recommendations: {e}")
+            skill_recommendations = {"status": "error", "message": str(e)}
+        
+        # Get course recommendations
+        try:
             course_recommender = CourseRecommender()
             course_recommendations = course_recommender.recommend_courses(skill_recommendations)
-            
-            # Add recommendations to results
-            results['skill_recommendations'] = skill_recommendations
-            results['learning_path'] = course_recommendations
-            
-            # Score the CV
-            cv_scores = score_parsed_cv(results)
+            if not course_recommendations:
+                logger.warning("No course recommendations generated")
+                course_recommendations = {"status": "error", "message": "No recommendations generated"}
+        except Exception as e:
+            logger.error(f"Error generating course recommendations: {e}")
+            course_recommendations = {"status": "error", "message": str(e)}
+        
+        # Add recommendations to results
+        results['skill_recommendations'] = skill_recommendations
+        results['learning_path'] = course_recommendations
+        
+        # Score the CV using the existing CVScorer
+        try:
+            cv_scorer = CVScorer()
+            cv_scores = {
+                'custom': cv_scorer.score_cv(custom_results) or {},
+                'pyres': cv_scorer.score_cv(results['parsers'].get('pyres', {})) or {}
+            }
             results['scores'] = cv_scores
-            
-            logger.info("Successfully parsed, scored and generated recommendations")
-            
-            if save_results:
+        except Exception as e:
+            logger.error(f"Error scoring CV: {e}")
+            results['scores'] = {'error': str(e)}
+        
+        logger.info("Successfully parsed, scored and generated recommendations")
+        
+        if save_results:
+            try:
                 output_dir = Path(__file__).parent / 'results'
                 output_dir.mkdir(exist_ok=True)
                 
@@ -276,45 +321,49 @@ def CV_parsing_main(pdf_path, save_results=False):
                 with open(output_file, 'w', encoding='utf-8') as f:
                     json.dump(results, f, indent=4, ensure_ascii=False)
                 logger.info(f"Results saved to: {output_file}")
+            except Exception as e:
+                logger.error(f"Error saving results: {e}")
+        
+        if args.console:
+            print("\n=== CV Analysis Results ===")
+            print(f"\nCurrent Position: {position}")
             
-            if args.console:
-                print("\n=== CV Analysis Results ===")
-                print(f"\nCurrent Position: {position}")
+            # Print scores safely
+            if 'scores' in results:
+                print("\nScores:")
+                for parser_name, score in results['scores'].items():
+                    if isinstance(score, dict) and 'total_score' in score:
+                        print(f"\n{parser_name.upper()} Parser Score:")
+                        print(f"Total Score: {score['total_score']:.1f}")
+                        if 'detailed_scores' in score:
+                            print("Detailed Scores:")
+                            for category, cat_score in score['detailed_scores'].items():
+                                print(f"- {category}: {cat_score:.1f}")
+            
+            # Print recommendations safely
+            if skill_recommendations.get("status") == "success":
                 print("\nSkill Recommendations:")
-                if skill_recommendations["status"] == "success":
+                recommendations = skill_recommendations.get("recommendations", {})
+                
+                if "missing_required" in recommendations:
                     print("\nMissing Required Skills:")
-                    for skill in skill_recommendations["recommendations"]["missing_required"]:
-                        print(f"- {skill}")
-                    
-                    print("\nMissing Preferred Skills:")
-                    for skill in skill_recommendations["recommendations"]["missing_preferred"]:
-                        print(f"- {skill}")
-                    
-                    print("\nRelated Skills to Consider:")
-                    for skill in skill_recommendations["recommendations"]["related_skills"]:
+                    for skill in recommendations["missing_required"]:
                         print(f"- {skill}")
                 
-                print("\n=== Learning Resources ===")
-                if course_recommendations["status"] == "success":
-                    print("\nPriority Courses:")
-                    for skill, courses in course_recommendations["high_priority"].items():
-                        print(f"\nFor {skill.upper()}:")
-                        if courses["udemy"]:
-                            print("  Udemy Courses:")
-                            for course in courses["udemy"][:2]:
-                                print(f"    - {course['title']}")
-                        if courses["certificates"]:
-                            print("  Recommended Certificates:")
-                            for cert in courses["certificates"]:
-                                print(f"    - {cert}")
-            
-            return results
-        else:
-            logger.error("Failed to parse resume")
-            return None
+                if "missing_preferred" in recommendations:
+                    print("\nMissing Preferred Skills:")
+                    for skill in recommendations["missing_preferred"]:
+                        print(f"- {skill}")
+                
+                if "related_skills" in recommendations:
+                    print("\nRelated Skills to Consider:")
+                    for skill in recommendations["related_skills"]:
+                        print(f"- {skill}")
+        
+        return results
             
     except Exception as e:
-        logger.error(f"Exception occurred: {str(e)}")
+        logger.error(f"Exception occurred: {str(e)}", exc_info=True)
         return None
 
 def setup_logging(enable_file_logging=False, enable_console=False):

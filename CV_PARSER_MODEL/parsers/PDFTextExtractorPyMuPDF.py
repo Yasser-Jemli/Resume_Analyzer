@@ -8,19 +8,31 @@
 # @Description: This module provides a class to extract text from PDF files.
 
 import fitz  # PyMuPDF
+import logging
 
 class PDFTextExtractorPyMuPDF:
     def __init__(self, pdf_path):
         self.pdf_path = pdf_path
-        self.doc = None
+        self.logger = logging.getLogger(__name__)
 
-    def load_pdf(self):
+    def extract_text(self) -> str:
+        """Extract text using PyMuPDF with better formatting"""
         try:
-            self.doc = fitz.open(self.pdf_path)
-            print(f"PDF loaded successfully: {self.pdf_path}")
+            doc = fitz.open(self.pdf_path)
+            text_blocks = []
+            
+            for page in doc:
+                blocks = page.get_text("blocks")
+                for b in blocks:
+                    if b[4].strip():  # Get clean text content
+                        text_blocks.append(b[4].strip())
+            
+            doc.close()
+            return "\n\n".join(text_blocks)
+            
         except Exception as e:
-            print(f"Failed to load PDF: {e}")
-            self.doc = None
+            self.logger.error(f"PyMuPDF extraction failed: {e}")
+            return ""
 
     def save_extracted_paragraphs(self, paragraphs, output_path):
         try:
@@ -32,27 +44,11 @@ class PDFTextExtractorPyMuPDF:
             print(f"Failed to save extracted paragraphs: {e}")
 
     def extract_paragraphs(self, output_path=None):
-        if not self.doc:
-            self.load_pdf()
-        if not self.doc:
-            return []
-
-        paragraphs = []
-        for page_num in range(len(self.doc)):
-            page = self.doc.load_page(page_num)
-            text = page.get_text("text")
-            page_paragraphs = self._split_into_paragraphs(text)
-            paragraphs.extend(page_paragraphs)
+        paragraphs = self.extract_text().split("\n\n")
         return self.save_extracted_paragraphs(paragraphs, output_path) if output_path else paragraphs
 
-
-    def _split_into_paragraphs(self, text):
-        # Split by two or more newlines as paragraph separator
-        return [para.strip() for para in text.split('\n\n') if para.strip()]
-
     def close(self):
-        if self.doc:
-            self.doc.close()
+        pass
 
 
 # Example usage
