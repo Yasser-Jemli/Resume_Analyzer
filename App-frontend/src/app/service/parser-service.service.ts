@@ -3,22 +3,30 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ParserServiceService {
+  private apiUrl = 'http://localhost:8081/cv-parser';
 
-  private apiUrl = 'http://localhost:8081';
+  constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient) { }
-
-  // Service pour récupérer les scores (utilisé dans getMyNote)
-  getScores(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/scores`);
+  // POST: Upload a CV for a specific user
+  uploadCv(userId: number, data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/user/${userId}`, data);
   }
-  getLearningPath(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/learning_path`);
+
+  // GET: Fetch all CVs for a specific user
+  getCvsByUser(userId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/user/${userId}`);
   }
-  getSkillRecommendations(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/skill_recommendations`);
+
+  // GET: Fetch a specific CV by its ID
+  getCvById(cvId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${cvId}`);
+  }
+
+  // DELETE: Delete a specific CV by its ID
+  deleteCvById(cvId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${cvId}`);
   }
 }

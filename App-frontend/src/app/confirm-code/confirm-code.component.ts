@@ -12,8 +12,9 @@ export class ConfirmCodeComponent implements OnInit {
   errorMessage: string | null = null;
   resendSuccessMessage: string | null = null;
   loading: boolean = false;
+  sendCodeLoading: boolean = false;
   codeInvalid: boolean = false;
-  mode: string = 'signup'; // default
+  mode: string = 'signup';
 
   constructor(
     private route: ActivatedRoute,
@@ -23,20 +24,39 @@ export class ConfirmCodeComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.email = params['email'] || '';
       this.mode = params['mode'] || '';
+
       if (!this.mode) {
         const url = this.router.url;
         if (url.includes('forgot-password')) {
           this.mode = 'forget';
         } else if (url.includes('signup')) {
           this.mode = 'signup';
+        } else if (url.includes('login')) {
+          this.mode = 'login';
         }
       }
+
       console.log('Mode actuel dans confirm-code:', this.mode);
     });
   }
 
   ngOnInit(): void {
-    // Le code est désormais généré et envoyé depuis le backend, plus besoin de générer ici
+    console.log('Email dans confirm-code:', this.email);
+    console.log('je suis in int');
+    console.log('Mode dans confirm-code:', this.mode);
+    if (this.email && this.mode === 'signup') {
+      console.log('Envoi du code de confirmation pour le mode login:', this.email);
+      this.userService.sendCode(this.email).subscribe({
+        next: () => {
+          this.sendCodeLoading = false;
+          this.resendSuccessMessage = 'Un code de confirmation a été envoyé à votre adresse email.';
+        },
+        error: () => {
+          this.sendCodeLoading = false;
+          this.errorMessage = 'Échec de l’envoi du code lors du login.';
+        }
+      });
+    }
   }
 
   onSubmit(): void {
@@ -52,30 +72,43 @@ export class ConfirmCodeComponent implements OnInit {
 
     this.userService.verifyCode({ email: this.email, code: this.code }).subscribe({
       next: () => {
-        if (this.mode === 'signup') {
-          const userData = JSON.parse(localStorage.getItem('pendingUser') || '{}');
-          if (userData && userData.username && userData.email && userData.password && userData.role) {
-            this.userService.createUser(userData).subscribe({
-              next: () => {
-                localStorage.removeItem('pendingUser');
-                this.loading = false;
-                this.router.navigate(['/log-in']);
-              },
-              error: () => {
-                this.loading = false;
-                this.errorMessage = 'Signup failed. Please try again.';
-              }
-            });
-          } else {
+        switch (this.mode) {
+          case 'signup':
+            const userData = JSON.parse(localStorage.getItem('pendingUser') || '{}');
+            if (userData && userData.username && userData.email && userData.password && userData.role) {
+              this.userService.createUser(userData).subscribe({
+                next: () => {
+                  localStorage.removeItem('pendingUser');
+                  this.loading = false;
+                  this.router.navigate(['/log-in']);
+                },
+                error: () => {
+                  this.loading = false;
+                  this.errorMessage = 'Échec de l’inscription. Veuillez réessayer.';
+                }
+              });
+            } else {
+              this.loading = false;
+              this.router.navigate(['/log-in']);
+            }
+            break;
+
+          case 'forget':
+            const forgetUser = JSON.parse(localStorage.getItem('pendingForgetUser') || '{}');
             this.loading = false;
-            this.router.navigate(['/log-in']);
-          }
-        } else if (this.mode === 'forget') {
-          const forgetUser = JSON.parse(localStorage.getItem('pendingForgetUser') || '{}');
-          this.loading = false;
-          this.router.navigate(['/update-password'], {
-            queryParams: { email: this.email, id: forgetUser.id }
-          });
+            this.router.navigate(['/update-password'], {
+              queryParams: { email: this.email, id: forgetUser.id }
+            });
+            break;
+
+          case 'login':
+            this.loading = false;
+            this.router.navigate(['/dashboard']);
+            break;
+
+          default:
+            this.loading = false;
+            this.errorMessage = 'Mode inconnu. Veuillez réessayer.';
         }
       },
       error: () => {
@@ -90,7 +123,7 @@ export class ConfirmCodeComponent implements OnInit {
     this.resendSuccessMessage = null;
     this.errorMessage = null;
 
-    this.userService.resendConfirmationCode(this.email).subscribe({
+    this.userService.sendCode(this.email).subscribe({
       next: () => {
         this.resendSuccessMessage = 'Un nouveau code a été envoyé à votre adresse email.';
       },

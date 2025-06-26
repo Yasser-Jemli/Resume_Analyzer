@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
+import {User} from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserServiceService {
-  //private apiUrl = 'http://localhost:8081/users';
+  // URL de l'API pour les opérations liées aux utilisateurs
     private apiUrl = 'http://localhost:8081/auth';
 
 
@@ -19,7 +20,7 @@ export class UserServiceService {
   // Authentification utilisateur (login) via POST
   login(credentials: { username?: string; email?: string; password: string }): Observable<any> {
     console.log('Login credentials:', credentials);
-    return this.http.post<any>(`${this.apiUrl+'/login'}`, credentials);
+    return this.http.post<User>(`${this.apiUrl+'/login'}`, credentials);
   }
   
   // Récupérer un utilisateur par email
@@ -29,22 +30,22 @@ export class UserServiceService {
 
   // Récupérer un utilisateur par username
   getUserByUsername(username: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl+'/check-username'}?username=${username}`);
+    return this.http.get<User[]>(`${this.apiUrl+'/check-username'}?username=${username}`);
   }
 
   // Créer un nouvel utilisateur (signup)
   createUser(user: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl+"/signup", user);
+    return this.http.post<User>(this.apiUrl+"/signup", user);
   }
 
   // Mettre à jour un utilisateur
   updateUser(id: string, data: any): Observable<any> {
-    return this.http.patch<any>(`${this.apiUrl+"/updatePassword"}/${id}`, data);
+    return this.http.patch<User>(`${this.apiUrl+"/updatePassword"}/${id}`, data);
   }
 
   // Supprimer un utilisateur
   deleteUser(id: string): Observable<any> {
-  return this.http.delete<any>(`${this.apiUrl}/deleteUser/${id}`);
+  return this.http.delete<User>(`${this.apiUrl}/deleteUser/${id}`);
 }
 
   // Gestion du username partagé
@@ -58,34 +59,34 @@ export class UserServiceService {
 
   // Vérifier le code de confirmation
  verifyCode(data: { email: string; code: string }): Observable<any> {
-  return this.http.post<any>(`${this.apiUrl}/verify-code`, data);
+  return this.http.post<User>(`${this.apiUrl}/verify-code`, data);
 }
 
 
   // Renvoyer le code de confirmation
   resendConfirmationCode(email: string): Observable<any> {
     // Corrige ici : enlève le + dans l'URL
-    return this.http.post<any>(`${this.apiUrl}/resend-code`, { email });
+    return this.http.post<User>(`${this.apiUrl}/resend-code`, { email });
   }
 
   // Récupérer tous les utilisateurs
   getAllUsers(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl+"/getallusers"}`);
+    return this.http.get<User[]>(`${this.apiUrl+"/getallusers"}`);
   }
 
   // Récupérer les utilisateurs par rôle (MANAGER ou CANDIDATE)
   getUsersByRole(role: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}?role=${role}`);
+    return this.http.get<User[]>(`${this.apiUrl}?role=${role}`);
   }
 
   // Changer la valeur de ChangePassword pour un utilisateur
   changePasswordFlag(id: string, value: boolean): Observable<any> {
-    return this.http.patch<any>(`${this.apiUrl}/${id}`, { mustChangePassword: value });
+    return this.http.patch<User>(`${this.apiUrl}/${id}`, { mustChangePassword: value });
   }
 
   // Récupérer un utilisateur par ID
   getUserById(id: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`);
+    return this.http.get<User>(`${this.apiUrl}/${id}`);
   }
 
   // update Password for a user
@@ -95,9 +96,13 @@ export class UserServiceService {
 
   // Récupérer le mot de passe d'un utilisateur par son id
   getPassword(id: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/getPassword/${id}`);
+    return this.http.get<User>(`${this.apiUrl}/getPassword/${id}`);
   }
    checkUsernameExists(username: string): Observable<{ exists: boolean }> {
     return this.http.get<{ exists: boolean }>(`${this.apiUrl}/check-username?username=${username}`);
   }
+  sendCode(email: string): Observable<any> {
+  console.log("Sending confirmation code to:", email);
+  return this.http.post(`${this.apiUrl}/send-login-code`, { email });
+}
 }

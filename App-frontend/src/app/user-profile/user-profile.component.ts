@@ -64,47 +64,6 @@ export class UserProfileComponent implements OnInit {
     this.showDetails[tabName] = true;
   }
 
-  deleteMyProfile(): void {
-    const password = prompt('Please enter your password to confirm profile deletion:');
-    if (!password) {
-      alert('Profile deletion cancelled.');
-      return;
-    }
-
-    if (this.username) {
-      this.userService.getUserByUsername(this.username).subscribe({
-        next: (users) => {
-          if (users.length > 0) {
-            const user = users[0];
-            if (user.password === password) {
-              if (confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
-                this.userService.deleteUser(user.id).subscribe({
-                  next: () => {
-                    alert('Profile deleted successfully.');
-                    localStorage.clear();
-                    window.location.href = '/log-in';
-                  },
-                  error: (err) => {
-                    alert('Failed to delete profile.');
-                    console.error('Delete error:', err);
-                  }
-                });
-              }
-            } else {
-              alert('Incorrect password. Profile not deleted.');
-            }
-          } else {
-            alert('User not found.');
-          }
-        },
-        error: (err) => {
-          alert('Error verifying password.');
-          console.error('Fetch user error:', err);
-        }
-      });
-    }
-  }
-
   getBadgeClass(score: number): string {
     if (score < 50) {
       return 'bg-danger text-light';
