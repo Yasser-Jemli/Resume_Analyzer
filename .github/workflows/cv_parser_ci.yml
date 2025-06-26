@@ -51,6 +51,7 @@ jobs:
             bouslimi.Azaiez@esprit.tn
             Nadine.MAAZOUN@Esprit.tn
             nader.BENHAMMOUDA@esprit.tn
+            yaaser.jemli@esprit.tn
           from: ${{ secrets.EMAIL_USER }}
           body: |
             Hello,
