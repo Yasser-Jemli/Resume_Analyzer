@@ -1,0 +1,59 @@
+name: CV Parser CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  run-parser:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r CV_PARSER_MODEL/requirements.txt
+
+      - name: Run CV Parser
+        run: |
+          python CV_PARSER_MODEL/main.py parse_cv --path .github/test-data/test_cv.pdf --save --console
+
+      - name: Upload result.json as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: result-json
+          path: CV_PARSER_MODEL/results/parsed_resume_*.json
+
+      - name: Send result email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USER }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "CV Parser CI Result"
+          to: |
+            sami.BOUKESRA@esprit.tn
+            Imed.Chakhari@esprit.tn
+            bouslimi.Azaiez@esprit.tn
+            Nadine.MAAZOUN@Esprit.tn
+            nader.BENHAMMOUDA@esprit.tn
+          from: ${{ secrets.EMAIL_USER }}
+          body: |
+            Hello,
+
+            The CV parser has finished running. Please find the result.json attached.
+
+            Regards,
+            GitHub Actions -CV_PARSER_MODEL 
+            for any questions , Please contact YASSER JEMLI 
+          attachments: CV_PARSER_MODEL/results/parsed_resume_*.json
