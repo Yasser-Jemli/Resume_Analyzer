@@ -23,6 +23,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r CV_PARSER_MODEL/requirements.txt
 
+      - name: Download NLTK data
+        run: |
+          python -m nltk.downloader stopwords
+
       - name: Run CV Parser
         run: |
           python CV_PARSER_MODEL/main.py parse_cv --path .github/test-data/test_cv.pdf --save --console
