@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { PostService } from '../service/post-service.service';
 import { ChatInterviewServiceService } from '../service/chat-interview-service.service';
-import { Post } from '../models/post.model'; // Use shared model
+import { Post } from '../models/post.model';
 
 @Component({
   selector: 'app-nouveauter',
@@ -12,6 +12,7 @@ import { Post } from '../models/post.model'; // Use shared model
 export class NouveauterComponent implements OnInit {
   posts: Post[] = [];
   filteredPosts: Post[] = [];
+  selectedPost: Post | null = null;
 
   constructor(
     private postService: PostService,
@@ -24,12 +25,13 @@ export class NouveauterComponent implements OnInit {
       next: (data: Post[]) => {
         this.posts = data;
 
-        // ✅ Only include posts with status 'Opened' or 'InProgress'
+        // Only include posts with status 'Opened' or 'InProgress'
         this.filteredPosts = this.posts.filter(
           post => post.status === 'Opened' || post.status === 'InProgress'
         );
 
-        console.log('Filtered Posts:', this.filteredPosts);
+        // Save all post IDs to localStorage
+        //localStorage.setItem('postsid', JSON.stringify(this.filteredPosts.map(post => post.id)));
       },
       error: (err) => {
         console.error('Failed to load posts:', err);
@@ -37,18 +39,31 @@ export class NouveauterComponent implements OnInit {
     });
   }
 
-  goToTestMonCV(post: Post): void {
-    // Optional: use a real field like post.skills instead of content
-    const skills = post.content?.split(',').map(s => s.trim()) || [];
-
-    localStorage.setItem('postSkills', JSON.stringify(skills));
-    localStorage.setItem('postName', post.title);
-
-    this.chatInterviewService.setSkills(skills);
-    this.router.navigate(['/test-mon-cv']);
+  selectPost(post: Post): void {
+    this.selectedPost = post;
   }
 
   onSubmit(): void {
-    localStorage.setItem('canIncrementCV', 'true');
+    if (!this.selectedPost) {
+      alert('Please select a post before submitting.');
+      return;
+    }
+  
+    localStorage.setItem('postname', this.selectedPost.title);
+    const postId = this.selectedPost?.id?.toString() ?? '';
+    localStorage.setItem('postid', postId);
+
+
+
+    console.log('Stored in localStorage:', {
+      postname: this.selectedPost.title,
+      postid: this.selectedPost.id
+    });
+
+    // Optional: Navigate or trigger something else
+    this.chatInterviewService.setSkills(
+      this.selectedPost.content?.split(',').map(s => s.trim()) || []
+    );
+    this.router.navigate(['/test-mon-cv']);
   }
 }

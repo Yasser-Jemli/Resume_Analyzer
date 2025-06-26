@@ -16,9 +16,9 @@
           />
         </div>
         <div class="col-md-3 text-end">
-          <button class="btn btn-primary w-100" (click)="uploadCV()" [disabled]="!selectedFile">
-            <i class="bi bi-cloud-download"></i> Upload CV
-          </button>
+          <button class="btn btn-primary w-100" (click)="startUpload()" [disabled]="!selectedFile">
+              <i class="bi bi-cloud-download"></i> Upload CV
+         </button>
         </div>
       </div>
 
@@ -28,10 +28,11 @@
       <!-- Progression Upload -->
       <div *ngIf="uploadProgress > 0 && uploadProgress < 100" class="progress mb-4">
         <div class="progress-bar progress-bar-striped progress-bar-animated" 
-             [style.width.%]="uploadProgress">
-          {{ uploadProgress }}%
-        </div>
+            [style.width.%]="uploadProgress">
+              {{ uploadProgress }}%
+         </div>
       </div>
+
 
       <!-- Contenu principal -->
       <div class="row">

@@ -1,18 +1,30 @@
 <div class="container py-4">
-  <h2 class="text-primary text-center">📌 Available Posts</h2>
+  <h2 class="text-primary text-center">
+    📌 Available Posts ({{ filteredPosts.length }})
+  </h2>
 
   <div *ngFor="let post of filteredPosts" class="card mb-3 shadow-sm">
     <div class="card-body">
-      <h5 class="card-title">title : {{ post.title }}</h5>
-      <p class="card-text">description : {{ post.content }}</p>
+      <h5 class="card-title">Title: {{ post.title }}</h5>
+      <p class="card-text">Description: {{ post.content }}</p>
       <p class="card-text">
-        <strong>Skills:</strong> {{ post.skills }}</p>
-      <span class="badge bg-info">Status: {{ post.status }}</span>
-      <br />
+        <strong>Skills:</strong> {{ post.skills }}
+      </p>
+      <span class="badge bg-info">Status: {{ post.status }}</span><br />
       <small class="text-muted">Posted on {{ post.createdAt | date: 'short' }}</small>
-      <div class="mt-2">
-        <button class="btn btn-primary" (click)="goToTestMonCV(post)">Submit</button>
+
+      <div class="mt-3">
+        <button class="btn btn-outline-primary" (click)="selectPost(post)">
+          Select
+        </button>
+        <span *ngIf="selectedPost?.id === post.id" class="text-success ms-2">
+          ✅ Selected
+        </span>
       </div>
     </div>
+  </div>
+
+  <div class="text-center mt-4">
+    <button class="btn btn-primary" (click)="onSubmit()">Submit</button>
   </div>
 </div>

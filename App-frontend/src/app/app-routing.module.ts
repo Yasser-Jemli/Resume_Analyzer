@@ -22,8 +22,29 @@ import { ConfirmCodeComponent } from './confirm-code/confirm-code.component';
 import { UpdatepasswordManagerComponent } from './updatepassword-manager/updatepassword-manager.component';
 
 const routes: Routes = [
+    /*Acces for all */
+
+  { path: 'log-in', component: LogInComponent},
+  { path: 'signup',component: SignupComponent },
+  { path: 'forgot-password',component: ForgotPasswordComponent},
+  { path: 'update-password',component: UpdatePasswordComponent},
+  {path : 'confirm-code',component: ConfirmCodeComponent},
+  { path: 'not-found', component: NotFoundComponent },
+
   { path: '', redirectTo: '/log-in', pathMatch: 'full' },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
+  {
+    path: 'gestion-managers',
+    component: GestionManagersComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['SYSADMIN'] }
+  },
+  {
+    path: 'profile/:id',
+    component: UserProfileComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['CANDIDATE','SYSADMIN'] }
+  },
 
   { 
     path: 'nouveauter', 
@@ -61,39 +82,9 @@ const routes: Routes = [
     data: { roles: ['CANDIDATE'] }
    },
 
-  { 
-    path: 'gestion-managers', 
-    component: GestionManagersComponent, 
-    canActivate: [AuthGuard], 
-    data: { roles: ['SYSADMIN'] } 
-  },
-  
-  { path: 'log-in', 
-    component: LogInComponent 
-  },
 
-  { path: 'signup', 
-    component: SignupComponent 
-  },
 
-  { path: 'forgot-password', 
-    component: ForgotPasswordComponent 
-  },
-  
-  { 
-    path: 'update-password', 
-    component: UpdatePasswordComponent},
-  { 
-    path : 'confirm-code', 
-    component: ConfirmCodeComponent
-  }, 
-  { path: 'not-found', component: NotFoundComponent },
-  { 
-    path: 'profile/:id', 
-    component: UserProfileComponent, 
-    canActivate: [AuthGuard],
-    data: { roles: ['CANDIDATE'] }
-  },
+
   { 
     path: 'manager-profile/:id',
     component: ManagerProfileComponent, 
