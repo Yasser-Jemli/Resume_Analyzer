@@ -216,25 +216,52 @@ class CVScorer:
             }
 
     def _score_education(self, education):
-        """Score education section"""
+        """Improved scoring for education section"""
         if not education:
             return 0
-            
-        try:
-            text = ' '.join(str(edu) for edu in education).lower()
-            required_degrees = self.criteria["education"]["required_degrees"]
-            
-            # Count matching degrees
-            matches = sum(1 for degree in required_degrees 
-                         if degree.lower() in text)
-            
-            score = (matches / len(required_degrees)) * 100 if required_degrees else 0
-            
-            return min(100, score)
-            
-        except Exception as e:
-            self.logger.error(f"Error scoring education: {str(e)}")
+
+        # If education is a dict with 'entries', use that
+        if isinstance(education, dict) and "entries" in education:
+            entries = education["entries"]
+        else:
+            entries = education
+
+        if not entries:
             return 0
+
+        total_points = 0
+        max_points = 0
+
+        for entry in entries:
+            entry_points = 0
+            entry_max = 3  # institution, degree, period
+
+            # 1. Institution present
+            if entry.get("institution"):
+                entry_points += 1
+
+            # 2. Degree present (partial match, case-insensitive)
+            degree = entry.get("degree")
+            if degree:
+                entry_points += 1
+
+            # 3. Period present (year or date range)
+            period = entry.get("period")
+            if period:
+                entry_points += 1
+
+            # Bonus: Higher education (engineering/university)
+            inst = entry.get("institution", "").lower()
+            if any(x in inst for x in ["esprit", "engineering", "university", "institute"]):
+                entry_points += 0.5
+                entry_max += 0.5
+
+            total_points += entry_points
+            max_points += entry_max
+
+        # Normalize to 100
+        score = (total_points / max_points) * 100 if max_points else 0
+        return round(min(100, score), 2)
 
     def _generate_feedback(self, scores):
         """Generate simple feedback based on scores"""
