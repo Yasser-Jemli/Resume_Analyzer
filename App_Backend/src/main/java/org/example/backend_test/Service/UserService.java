@@ -2,24 +2,31 @@ package org.example.backend_test.Service;
 
 import org.example.backend_test.Entity.User;
 import org.example.backend_test.Repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
+import jakarta.validation.constraints.Email;
+import lombok.RequiredArgsConstructor;
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final ConfirmationCodeService confirmationCodeService;
     private final EmailService emailService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Autowired
     public UserService(UserRepository userRepository,
                        ConfirmationCodeService confirmationCodeService,
-                       EmailService emailService) {
+                       EmailService emailService ,BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.confirmationCodeService = confirmationCodeService;
         this.emailService = emailService;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     public List<User> getAllUsers() {
@@ -38,8 +45,26 @@ public class UserService {
         return userRepository.findByUsername(username).isPresent();
     }
 
-    public User saveUser(User user) {
-        return userRepository.save(user);
+    public User saveUser (User newUser ) {
+        // Hash the password before saving
+        newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
+        // Generate a verification code
+        newUser .setVerificationCode(UUID.randomUUID().toString());
+        newUser .setEnabled(false); // Set user as not verified
+
+        return userRepository.save(newUser );
+    }
+
+    public boolean verifyUser (String verificationCode) {
+        System.out.println("Verifying code: " + verificationCode);
+        User user = userRepository.findByVerificationCode(verificationCode);
+        if (user == null || user.getEnabled()) {
+            return false; // User not found or already verified
+        }
+        user.setEnabled(true);
+        user.setVerificationCode(null); // Clear the verification code
+        userRepository.save(user);
+        return true;
     }
 
     public Optional<User> findByUsername(String username) {
@@ -91,10 +116,5 @@ public class UserService {
             return true;
         }
         return false;
-    }
-
-    // ➕ Nouveau : vérifie le code temporaire (depuis mémoire)
-    public boolean verifyConfirmationCode(String email, String code) {
-        return confirmationCodeService.verifyCode(email, code);
     }
 }

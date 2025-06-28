@@ -36,8 +36,10 @@ public class Post {
     private LocalDateTime createdAt;
 
     @ManyToOne
-    @JsonIgnore
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
+
 
 
 }

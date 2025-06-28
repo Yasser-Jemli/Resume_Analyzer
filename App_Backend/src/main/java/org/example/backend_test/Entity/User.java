@@ -2,10 +2,7 @@ package org.example.backend_test.Entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -32,7 +29,8 @@ public class User implements Serializable {
     private String password;
     @Column(nullable = false)
     private Boolean mustChangePassword= false;
-
+    private String verificationCode;// New field for verification code
+    private Boolean enabled = false; // New field to check if user is verified
     @OneToMany(mappedBy = "user")
     private List<Post> posts;
 
