@@ -2,16 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { PostService } from '../service/post-service.service';
 import { Post } from '../models/post.model';
 
-
 @Component({
   selector: 'app-mypost',
   templateUrl: './mypost.component.html',
   styleUrls: ['./mypost.component.css']
 })
 export class MypostComponent implements OnInit {
-  posts: any[] = [];
+  posts: Post[] = [];
   status: string = 'Opened';
-  newPost: any = { title: '', content: '', author: '' , status: 'Opened' };
+  newPost: Post = { title: '', content: '', skills: '', status: 'Opened' };
   editingPostId: number | null = null;
   statusOptions: string[] = ['InProgress', 'Opened', 'Terminated'];
 
@@ -21,55 +20,69 @@ export class MypostComponent implements OnInit {
     this.loadPosts();
   }
 
-loadPosts(): void {
-  const userId = Number(localStorage.getItem('id'));
-  if (!userId) {
-    console.error('User ID not found in localStorage');
-    return;
-  }
+  loadPosts(): void {
+    const userId = Number(localStorage.getItem('id'));
+    if (isNaN(userId) || userId <= 0) {
+      console.error('User ID not found or invalid in localStorage');
+      alert('Please log in to view your posts.');
+      return;
+    }
 
-  this.postService.getPostsByUserId(userId).subscribe({
+      this.postService.getPostsByManager(userId).subscribe({
     next: (posts) => {
+      console.log('Posts loaded:', posts);
       this.posts = posts;
     },
     error: (err) => {
       console.error('Failed to load posts:', err);
+      alert('Failed to load posts: ' + err.message);
     }
   });
-}
-
-
+  }
 
   createPost(): void {
   const userId = Number(localStorage.getItem('id'));
-
-  if (!this.newPost.title || !this.newPost.content) {
-    alert('Please fill in all fields.');
+  if (isNaN(userId) || userId <= 0) {
+    alert('Please log in to create a post.');
     return;
   }
 
-  this.postService.createPost(userId, {
-    title: this.newPost.title,
-    content: this.newPost.content,
-    skills: this.newPost.skills || '',
-    status: this.newPost.status || 'Opened'
-  }).subscribe({
-    next: (post) => {
-      console.log('Post created:', post);
-      this.posts.push(post);
-      this.newPost = { title: '', content: '', author: '', status: 'Opened', skills: '' }; // Reset form
+  if (!this.newPost.title || !this.newPost.content) {
+    alert('Please fill in all required fields (title and content).');
+    return;
+  }
+
+  // Ensure status defaults to 'Opened' if undefined
+  if (!this.newPost.status) {
+    this.newPost.status = 'Opened';
+  }
+
+  this.postService.createPost(userId, this.newPost).subscribe({
+    next: (createdPost) => {
+      console.log('Post created successfully:', createdPost);
+
+      // Prepend to the posts list for immediate UI reflection
+      this.posts.unshift(createdPost);
+
+      // Reset form cleanly while preserving object structure
+      this.newPost = { title: '', content: '', skills: '', status: 'Opened' };
+
+      // Optional: Notify user
+      alert('Post created successfully.');
     },
     error: (err) => {
-      const msg = err.error?.error || err.statusText || 'Unknown error';
-      alert('Failed to create post: ' + msg);
+      console.error('Error creating post:', err);
+      alert('Error creating post: ' + (err.message || 'Unknown error'));
     }
   });
 }
 
 
-
-  updatePost(post: any): void {
-    if (!post.id) return;
+  updatePost(post: Post): void {
+    if (!post.id) {
+      alert('Invalid post ID.');
+      return;
+    }
 
     this.postService.updatePost(post.id, post).subscribe({
       next: () => {
@@ -78,6 +91,7 @@ loadPosts(): void {
         this.loadPosts();
       },
       error: (err) => {
+        console.error('Failed to update post:', err);
         alert('Failed to update post: ' + err.message);
       }
     });
@@ -91,13 +105,18 @@ loadPosts(): void {
         this.posts = this.posts.filter(p => p.id !== id);
       },
       error: (err) => {
+        console.error('Failed to delete post:', err);
         alert('Failed to delete post: ' + err.message);
       }
     });
   }
 
-  editPost(post: any): void {
-    this.editingPostId = post.id;
+  editPost(post: Post): void {
+    if (!post.id) {
+      alert('Cannot edit post: Invalid post ID.');
+      return;
+    }
+    this.editingPostId = post.id; // post.id is number | undefined, but checked above
   }
 
   cancelEdit(): void {

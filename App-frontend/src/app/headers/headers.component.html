@@ -20,7 +20,6 @@
         <ul class="dropdown-list" *ngIf="showMenu">
           <li>
             <a [routerLink]="['/profile', getUserId()]" (click)="showMenu = false">View Profile</a>
-          
           </li>
           <li>
             <a (click)="logout(); showMenu = false">Log out</a>
@@ -33,7 +32,7 @@
     <!-- Non-admin navigation -->
     <ng-template #notAdminNav>
       <!-- MANAGER navigation -->
-      <ng-container *ngIf=" isLoggedIn() && isManager(); else candidateNav">
+      <ng-container *ngIf="isLoggedIn() && isManager(); else candidateNav">
         <div class="profile-dropdown"
              (mouseenter)="showMenu = true"
              (mouseleave)="showMenu = false">
@@ -58,7 +57,7 @@
              *ngIf="isLoggedIn()"
              (mouseenter)="showMenu = true"
              (mouseleave)="showMenu = false">
-          <button class="nav-button" type="button">log in : {{ getUsername() }}</button>
+          <button class="nav-button" type="button">{{ getUsername() }}</button>
           <ul class="dropdown-list" *ngIf="showMenu">
             <li>
               <a [routerLink]="['/profile', getUserId()]" (click)="showMenu = false">View Profile</a>

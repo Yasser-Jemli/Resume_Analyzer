@@ -30,8 +30,6 @@
       <th>Username</th>
       <th>Email</th>
       <th>Role</th>
-      <th>Password</th>
-      <th>Action</th>
       <th>
         <label for="roleFilter"><strong>Filter by role:</strong></label>
         <select id="roleFilter" [(ngModel)]="selectedRole" (change)="onRoleFilterChange(selectedRole)">
@@ -48,10 +46,8 @@
       <td>{{ user.email }}</td>
       <td>{{ user.role }}</td>
       <td>
-        <span *ngIf="!showPassword[user.username]">******</span>
         <span *ngIf="showPassword[user.username]">{{ user.password }}</span>
         <button type="button" (click)="togglePassword(user.username)" style="background:none;border:none;cursor:pointer;">
-          <span [ngClass]="showPassword[user.username] ? 'fa fa-eye-slash' : 'fa fa-eye'"></span>
         </button>
       </td>
       <td>
