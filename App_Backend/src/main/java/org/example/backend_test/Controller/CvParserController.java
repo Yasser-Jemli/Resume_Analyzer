@@ -1,86 +1,100 @@
 package org.example.backend_test.Controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.backend_test.Dto.CvParserRequestDto;
-import org.example.backend_test.Dto.CvParserResponseDto;
+import lombok.RequiredArgsConstructor;
+import org.example.backend_test.Dto.CV_Parser_Dto;
 import org.example.backend_test.Entity.CvParser;
 import org.example.backend_test.Service.CvParserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/cv-parser")
-//@CrossOrigin(origins = "*") // Allow cross-origin for frontend
+@RequiredArgsConstructor
 public class CvParserController {
 
-    @Autowired
-    private CvParserService cvParserService;
+    private final CvParserService cvParserService;
 
-    // POST /cv-parser/user/{userId}
-    @PostMapping("/user/{userId}")
-    public ResponseEntity<CvParser> uploadCv(
-            @PathVariable Long userId,
-            @RequestBody CvParserRequestDto dto
-    ) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-
-        String learningPathJson = mapper.writeValueAsString(dto.getLearning_path());
-        String skillRecommendationsJson = mapper.writeValueAsString(dto.getSkill_recommendations());
-        String scoresJson = mapper.writeValueAsString(dto.getScores());
-        String cvnameJson = mapper.writeValueAsString(dto.getCv_name());
-        String cvskills = mapper.writeValueAsString(dto.getSkills());
-
-        CvParser savedCv = cvParserService.uploadCv(userId , learningPathJson, skillRecommendationsJson, scoresJson , cvskills);
-        return ResponseEntity.ok(savedCv);
-    }
-    // GET /cv-parser/user/{userId}
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<CvParserResponseDto>> getCvsByUser(@PathVariable Long userId) throws JsonProcessingException {
-        List<CvParser> cvList = cvParserService.getCvsByUserId(userId);
-        ObjectMapper mapper = new ObjectMapper();
-
-        List<CvParserResponseDto> responseList = cvList.stream().map(cv -> {
-            try {
-                return new CvParserResponseDto(
-                        mapper.readValue(cv.getLearningPathJson(), Object.class),
-                        mapper.readValue(cv.getSkillRecommendationsJson(), Object.class),
-                        mapper.readValue(cv.getScoresJson(), Object.class),
-                        mapper.readValue(cv.getSkillsJson(), Object.class)
-                );
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("Invalid JSON in DB", e);
-            }
-        }).toList();
-
-        return ResponseEntity.ok(responseList);
+    @GetMapping
+    public List<CV_Parser_Dto> getAllCVs() {
+        return cvParserService.getAllCvs().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
-
-    // GET /cv-parser/{cvId}
-    @GetMapping("/{cvId}")
-    public ResponseEntity<CvParserResponseDto> getCvById(@PathVariable Long cvId) throws JsonProcessingException {
-        CvParser cv = cvParserService.getCvById(cvId);
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        CvParserResponseDto responseDto = new CvParserResponseDto();
-        responseDto.setLearning_path(mapper.readValue(cv.getLearningPathJson(), Object.class));
-        responseDto.setSkill_recommendations(mapper.readValue(cv.getSkillRecommendationsJson(), Object.class));
-        responseDto.setScores(mapper.readValue(cv.getScoresJson(), Object.class));
-
-        return ResponseEntity.ok(responseDto);
+    @GetMapping("/{id}")
+    public ResponseEntity<CV_Parser_Dto> getCVById(@PathVariable Long id) {
+        return cvParserService.getCvById(id)
+                .map(this::convertToDto)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/add_Parsed_cv")
+    public ResponseEntity<CV_Parser_Dto> createCV(@RequestBody CV_Parser_Dto cvDto) {
+        CvParser cv = convertToEntity(cvDto);
+        CvParser savedCV = cvParserService.saveCv(cv);
+        return ResponseEntity.ok(convertToDto(savedCV));
+    }
 
-    // DELETE /cv-parser/{cvId}
-    @DeleteMapping("/{cvId}")
-    public ResponseEntity<Void> deleteCvById(@PathVariable Long cvId) {
-        cvParserService.deleteCvById(cvId);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCV(@PathVariable Long id) {
+        cvParserService.deleteCv(id);
         return ResponseEntity.noContent().build();
     }
-}
 
+    // Helper methods
+    private CV_Parser_Dto convertToDto(CvParser cv) {
+        CV_Parser_Dto dto = new CV_Parser_Dto();
+        dto.setId(cv.getCvParserId());
+        dto.setName(cv.getName());
+        dto.setEmail(cv.getEmail());
+        dto.setPhone(cv.getPhone());
+        dto.setSkills(cv.getSkills());
+        dto.setExperience(cv.getExperience());
+        dto.setEducation(cv.getEducation());
+        dto.setMissingRequiredSkills(cv.getMissingRequiredSkills());
+        dto.setMissingPreferredSkills(cv.getMissingPreferredSkills());
+        dto.setRelatedSkills(cv.getRelatedSkills());
+        dto.setHighPriorityLearningResources(cv.getHighPriorityLearningResources());
+        dto.setMediumPriorityLearningResources(cv.getMediumPriorityLearningResources());
+        dto.setAdditionalLearningResources(cv.getAdditionalLearningResources());
+        dto.setTotalScore(cv.getTotalScore());
+        dto.setSkillsScore(cv.getSkillsScore());
+        dto.setExperienceScore(cv.getExperienceScore());
+        dto.setEducationScore(cv.getEducationScore());
+        dto.setExperienceYears(cv.getExperienceYears());
+        dto.setExperiencePositions(cv.getExperiencePositions());
+        dto.setExperienceDetails(cv.getExperienceDetails());
+        dto.setFeedback(cv.getFeedback());
+        return dto;
+    }
+
+    private CvParser convertToEntity(CV_Parser_Dto dto) {
+        CvParser cv = new CvParser();
+        cv.setCvParserId(dto.getId());
+        cv.setName(dto.getName());
+        cv.setEmail(dto.getEmail());
+        cv.setPhone(dto.getPhone());
+        cv.setSkills(dto.getSkills());
+        cv.setExperience(dto.getExperience());
+        cv.setEducation(dto.getEducation());
+        cv.setMissingRequiredSkills(dto.getMissingRequiredSkills());
+        cv.setMissingPreferredSkills(dto.getMissingPreferredSkills());
+        cv.setRelatedSkills(dto.getRelatedSkills());
+        cv.setHighPriorityLearningResources(dto.getHighPriorityLearningResources());
+        cv.setMediumPriorityLearningResources(dto.getMediumPriorityLearningResources());
+        cv.setAdditionalLearningResources(dto.getAdditionalLearningResources());
+        cv.setTotalScore(dto.getTotalScore());
+        cv.setSkillsScore(dto.getSkillsScore());
+        cv.setExperienceScore(dto.getExperienceScore());
+        cv.setEducationScore(dto.getEducationScore());
+        cv.setExperienceYears(dto.getExperienceYears());
+        cv.setExperiencePositions(dto.getExperiencePositions());
+        cv.setExperienceDetails(dto.getExperienceDetails());
+        cv.setFeedback(dto.getFeedback());
+        return cv;
+    }
+}
