@@ -1,4 +1,4 @@
-<div class="container-fluid min-vh-1 bg-light py-4">
+<div class="container-fluid min-vh-100 bg-light py-4">
   <div class="row justify-content-center">
     <div class="col-lg-10 col-xl-8">
       <div class="card shadow rounded-4 p-4">
@@ -10,20 +10,23 @@
             <i class="bi bi-person-circle"></i>
           </div>
           <div class="text-center text-md-start">
-            <h2 class="fw-bold text-primary mb-0">{{ username }}</h2>
-            <p class="mb-0"><strong>Your Email:</strong> {{ email }}</p>
-            <p class="mb-0"><strong>Last CV Name:</strong> {{ lastcvName }}</p>
-            <p class="mb-0"><strong>Last Posts :</strong> {{ lastPosts }}</p>
-            <p class="mb-0">
+            <h2 class="fw-bold text-primary mb-1">{{ username }}</h2>
+            <p class="mb-1"><strong>Email:</strong> {{ email }}</p>
+            <p class="mb-1"><strong>Last CV Name:</strong> {{ lastcvName || 'N/A' }}</p>
+            <p class="mb-1">
               <strong>CV Score:</strong>
               <span class="ms-2 px-2 py-1 rounded"
                     [ngClass]="getBadgeClass(customScore?.total_score ?? 0)"
                     style="font-weight: 600;">
-                {{ customScore?.total_score }} %
+                {{ customScore?.total_score ?? 0 }} %
               </span>
             </p>
+            <p class="mb-0"><strong>last post Name :</strong> {{ lastpostName ?? 0 }}</p>
           </div>
         </div>
+
+        <!-- Recent Posts -->
+        
 
         <!-- Tabs -->
         <ul class="nav nav-tabs mb-4">
@@ -52,21 +55,21 @@
               Skills:
               <span class="ms-2 px-2 py-1 rounded"
                     [ngClass]="getBadgeClass(customScore?.detailed_scores?.skills)">
-                {{ customScore?.detailed_scores?.skills }}
+                {{ customScore?.detailed_scores?.skills ?? 'N/A' }}
               </span>
             </li>
             <li>
               Experience:
               <span class="ms-2 px-2 py-1 rounded"
                     [ngClass]="getBadgeClass(customScore?.detailed_scores?.experience)">
-                {{ customScore?.detailed_scores?.experience }}
+                {{ customScore?.detailed_scores?.experience ?? 'N/A' }}
               </span>
             </li>
             <li>
               Education:
               <span class="ms-2 px-2 py-1 rounded"
                     [ngClass]="getBadgeClass(customScore?.detailed_scores?.education)">
-                {{ customScore?.detailed_scores?.education }}
+                {{ customScore?.detailed_scores?.education ?? 'N/A' }}
               </span>
             </li>
           </ul>
@@ -75,30 +78,26 @@
         <div *ngIf="showDetails.experienceMetrics">
           <h5 class="text-secondary">Experience Metrics</h5>
           <ul>
-            <li>Years: {{ customScore?.experience_metrics?.years }}</li>
-            <li>Positions: {{ customScore?.experience_metrics?.positions }}</li>
+            <li>Years: {{ customScore?.experience_metrics?.years ?? 'N/A' }}</li>
+            <li>Positions: {{ customScore?.experience_metrics?.positions ?? 'N/A' }}</li>
           </ul>
         </div>
 
         <div *ngIf="showDetails.feedback">
           <h5 class="text-secondary">Feedback</h5>
-          <ul>
-            <li *ngFor="let item of customScore?.feedback">{{ item }}</li>
+          <ul *ngIf="customScore?.feedback?.length > 0; else noFeedback">
+            <li *ngFor="let item of customScore.feedback">{{ item }}</li>
           </ul>
+          <ng-template #noFeedback>
+            <p>No feedback available.</p>
+          </ng-template>
         </div>
 
         <!-- Update Password Button -->
         <button class="btn btn-outline-primary w-100 mt-4" (click)="updatePassword()">
-          <i class="bi bi-key"></i> update password
+          <i class="bi bi-key"></i> Update Password
         </button>
       </div>
     </div>
   </div>
 </div>
-
-<!-- Custom violet badge style -->
-<style>
-  .bg-violet {
-    background-color: #7c3aed !important;
-  }
-</style>

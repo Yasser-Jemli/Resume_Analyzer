@@ -1,16 +1,62 @@
 <div class="container py-4">
-    <h2 class="text-primary text-center">📝 Manage My Posts ( Total Posts = {{ posts.length }})</h2>
+  <h2 class="text-primary text-center">📝 Manage My Posts (Total Posts = {{ posts.length }})</h2>
 
   <!-- Create New Post Form -->
   <div class="card shadow-sm mb-4">
     <div class="card-body">
       <h5 class="card-title">Create a New Post</h5>
-      <div class="mb-2">
-        <input class="form-control mb-2" [(ngModel)]="newPost.title" placeholder="Post Title" />
-        <textarea class="form-control mb-2" [(ngModel)]="newPost.content" placeholder="Post Content..."></textarea>
-        <textarea class="form-control mb-2" [(ngModel)]="newPost.skills" placeholder="Post skills..."></textarea>
-      </div>
-      <button class="btn btn-success" (click)="createPost()">Create</button>
+      <form #postForm="ngForm">
+        <div class="mb-2">
+          <label for="postTitle" class="form-label">Post Title</label>
+          <input
+            id="postTitle"
+            class="form-control mb-2"
+            [(ngModel)]="newPost.title"
+            name="title"
+            placeholder="Enter post title"
+            required
+            #title="ngModel"
+          />
+          <div *ngIf="title.invalid && (title.dirty || title.touched)" class="text-danger">
+            Title is required.
+          </div>
+        </div>
+        <div class="mb-2">
+          <label for="postContent" class="form-label">Post Content</label>
+          <textarea
+            id="postContent"
+            class="form-control mb-2"
+            [(ngModel)]="newPost.content"
+            name="content"
+            placeholder="Enter post content"
+            rows="4"
+            required
+            #content="ngModel"
+          ></textarea>
+          <div *ngIf="content.invalid && (content.dirty || content.touched)" class="text-danger">
+            Content is required.
+          </div>
+        </div>
+        <div class="mb-2">
+          <label for="postSkills" class="form-label">Skills</label>
+          <textarea
+            id="postSkills"
+            class="form-control mb-2"
+            [(ngModel)]="newPost.skills"
+            name="skills"
+            placeholder="Enter required skills (e.g., Java, Angular)"
+            rows="2"
+          ></textarea>
+        </div>
+        <!-- Status selection removed -->
+        <button
+          class="btn btn-success"
+          (click)="createPost()"
+          [disabled]="postForm.invalid"
+        >
+          Create
+        </button>
+      </form>
     </div>
   </div>
 
@@ -19,18 +65,28 @@
     <div class="card-body">
       <!-- Display Mode -->
       <div *ngIf="editingPostId !== post.id">
-        <h5 class="card-title"> Title : {{ post.title }}</h5>
-        <p class="card-text">description: {{ post.content }}</p>
-        <p class="card-text">skills: {{ post.skills }}</p>
+        <h5 class="card-title">Title: {{ post.title }}</h5>
+        <p class="card-text">Description: {{ post.content }}</p>
+        <p class="card-text">Skills: {{ post.skills || 'None' }}</p>
         <p>
           <span class="badge bg-info text-dark">Status: {{ post.status }}</span>
         </p>
-        <small class="text-muted">Creation Date: {{ post.createdAt | date: 'short' }}</small>
+        <small class="text-muted">
+          Creation Date: {{ post.createdAt ? (post.createdAt | date: 'short') : 'N/A' }}
+        </small>
         <div class="mt-3">
-          <button class="btn btn-outline-primary me-2" (click)="editPost(post)">
+          <button
+            class="btn btn-outline-primary me-2"
+            (click)="editPost(post)"
+            [disabled]="!post.id"
+          >
             ✏️ Edit
           </button>
-          <button class="btn btn-outline-danger" (click)="deletePost(post.id)">
+          <button
+            class="btn btn-outline-danger"
+            (click)="deletePost(post.id!)"
+            [disabled]="!post.id"
+          >
             🗑️ Delete
           </button>
         </div>
@@ -38,17 +94,59 @@
 
       <!-- Edit Mode -->
       <div *ngIf="editingPostId === post.id">
-        <input class="form-control mb-2" [(ngModel)]="post.title" />
-        <textarea class="form-control mb-2" [(ngModel)]="post.content"></textarea>
-        <textarea class="form-control mb-2" [(ngModel)]="post.skills" placeholder="Post skills..."></textarea>
-
-        <!-- Status Dropdown -->
-        <select class="form-select mb-2" [(ngModel)]="post.status">
-          <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
-        </select>
-
-        <button class="btn btn-success me-2" (click)="updatePost(post)">💾 Save</button>
-        <button class="btn btn-secondary" (click)="cancelEdit()">❌ Cancel</button>
+        <form #editForm="ngForm">
+          <div class="mb-2">
+            <label for="editTitle_{{ post.id }}" class="form-label">Post Title</label>
+            <input
+              id="editTitle_{{ post.id }}"
+              class="form-control mb-2"
+              [(ngModel)]="post.title"
+              name="title"
+              required
+              #editTitle="ngModel"
+            />
+            <div *ngIf="editTitle.invalid && (editTitle.dirty || editTitle.touched)" class="text-danger">
+              Title is required.
+            </div>
+          </div>
+          <div class="mb-2">
+            <label for="editContent_{{ post.id }}" class="form-label">Post Content</label>
+            <textarea
+              id="editContent_{{ post.id }}"
+              class="form-control mb-2"
+              [(ngModel)]="post.content"
+              name="content"
+              rows="4"
+              required
+              #editContent="ngModel"
+            ></textarea>
+            <div *ngIf="editContent.invalid && (editContent.dirty || editContent.touched)" class="text-danger">
+              Content is required.
+            </div>
+          </div>
+          <div class="mb-2">
+            <label for="editSkills_{{ post.id }}" class="form-label">Skills</label>
+            <textarea
+              id="editSkills_{{ post.id }}"
+              class="form-control mb-2"
+              [(ngModel)]="post.skills"
+              name="skills"
+              rows="2"
+              placeholder="Enter required skills"
+            ></textarea>
+          </div>
+          <!-- Status selection removed here as well -->
+          <button
+            class="btn btn-success me-2"
+            (click)="updatePost(post)"
+            [disabled]="editForm.invalid"
+          >
+            💾 Save
+          </button>
+          <button class="btn btn-secondary" (click)="cancelEdit()">
+            ❌ Cancel
+          </button>
+        </form>
       </div>
     </div>
   </div>

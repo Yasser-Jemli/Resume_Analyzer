@@ -6,7 +6,8 @@
         <th>Username</th>
         <th>CV Name</th>
         <th>CV Note</th>
-        <th> Submited Post</th>
+        <th>Submitted Post</th>
+        <th>Actions</th> <!-- Added for Download CV button -->
       </tr>
     </thead>
     <tbody>
@@ -15,6 +16,17 @@
         <td>{{ user.lastcvName || 'N/A' }}</td>
         <td>
           {{ user.customScore?.total_score ?? user.CV_Note ?? 'N/A' }}
+        </td>
+        <td>
+          {{ user.submittedPostName || 'N/A' }}
+        </td>
+        <td>
+          <button
+            class="btn btn-success btn-sm"
+            (click)="downloadCV(user)"
+          >
+            Download CV
+          </button>
         </td>
       </tr>
     </tbody>

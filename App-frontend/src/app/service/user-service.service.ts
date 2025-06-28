@@ -104,5 +104,8 @@ export class UserServiceService {
   sendCode(email: string): Observable<any> {
   console.log("Sending confirmation code to:", email);
   return this.http.post(`${this.apiUrl}/send-login-code`, { email });
-}
+  }
+  getCVbyuserID(userId: number): Observable<Blob> {
+  return this.http.get(`/cv-parser/user/${userId}/download`, { responseType: 'blob' });
+   }
 }

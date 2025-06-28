@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UserServiceService } from '../service/user-service.service';
+import { ParserServiceService } from '../service/parser-service.service';
+import { CvUploadService } from '../service/cv-upload-service.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -10,13 +12,14 @@ export class UserProfileComponent implements OnInit {
   username: string | null = '';
   email: string | null = '';
   id: string | null = null;
-  Nbr_Posts: number | null = null;
+  lastpostName: string | null = null;
   lastPosts: string | null = null;
   CV_Note: number | null = null;
   showPosts = false;
-  lastTwoPosts: string[] = [];
+  //lastTwoPosts: string[] = [];
   lastcvName: string | null = '';
   customScore: any = null;
+  fileName: string | null = null;
 
   showDetails = {
     detailedScores: false,
@@ -24,35 +27,14 @@ export class UserProfileComponent implements OnInit {
     feedback: false
   };
 
-  constructor(private userService: UserServiceService) {}
+  constructor(
+    private userService: UserServiceService,
+    private parserService: ParserServiceService,
+    private cvuploadService: CvUploadService
+  ) {}
 
   ngOnInit(): void {
-    this.username = localStorage.getItem('username');
-    this.email = localStorage.getItem('email');
-    this.id = localStorage.getItem('id'); 
-    this.Nbr_Posts = Number(localStorage.getItem('Nbr_Posts')) || 0;
-    this.lastPosts = localStorage.getItem('lastPosts');
-    this.lastcvName = localStorage.getItem('lastcvName') || '';
-    this.customScore = JSON.parse(localStorage.getItem('customScore') || '{}') || { total_score: 0 };
-    if (this.username) {
-      this.userService.getUserByUsername(this.username).subscribe({
-        next: (users) => {
-          if (users.length > 0) {
-            const user = users[0];
-            this.email = user.email;
-            this.id = user.id;
-            this.username = user.username;
-            this.Nbr_Posts = user.Nbr_Posts || 0;
-            this.lastPosts = user.lastPosts || null;
-            this.customScore = user.customScore || { total_score: 0 };
-            this.lastcvName = user.lastcvName || '';
-          }
-        },
-        error: (err) => {
-          // handle error
-        }
-      });
-    }
+    this.reloadUserData();
   }
 
   showTab(tabName: 'detailedScores' | 'experienceMetrics' | 'feedback') {
@@ -75,20 +57,42 @@ export class UserProfileComponent implements OnInit {
   }
 
   reloadUserData() {
-    if (this.username) {
-      this.userService.getUserByUsername(this.username).subscribe({
-        next: (users) => {
-          if (users.length > 0) {
-            console.log('Reloaded user data:', users);
-            const user = users[0];
-            this.email = user.email;
-            this.id = user.id;
-            this.username = user.username;
-            this.Nbr_Posts = user.Nbr_Posts || 0;
-            this.lastPosts = user.lastPosts || null;
-            this.customScore = user.customScore || { total_score: 0 };
-            this.lastcvName = user.lastcvName || '';
+    console.log('Reloading user data...reloadUserData');
+
+    this.username = localStorage.getItem('username');
+    this.email = localStorage.getItem('email');
+    this.id = localStorage.getItem('id');
+    const userId = parseInt(this.id || '0', 10);
+    if (userId > 0) {
+      this.cvuploadService.getAllCVInfosByUsername(this.username || '').subscribe({
+        next: (cvData) => {
+          console.log('CV data from backend:', cvData);
+          if (cvData && cvData.length > 0) {
+            const latestCV = cvData[0]; // Latest CV (assuming sorted by id DESC)
+            this.lastcvName = latestCV?.fileName || 'N/A';
+            this.fileName = latestCV?.fileName || 'N/A'; // Set fileName consistently
+            this.lastpostName = latestCV?.postname;
+          } else {
+            this.lastcvName = 'N/A';
+            this.lastpostName = '0';
+            this.fileName = 'N/A';
           }
+        },
+        error: (err) => {
+          console.error('Failed to fetch CV data:', err);
+          this.lastcvName = 'N/A';
+          this.lastpostName = '0';
+          this.fileName = 'N/A';
+        }
+      });
+
+      this.parserService.getCvsByUser(userId).subscribe({
+        next: (data) => {
+          console.log('User data from backend:', data);
+          this.customScore = data.scores?.custom ?? null;
+        },
+        error: (err) => {
+          console.error('Error fetching CVs:', err);
         }
       });
     }
@@ -114,7 +118,6 @@ export class UserProfileComponent implements OnInit {
         return;
       }
 
-      // Utilisation du service getPassword
       this.userService.getPassword(userId).subscribe({
         next: (response) => {
           const storedPassword = response.password;

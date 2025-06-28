@@ -111,4 +111,6 @@ export class GestionManagersComponent implements OnInit {
     }
     return password;
   }
+
+
 }
