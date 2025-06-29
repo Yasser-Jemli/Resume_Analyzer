@@ -47,6 +47,24 @@ jobs:
           name: result-json
           path: CV_PARSER_MODEL/results/parsed_resume_*.json
 
+  send-emails:
+    needs: run-parser
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        recipient:
+          - sami.boukesra@esprit.tn
+          - imed.chakhari@esprit.tn
+          - bouslimi.azaiez@esprit.tn
+          - nadine.maazoun@esprit.tn
+          - nader.benhammouda@esprit.tn
+          - yaaser.jemli@esprit.tn
+    steps:
+      - name: Download result artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: result-json
+
       - name: Send result email to ${{ matrix.recipient }}
         uses: dawidd6/action-send-mail@v3
         with:
@@ -72,4 +90,4 @@ jobs:
             Regards,
             GitHub Actions - CV_PARSER_MODEL
             For any questions, please contact YASSER JEMLI
-          attachments: CV_PARSER_MODEL/results/parsed_resume_*.json
+          attachments: result-json/parsed_resume_*.json
