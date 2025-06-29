@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -44,6 +45,28 @@ public class CvParserController {
         cvParserService.deleteCv(id);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/by-skill")
+    public ResponseEntity<List<CvParser>> getBySkill(
+            @RequestParam String skill) {
+        return ResponseEntity.ok(cvParserService.findBySkill(skill));
+    }
+
+    @GetMapping("/by-skills")
+    public ResponseEntity<List<CvParser>> getBySkills(
+            @RequestParam List<String> skills) {
+        return ResponseEntity.ok(cvParserService.findBySkills(skills));
+    }
+
+    @GetMapping("/skills/unique")
+    public ResponseEntity<List<String>> getAllUniqueSkills() {
+        return ResponseEntity.ok(cvParserService.findAllUniqueSkills());
+    }
+
+    @GetMapping("/skills/stats")
+    public ResponseEntity<Map<String, Long>> getSkillStatistics() {
+        return ResponseEntity.ok(cvParserService.getSkillStatistics());
+    }
+
 
     // Helper methods
     private CV_Parser_Dto convertToDto(CvParser cv) {

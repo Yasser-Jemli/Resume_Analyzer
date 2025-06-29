@@ -1,7 +1,9 @@
 package org.example.backend_test.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,6 +39,45 @@ public class CvParserService {
         cvParserRepository.deleteById(id);
     }
 
+
+    // Find by ID
+    public CvParser findById(Long id) {
+        return cvParserRepository.findByCvParserId(id)
+                .orElseThrow(() -> new RuntimeException("CV not found with id: " + id));
+    }
+
+    // Find by exact skill name
+    public List<CvParser> findBySkill(String skillName) {
+        return cvParserRepository.findBySkillName(skillName);
+    }
+
+    // Find by multiple skills
+    public List<CvParser> findBySkills(List<String> skillNames) {
+        return cvParserRepository.findBySkillNames(skillNames);
+    }
+
+    // Find by skill prefix
+    public List<CvParser> findBySkillPrefix(String prefix) {
+        return cvParserRepository.findBySkillStartingWith(prefix);
+    }
+
+    // Get all unique skills
+    public List<String> findAllUniqueSkills() {
+        return cvParserRepository.findAll().stream()
+                .flatMap(cv -> cv.getSkills().stream())
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    // Get CVs with skill statistics
+    public Map<String, Long> getSkillStatistics() {
+        return findAllUniqueSkills().stream()
+                .collect(Collectors.toMap(
+                        skill -> skill,
+                        skill -> cvParserRepository.countBySkill(skill)
+                ));
+    }
 //    public CvParser uploadCv(Long userId, String cvNameJson, String learningPathJson, String skillRecommendationsJson, String scoresJson) {
 //        Optional<User> optionalUser = userRepository.findById(userId);
 //        if (optionalUser.isEmpty()) {

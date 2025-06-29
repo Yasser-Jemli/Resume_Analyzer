@@ -16,7 +16,7 @@ public class EmailService {
     private final Environment env;
 
     public void sendVerificationEmail(User user, String verificationCode) {
-        String verificationLink = "http://localhost:8080/auth/verify-code?code=" + verificationCode;
+        String verificationLink = "http://localhost:8081/auth/verify-code?code=" + verificationCode;
         // Simple email content
         String content = "Dear " + user.getUsername() + ",\n\n"
                 + "Please click the link below to verify your email:\n"

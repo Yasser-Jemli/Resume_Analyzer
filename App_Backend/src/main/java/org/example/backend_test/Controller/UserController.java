@@ -1,42 +1,32 @@
 package org.example.backend_test.Controller;
 
-import org.example.backend_test.Dto.AuthRequest;
 import org.example.backend_test.Dto.UserDTO;
-import org.example.backend_test.Entity.Role;
 import org.example.backend_test.Entity.User;
-import org.example.backend_test.Security.JwtUtil;
+import org.example.backend_test.Security.JwtTokenUtil;
+import org.example.backend_test.Security.PasswordUtils;
 import org.example.backend_test.Service.ConfirmationCodeService;
 import org.example.backend_test.Service.EmailService;
 import org.example.backend_test.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
 @Validated
 public class UserController {
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
 
     private final UserService userService;
+    private final JwtTokenUtil jwtUtil;
 
     @Autowired
     private ConfirmationCodeService codeService;
@@ -46,10 +36,11 @@ public class UserController {
     // Injecter via constructeur (plus propre)
 
     @Autowired
-    public UserController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, UserService userService) {
-        this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
+    public UserController(UserService userService) {
         this.userService = userService;
+
+        // Idéalement, injecter via configuration/Bean
+        this.jwtUtil = new JwtTokenUtil("f01d2052c57aa5e2454f42701378138b741876951ec571f1230d8dc2b0e6f325");
     }
 
     @GetMapping("/check-email")
@@ -70,7 +61,8 @@ public class UserController {
             );
 
             return ResponseEntity.ok(response);
-        } else { return ResponseEntity.ok(Map.of("exists", false));
+        } else {
+            return ResponseEntity.ok(Map.of("exists", false));
         }
     }
 
@@ -93,84 +85,136 @@ public class UserController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<User> signupUser (@RequestBody @Valid User newUser ) {
-        String verificationCode = UUID.randomUUID().toString();
-        newUser.setEnabled(false);
-        User savedUser  = userService.saveUser (newUser );
-        emailService.sendVerificationEmail(savedUser,verificationCode ); // Send verification email
-        return ResponseEntity.ok(savedUser );
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody AuthRequest loginRequest) {
-        System.out.println("Login attempt for: " + loginRequest.getUsername());
+    public ResponseEntity<?> signupUser(@RequestBody @Valid User newUser) {
         try {
-            // Authenticate
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.getUsername(),
-                            loginRequest.getPassword()
+            // 1. Validate password isn't already hashed
+            if (newUser.getPassword().startsWith("$2a$")) {
+                return ResponseEntity.badRequest().body(
+                        Map.of(
+                                "success", false,
+                                "message", "Password appears to be already hashed"
+                        )
+                );
+            }
+
+            // 2. Check email availability
+            if (userService.existsByEmail(newUser.getEmail())) {
+                return ResponseEntity.badRequest().body(
+                        Map.of(
+                                "success", false,
+                                "message", "Email is already registered"
+                        )
+                );
+            }
+
+            // Hash and save user
+            String rawPassword = newUser.getPassword().trim();
+            String salt = PasswordUtils.generateSalt();
+            String hashedPassword = PasswordUtils.hashPassword(rawPassword, salt);
+            newUser.setPassword(hashedPassword);
+            newUser.setEnabled(false);
+            newUser.setVerificationCode(UUID.randomUUID().toString());
+
+            User savedUser = userService.saveUser(newUser);
+
+            // 5. Verify storage
+
+            // 6. Send verification email
+            emailService.sendVerificationEmail(savedUser, savedUser.getVerificationCode());
+
+            return ResponseEntity.ok(
+                    Map.of(
+                            "success", true,
+                            "message", "Registration successful",
+                            "userId", savedUser.getId()
                     )
             );
-            System.out.println("Authentication successful!");
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-// Extract role from authorities
-            String role = userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .findFirst()
-                    .orElse("ROLE_USER");
 
-            // Generate token
-            String token = jwtUtil.generateToken(
-                    loginRequest.getUsername(),
-                    Role.valueOf(role.replace("ROLE_", ""))
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(
+                    Map.of(
+                            "success", false,
+                            "message", "Registration failed: " + e.getMessage()
+                    )
             );
-            System.out.println("Generated token: " + token);
-
-            // Return response
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                    .body(Map.of(
-                            "token", token,
-                            "username", loginRequest.getUsername(),
-                            "role", role
-                    ));
-
-        } catch (BadCredentialsException e) {
-            System.out.println("Authentication failed for: " + loginRequest.getUsername());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Invalid email or password"));
         }
     }
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody User loginRequest) {
+
+        // Input validation
+        if ((loginRequest.getUsername() == null || loginRequest.getUsername().isEmpty()) &&
+                (loginRequest.getEmail() == null || loginRequest.getEmail().isEmpty())) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Username or email is required"
+            ));
+        }
+
+        if (loginRequest.getPassword() == null || loginRequest.getPassword().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Password is required"
+            ));
+        }
 
 
-//        // Validation simple des champs
-//        if ((loginRequest.getUsername() == null || loginRequest.getUsername().isEmpty()) &&
-//                (loginRequest.getUsername() == null || loginRequest.getUsername().isEmpty())) {
-//            return ResponseEntity.badRequest().body(Map.of(
-//                    "success", false,
-//                    "message", "Username or email is required"
-//            ));
-//        }
-//        if (loginRequest.getPassword() == null || loginRequest.getPassword().isEmpty()) {
-//            return ResponseEntity.badRequest().body(Map.of(
-//                    "success", false,
-//                    "message", "Password is required"
-//            ));
-//        }
-//
-//        // Recherche user par username ou email
-//        Optional<User> userOpt = (loginRequest.getUsername() != null && !loginRequest.getUsername().isEmpty())
-//                ? userService.findByUsername(loginRequest.getUsername())
-//                : userService.findByEmail(loginRequest.getUsername());
-//
-//        if (userOpt.isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-//                    "success", false,
-//                    "message", "User not found"
-//            ));
-//        }
-//    }
+        // Find user
+        Optional<User> userOpt = (loginRequest.getUsername() != null && !loginRequest.getUsername().isEmpty())
+                ? userService.findByUsername(loginRequest.getUsername())
+                : userService.findByEmail(loginRequest.getEmail());
+
+        System.out.println("Login attempt for: " +
+                (loginRequest.getUsername() != null ? loginRequest.getUsername() : loginRequest.getEmail()));
+        System.out.println("Raw password received: " + loginRequest.getPassword());
+
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                    "success", false,
+                    "message", "Invalid credentials 1" // Keep generic for security
+            ));
+        }
+
+
+        User user = userOpt.get();
+        System.out.println("Found user: " + user.getUsername());
+        System.out.println("Stored password hash: " + user.getPassword());
+        System.out.println("Account enabled: " + user.getEnabled());
+
+        // Account verification check
+        if (!user.getEnabled()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                    "success", false,
+                    "message", "Account not verified. Please check your email."
+            ));
+        }
+        // Password verification using SHA-256
+        if (!PasswordUtils.verifyPassword(loginRequest.getPassword(), user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                    "success", false,
+                    "message", "Invalid credentials"
+            ));
+        }
+
+        // Generate token using your existing JWT util
+        String token = jwtUtil.generateToken(user.getUsername(), String.valueOf(user.getRole()));
+        Boolean mustChangePwd = user.getMustChangePassword();
+        if (mustChangePwd == null) {
+            mustChangePwd = false;
+        }
+        // Build response
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Login successful",
+                "id", user.getId(),
+                "username", user.getUsername(),
+                "email", user.getEmail(),
+                "token", token,
+                "role", user.getRole(),
+                "mustChangePassword", mustChangePwd
+        ));
+
+    }
 
     @DeleteMapping("/deleteUser/{id}")
     public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Long id) {
@@ -188,6 +232,7 @@ public class UserController {
                     .body(Map.of("success", false, "message", "Internal server error"));
         }
     }
+
     public static class PasswordUpdateRequest {
         public String newPassword;
     }
@@ -210,6 +255,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("success", false, "message", "Server error"));
         }
     }
+
     @GetMapping("/getPassword/{id}")
     public ResponseEntity<?> getPasswordByUserId(@PathVariable Long id) {
         Optional<User> userOpt = userService.findById(id);
@@ -230,7 +276,7 @@ public class UserController {
         if (optionalUser.isPresent()) {
             String code = codeService.generateAndStoreCode(email);
             emailService.sendConfirmationCode(email, code);
-            System.out.println("code de confirmation"+code);
+            System.out.println("code de confirmation" + code);
             return ResponseEntity.ok(Map.of("message", "Code envoyé"));
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -238,14 +284,16 @@ public class UserController {
         }
     }
 
-    @PostMapping("/verify-code")
-    public ResponseEntity<?> verifyUser (@RequestParam("code") String code) {
-        if (userService.verifyUser (code)) {
-            return ResponseEntity.ok(Map.of("message", "Verification successful. You can now log in."));
-        } else {
-            return ResponseEntity.badRequest().body(Map.of("error", "Invalid or expired verification code."));
+    @GetMapping("/verify-code")
+    public ResponseEntity<String> verifyUser(@RequestParam String code) {
+        try {
+            userService.verifyUser(code);
+            return ResponseEntity.ok("Account verified successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
     @PostMapping("/send-login-code")
     public ResponseEntity<?> sendLoginCode(@RequestBody Map<String, String> data) {
         String email = data.get("email");
@@ -262,7 +310,5 @@ public class UserController {
         return ResponseEntity.ok(Map.of("message", "Code envoyé"));
     }
 
-
-
-
 }
+

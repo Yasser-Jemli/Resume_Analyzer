@@ -24,7 +24,7 @@ public class PostController {
     @Autowired
     private UserService userService;
 
-
+@CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("/getAllPosts")
     public List<Post> getAllPosts() {
         return postService.getAllPosts();
