@@ -3,11 +3,13 @@ import json
 from pathlib import Path
 from threading import Thread
 from typing import List, Dict, Any
-
+import smtplib
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from gtts import gTTS
-
+import json, smtplib, os
+from email.mime.text import MIMEText
+from pathlib import Path
 # ─────────────────────────── Flask & CORS ─────────────────────────── #
 app = Flask(__name__)
 CORS(app)
@@ -21,7 +23,7 @@ conversation_history: List[Dict[str, str]] = []
 
 # ─────────────────────── Fonction utilitaires ─────────────────────── #
 DATA_PATH = Path("questions.json")
-
+CONFIG_PATH = Path("smtp_config.json")
 def load_questions() -> List[Dict[str, Any]]:
     """Charge les questions depuis questions.json et fusionne toutes les clés
        commençant par 'questions_'. Renvoie une liste plate d'objets question."""
@@ -41,7 +43,48 @@ def load_questions() -> List[Dict[str, Any]]:
             bank.extend(val)
     print(f"✅ {len(bank)} questions chargées.")
     return bank
+def load_smtp_config() -> dict:
+    """Charge la config SMTP depuis smtp_config.json (puis variables d'env en secours)."""
+    cfg = {}
+    if CONFIG_PATH.exists():
+        try:
+            cfg = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            print("❌ smtp_config.json invalide, on bascule sur les variables d'environnement.")
+    # Complète avec les variables d'environnement si champs manquants
+    for key in ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "EMAIL_TO"]:
+        cfg.setdefault(key, os.getenv(key))
+    return cfg
 
+def send_email_result(avg: float) -> None:
+    cfg = load_smtp_config()
+    host = cfg.get("SMTP_HOST")
+    port = int(cfg.get("SMTP_PORT", 587) or 587)
+    user = cfg.get("SMTP_USER")
+    pwd  = cfg.get("SMTP_PASS")
+    dest = cfg.get("EMAIL_TO")
+
+    if not all([host, user, pwd, dest]):
+        print("ℹ️ Paramètres SMTP incomplets ; email non envoyé.")
+        return
+
+    sujet = "Résultat de votre entretien"
+    body  = (f"Bonjour,\n\nVotre entretien est terminé.\n"
+             f"Score moyen : {avg:.1f}/20.\n\nCordialement,\nBot IA")
+
+    msg = MIMEText(body, _charset="utf-8")
+    msg["Subject"] = sujet
+    msg["From"]    = user
+    msg["To"]      = dest
+
+    try:
+        with smtplib.SMTP(host, port) as server:
+            server.starttls()
+            server.login(user, pwd)
+            server.send_message(msg)
+        print("📧 Email de résultat envoyé !")
+    except Exception as e:
+        print(f"❌ Échec envoi email : {e}")
 def save_conversation_to_json(path: Path = Path("conversation.json")) -> None:
     path.write_text(json.dumps(conversation_history, indent=2, ensure_ascii=False), encoding="utf-8")
 
@@ -121,6 +164,7 @@ def entretien_ask():
     else:
         average = total_score / num_responses if num_responses else 0
         full_response = f"{feedback} Fin de l'entretien. Score moyen : {average:.1f}/20."
+        Thread(target=send_email_result, args=(average,)).start()  # <-- envoi email ici
         Thread(target=text_to_speech, args=("Fin de l'entretien.",)).start()
 
     save_conversation_to_json()
