@@ -1,33 +1,25 @@
 package org.example.backend_test.Service;
 
+import lombok.RequiredArgsConstructor;
 import org.example.backend_test.Entity.User;
 import org.example.backend_test.Repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.example.backend_test.Security.PasswordUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import jakarta.validation.constraints.Email;
-import lombok.RequiredArgsConstructor;
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final ConfirmationCodeService confirmationCodeService;
     private final EmailService emailService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Autowired
-    public UserService(UserRepository userRepository,
-                       ConfirmationCodeService confirmationCodeService,
-                       EmailService emailService ,BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userRepository = userRepository;
-        this.confirmationCodeService = confirmationCodeService;
-        this.emailService = emailService;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -45,32 +37,41 @@ public class UserService {
         return userRepository.findByUsername(username).isPresent();
     }
 
-    public User saveUser (User newUser ) {
-        // Hash the password before saving
-        newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
-        // Generate a verification code
-        newUser .setVerificationCode(UUID.randomUUID().toString());
-        newUser .setEnabled(false); // Set user as not verified
-
-        return userRepository.save(newUser );
-    }
-
-    public boolean verifyUser (String verificationCode) {
-        System.out.println("Verifying code: " + verificationCode);
-        User user = userRepository.findByVerificationCode(verificationCode);
-        if (user == null || user.getEnabled()) {
-            return false; // User not found or already verified
+    public User saveUser(User user) {
+        // Generate salt and hash the password
+        if (!user.getPassword().contains(":")) { // Ensure it's not already hashed
+            String salt = PasswordUtils.generateSalt();
+            String hashedPassword = PasswordUtils.hashPassword(user.getPassword(), salt);
+            user.setPassword(hashedPassword);
         }
+
+        user.setEnabled(false);
+        user.setVerificationCode(UUID.randomUUID().toString());
+        user.setMustChangePassword(false);
+
+        User savedUser = userRepository.save(user);
+        emailService.sendVerificationEmail(savedUser, savedUser.getVerificationCode());
+
+        return savedUser;
+    }
+
+
+    public void verifyUser(String verificationCode) {
+        User user = findByVerificationCode(verificationCode);
+        if (user.getEnabled()) {
+            throw new RuntimeException("Account already verified");
+        }
+        user.setVerificationCode(null);
         user.setEnabled(true);
-        user.setVerificationCode(null); // Clear the verification code
         userRepository.save(user);
-        return true;
     }
-
     public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        // Add logging to verify the lookup
+        System.out.println("Searching for username: " + username);
+        Optional<User> user = userRepository.findByUsername(username);
+        user.ifPresent(u -> System.out.println("Found user: " + u.getEmail()));
+        return user;
     }
-
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
@@ -116,5 +117,13 @@ public class UserService {
             return true;
         }
         return false;
+    }
+    // ➕ Nouveau : vérifie le code temporaire (depuis mémoire)
+    public boolean verifyConfirmationCode(String email, String code) {
+        return confirmationCodeService.verifyCode(email, code);
+    }
+    public User findByVerificationCode(String verificationCode) {
+        return userRepository.findByVerificationCode(verificationCode)
+                .orElseThrow(() -> new RuntimeException("Invalid verification code: " + verificationCode));
     }
 }
