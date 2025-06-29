@@ -36,6 +36,10 @@ export class HeadersComponent {
     localStorage.removeItem('role');
     localStorage.removeItem('mustChangePassword');
     localStorage.removeItem('email');
+    localStorage.removeItem('postname');
+    localStorage.removeItem('postid');
+    localStorage.removeItem('post');
+    localStorage.removeItem('pdfjs.history');
     //localStorage.removeItem('password');
     this.router.navigate(['/log-in']);
   }

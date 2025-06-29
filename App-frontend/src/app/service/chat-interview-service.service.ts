@@ -31,4 +31,7 @@ export class ChatInterviewServiceService {
   fetchSkillsFromBackend(): Observable<{skills: string[]}> {
     return this.http.get<{skills: string[]}>(this.apiUrl);
   }
+  sendposttochatbot(post: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/sendPost`, post);
+  }
 }

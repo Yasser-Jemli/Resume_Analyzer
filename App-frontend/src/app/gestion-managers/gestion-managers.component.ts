@@ -8,7 +8,6 @@ import { UserServiceService } from '../service/user-service.service';
 })
 export class GestionManagersComponent implements OnInit {
   isAdmin: boolean = false;
-  managers: any[] = [];
   showAddForm: boolean = false;
   newManager = { username: '', email: '' };
 
@@ -16,7 +15,15 @@ export class GestionManagersComponent implements OnInit {
   filteredUsers: any[] = [];
   selectedRole: string = 'ALL';
 
+  searchQuery: string = '';
+  sortOrder: 'asc' | 'desc' = 'asc';
+
   showPassword: { [username: string]: boolean } = {};
+
+  // Pagination properties
+  currentPage: number = 1;
+  itemsPerPage: number = 8;
+  totalPages: number = 1;
 
   constructor(private userService: UserServiceService) {
     const username = localStorage.getItem('username');
@@ -38,11 +45,65 @@ export class GestionManagersComponent implements OnInit {
   }
 
   filterUsers(): void {
-    if (this.selectedRole === 'ALL') {
-      this.filteredUsers = this.allUsers;
-    } else {
-      this.filteredUsers = this.allUsers.filter(user => user.role === this.selectedRole);
+    let users = this.allUsers;
+
+    if (this.selectedRole !== 'ALL') {
+      users = users.filter(user => user.role === this.selectedRole);
     }
+
+    if (this.searchQuery.trim() !== '') {
+      const query = this.searchQuery.toLowerCase();
+      users = users.filter(user =>
+        user.username.toLowerCase().includes(query) ||
+        user.email.toLowerCase().includes(query)
+      );
+    }
+
+    users = users.sort((a, b) => {
+      const usernameA = a.username.toLowerCase();
+      const usernameB = b.username.toLowerCase();
+      return this.sortOrder === 'asc'
+        ? usernameA.localeCompare(usernameB)
+        : usernameB.localeCompare(usernameA);
+    });
+
+    this.filteredUsers = users;
+    this.currentPage = 1; // reset to first page on filter change
+    this.updatePagination();
+  }
+
+  updatePagination(): void {
+    if (this.filteredUsers && this.filteredUsers.length > 0) {
+      this.totalPages = Math.ceil(this.filteredUsers.length / this.itemsPerPage);
+    } else {
+      this.totalPages = 1;
+    }
+  }
+
+  get paginatedUsers(): any[] {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filteredUsers.slice(start, start + this.itemsPerPage);
+  }
+
+  goToPreviousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
+  goToNextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  toggleSortOrder(): void {
+    this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    this.filterUsers();
+  }
+
+  onSearchChange(): void {
+    this.filterUsers();
   }
 
   toggleAddForm(): void {
@@ -88,6 +149,8 @@ export class GestionManagersComponent implements OnInit {
   }
 
   deleteUser(user: any): void {
+    if (!confirm(`Are you sure you want to delete ${user.username}?`)) return;
+
     this.userService.deleteUser(user.id).subscribe({
       next: () => this.loadAllUsers(),
       error: (err) => alert('Failed to delete user: ' + err.message)
@@ -111,6 +174,4 @@ export class GestionManagersComponent implements OnInit {
     }
     return password;
   }
-
-
 }

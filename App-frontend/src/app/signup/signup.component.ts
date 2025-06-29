@@ -47,29 +47,30 @@ export class SignupComponent {
   this.errorMessage = null;
   const { username, email, password } = this.signupForm.value;
 
-  // Vérifier unicité email puis username avant de poursuivre
+  // Check email existence first
   this.userService.getUserByEmail(email).subscribe({
-    next: (response) => {
-      if (response.exists) {
+    next: (emailResponse) => {
+      if (emailResponse.exists) {
         this.errorMessage = 'This email is already used.';
         return;
       }
 
-      // Vérifier username dans users
+      // Check username existence
       this.userService.getUserByUsername(username).subscribe({
-        next: (usersByUsername) => {
-          if (usersByUsername.length > 0) {
+        next: (usernameResponse) => {
+          if (usernameResponse.exists) {
             this.errorMessage = 'This username is already taken.';
             return;
           }
 
-          // Stocker uniquement les infos nécessaires en localStorage pour la confirmation
+          // Proceed if both are unique
           localStorage.setItem('pendingUser', JSON.stringify({
             username,
             email,
             password,
-            role: "CANDIDATE" // Role par défaut pour les nouveaux utilisateurs
+            role: "CANDIDATE"
           }));
+
           console.log('Pending user data stored in localStorage:', {
             username,
             email,
@@ -77,7 +78,6 @@ export class SignupComponent {
             role: 'CANDIDATE'
           });
 
-          // Rediriger vers la page de confirmation de code avec le mode signup
           this.router.navigate(['/confirm-code'], { queryParams: { email, mode: 'signup' } });
         },
         error: () => {

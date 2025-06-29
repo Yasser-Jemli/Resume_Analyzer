@@ -24,14 +24,16 @@ export class UserServiceService {
   }
   
   // Récupérer un utilisateur par email
- getUserByEmail(email: string): Observable<{ exists: boolean }> {
-  return this.http.get<{ exists: boolean }>(`${this.apiUrl}/check-email?email=${email}`);
+ getUserByUsername(username: string): Observable<{ exists: boolean }> {
+  return this.http.get<{ exists: boolean }>(`${this.apiUrl}/check-username`, { params: { username } });
 }
 
   // Récupérer un utilisateur par username
-  getUserByUsername(username: string): Observable<any[]> {
-    return this.http.get<User[]>(`${this.apiUrl+'/check-username'}?username=${username}`);
-  }
+  
+  getUserByEmail(email: string): Observable<{ exists: boolean }> {
+  return this.http.get<{ exists: boolean }>(`${this.apiUrl}/check-email`, { params: { email } });
+}
+
 
   // Créer un nouvel utilisateur (signup)
   createUser(user: any): Observable<any> {
