@@ -46,11 +46,11 @@ jobs:
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "CV Parser CI Result"
           to: |
-            sami.BOUKESRA@esprit.tn
-            Imed.Chakhari@esprit.tn
-            bouslimi.Azaiez@esprit.tn
-            Nadine.MAAZOUN@Esprit.tn
-            nader.BENHAMMOUDA@esprit.tn
+            sami.boukesra@esprit.tn
+            imed.chakhari@esprit.tn
+            bouslimi.azaiez@esprit.tn
+            nadine.maazoun@esprit.tn
+            nader.benhammouda@esprit.tn
             yaaser.jemli@esprit.tn
           from: ${{ secrets.EMAIL_USER }}
           body: |
