@@ -1,6 +1,126 @@
 [
-    {
-        "role": "assistant",
-        "content": "Pouvez-vous expliquer ce qu'est le polymorphisme en Python et donner un exemple de son utilisation ?"
-    }
+  {
+    "role": "assistant",
+    "content": "Comment implémenteriez-vous un patron de conception Singleton en C++ ?"
+  },
+  {
+    "role": "user",
+    "content": "sfdgfdsgfdsgfdsg"
+  },
+  {
+    "role": "assistant",
+    "content": "Merci pour votre réponse. Note : 0/20. Il manque plusieurs éléments importants."
+  },
+  {
+    "role": "assistant",
+    "content": "Quelle est la différence entre les pointeurs intelligents unique_ptr et shared_ptr en C++ ?"
+  },
+  {
+    "role": "user",
+    "content": "questions_entretien"
+  },
+  {
+    "role": "assistant",
+    "content": "Merci pour votre réponse. Note : 0/20. Il manque plusieurs éléments importants."
+  },
+  {
+    "role": "assistant",
+    "content": "Comment géreriez-vous les exceptions en C++ pour assurer la robustesse d’un programme ?"
+  },
+  {
+    "role": "user",
+    "content": "Merci pour votre réponse. Note : 0/20. Il manque plusieurs éléments importants. Question suivante : Comment géreriez-vous les exceptions en C++ pour assurer la robustesse d’un programme ?"
+  },
+  {
+    "role": "assistant",
+    "content": "Merci pour votre réponse. Note : 15/20. Réponse correcte, mais elle peut être améliorée."
+  },
+  {
+    "role": "assistant",
+    "content": "Expliquez le concept de surcharge d’opérateurs en C++ et donnez un exemple d’utilisation."
+  },
+  {
+    "role": "user",
+    "content": "cvnbvcnvcn"
+  },
+  {
+    "role": "assistant",
+    "content": "Merci pour votre réponse. Note : 0/20. Il manque plusieurs éléments importants."
+  },
+  {
+    "role": "assistant",
+    "content": "Quels sont les avantages et les inconvénients de l’utilisation de l’héritage multiple en C++ ?"
+  },
+  {
+    "role": "user",
+    "content": "xvcgsfdgfd"
+  },
+  {
+    "role": "assistant",
+    "content": "Merci pour votre réponse. Note : 0/20. Il manque plusieurs éléments importants."
+  },
+  {
+    "role": "assistant",
+    "content": "Comment alloueriez-vous de la mémoire dynamique en C pour un tableau de structures ?"
+  },
+  {
+    "role": "user",
+    "content": "fsqdfsqdfdsqf"
+  },
+  {
+    "role": "assistant",
+    "content": "Merci pour votre réponse. Note : 0/20. Il manque plusieurs éléments importants."
+  },
+  {
+    "role": "assistant",
+    "content": "Quelle est la différence entre les types de données signed et unsigned en C ?"
+  },
+  {
+    "role": "user",
+    "content": "fsqdfdsqfqsdfdsqf"
+  },
+  {
+    "role": "assistant",
+    "content": "Merci pour votre réponse. Note : 0/20. Il manque plusieurs éléments importants."
+  },
+  {
+    "role": "assistant",
+    "content": "Expliquez le fonctionnement des pointeurs en C et donnez un exemple d’utilisation."
+  },
+  {
+    "role": "user",
+    "content": "qsfdqsdfsqdfdsqf"
+  },
+  {
+    "role": "assistant",
+    "content": "Merci pour votre réponse. Note : 0/20. Il manque plusieurs éléments importants."
+  },
+  {
+    "role": "assistant",
+    "content": "Comment géreriez-vous les erreurs lors de l’ouverture et de la lecture de fichiers en C ?"
+  },
+  {
+    "role": "user",
+    "content": "fqsdfsqdfdsqfdsqf"
+  },
+  {
+    "role": "assistant",
+    "content": "Merci pour votre réponse. Note : 0/20. Il manque plusieurs éléments importants."
+  },
+  {
+    "role": "assistant",
+    "content": "Quels sont les principes de base pour écrire du code C sécurisé et robuste ?"
+  },
+  {
+    "role": "user",
+    "content": "fsqdfsqdfdsqfdsqf"
+  },
+  {
+    "role": "assistant",
+    "content": "Merci pour votre réponse. Note : 0/20. Il manque plusieurs éléments importants."
+  },
+  {
+    "role": "assistant",
+    "content": "Comment configurez-vous un nouveau projet dans Jira pour suivre les problèmes et les tâches ?"
+  }
 ]

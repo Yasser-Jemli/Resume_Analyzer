@@ -1,5 +1,6 @@
 #!/bin/bash
-
+pip install gtts pyautogui groq
+pip install flask groq pyautogui
 # Activer l'environnement virtuel
 source ./venv/bin/activate
 
