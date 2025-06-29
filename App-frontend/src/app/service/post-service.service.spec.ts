@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { JiraServiceService } from './jira-service.service';
+import { PostServiceService } from './post-service.service';
 
-describe('JiraServiceService', () => {
-  let service: JiraServiceService;
+describe('PostServiceService', () => {
+  let service: PostServiceService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(JiraServiceService);
+    service = TestBed.inject(PostServiceService);
   });
 
   it('should be created', () => {

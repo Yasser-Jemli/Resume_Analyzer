@@ -1,9 +1,9 @@
 import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-// Import services
-import { ParserServiceService } from '../service/parser-service.service';
 import { UserServiceService } from '../service/user-service.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEventType } from '@angular/common/http';
+import { CvUploadService } from '../service/cv-upload-service.service';
+import { ParserServiceService } from '../service/parser-service.service';
 
 @Component({
   selector: 'app-test-mon-cv',
@@ -12,10 +12,10 @@ import { HttpClient } from '@angular/common/http';
 })
 export class TestMonCvComponent implements OnInit {
   selectedFile: File | null = null;
-  pdfSrc: string = '';
+  pdfSrc = '';
   uploadProgress = 0;
   errorMessage: string | null = null;
-  pdfisupdated: boolean = false;
+  pdfisupdated = false;
   customScore: any = null;
   pyresScore: any = null;
   getNoteProgress = 0;
@@ -24,266 +24,197 @@ export class TestMonCvComponent implements OnInit {
   recommendations: string[] = [];
   skillRecommendations: any = null;
   learningPath: any = null;
-  showResults: boolean = false;
+  showResults = false;
+  showUploadProgress = false;
 
   constructor(
+    private cvUploadService: CvUploadService,
     private parserService: ParserServiceService,
     private userService: UserServiceService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private http: HttpClient // Only for upload notification, can be refactored too
+    private http: HttpClient
   ) {}
 
-  getBadgeClass(score: number): string {
-    if (score < 50) {
-      return 'bg-danger text-light';
-    } else if (score < 70) {
-      return 'bg-warning text-dark';
-    } else {
-      return 'bg-success text-light';
-    }
-  }
+  ngOnInit(): void {}
 
-  goToChat(): void {
-    if (this.pdfisupdated && localStorage.getItem('canIncrementCV') === 'true') {
-      this.incrementNbrPosts();
-      localStorage.removeItem('canIncrementCV');
-      console.log('Nbr_Posts incremented and flag removed');
-    }
-    this.router.navigate(['/chat-bot']);
-  }
-
-  onFileSelected(event: Event) {
+  onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      if (file.type !== 'application/pdf') {
-        this.errorMessage = 'Veuillez sélectionner un fichier PDF uniquement.';
-        this.selectedFile = null;
-        this.pdfSrc = '';
-        this.pdfisupdated = false;
-        console.warn('❌ Fichier non PDF sélectionné');
-        return;
-      }
-      this.selectedFile = file;
-      this.errorMessage = null;
-      this.pdfSrc = '';
-      this.pdfisupdated = false;
-      console.log('✅ Fichier sélectionné :', file.name);
-    } else {
-      this.selectedFile = null;
-      this.pdfSrc = '';
-      this.pdfisupdated = false;
-      this.errorMessage = 'Aucun fichier sélectionné.';
-    }
-  }
+    const file = input?.files?.[0];
 
-  uploadCV() {
-    if (!this.selectedFile) {
-      this.errorMessage = 'Veuillez sélectionner un fichier PDF.';
-      console.warn('⚠️ Aucun fichier sélectionné');
+    if (!file) {
+      this.resetFileSelection('No file selected.');
       return;
     }
-    this.uploadProgress = 0;
+
+    if (!file.name.toLowerCase().endsWith('.pdf') || file.type !== 'application/pdf') {
+      this.resetFileSelection('Please select a PDF file only.');
+      return;
+    }
+
+    this.selectedFile = file;
     this.errorMessage = null;
-    const progressInterval = setInterval(() => {
-      this.uploadProgress += 10;
-      if (this.uploadProgress >= 100) {
-        clearInterval(progressInterval);
-        console.log('✅ Téléchargement terminé !');
-        this.displayPDF();
-        this.notifyBackendCVUpload();
-      }
-    }, 200);
+    this.pdfSrc = '';
+    this.pdfisupdated = false;
   }
 
-  private displayPDF() {
+  private resetFileSelection(message: string): void {
+    this.selectedFile = null;
+    this.pdfSrc = '';
+    this.pdfisupdated = false;
+    this.errorMessage = message;
+  }
+
+  startUpload(): void {
     if (!this.selectedFile) {
-      this.errorMessage = 'Aucun fichier sélectionné pour l\'aperçu.';
-      console.warn('⚠️ Aucun fichier pour l\'aperçu');
+      this.errorMessage = 'Please select a PDF file.';
       return;
     }
+
+    this.uploadProgress = 0;
+    this.showUploadProgress = true;
+    this.errorMessage = null;
+    this.cdr.detectChanges();
+
+    this.uploadCV();
+  }
+
+  private uploadCV(): void {
+    if (!this.selectedFile) {
+      this.errorMessage = 'Please select a PDF file.';
+      this.showUploadProgress = false;
+      return;
+    }
+
+    const metadata = {
+      userid : localStorage.getItem('id') || '',
+      username: localStorage.getItem('username') || '',
+      usermail: localStorage.getItem('email') || '',
+      postname: localStorage.getItem('postname') || '',
+      postid: localStorage.getItem('postid') || ''
+    };
+
+    this.cvUploadService.uploadCV(this.selectedFile, metadata).subscribe({
+      next: (event) => {
+        if (event.type === HttpEventType.UploadProgress && event.total) {
+          this.uploadProgress = Math.round((100 * event.loaded) / event.total);
+          this.cdr.detectChanges();
+        } else if (event.type === HttpEventType.Response) {
+          this.uploadProgress = 100;
+          console.log('Upload success:', event.body);
+          setTimeout(() => this.displayPDF(), 500);
+        }
+      },
+      error: (err) => {
+        this.uploadProgress = 0;
+        this.showUploadProgress = false;
+        this.errorMessage = err.error?.message || 'Error uploading CV.';
+        console.error('Upload error:', err);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private displayPDF(): void {
+    if (!this.selectedFile) return;
+
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>) => {
       if (e.target?.result) {
         this.pdfSrc = e.target.result as string;
         this.pdfisupdated = true;
         this.cdr.detectChanges();
-        console.log('📄 PDF affiché avec succès');
-      } else {
-        this.errorMessage = 'Erreur lors de la lecture du fichier PDF.';
-        this.pdfisupdated = false;
-        console.error('❌ Résultat de FileReader vide');
       }
     };
     reader.onerror = () => {
-      this.errorMessage = 'Erreur lors de la lecture du fichier PDF.';
-      this.pdfisupdated = false;
-      this.pdfSrc = '';
-      console.error('❌ Erreur de lecture du fichier PDF');
+      this.resetFileSelection('Error reading PDF file.');
       this.cdr.detectChanges();
     };
     reader.readAsDataURL(this.selectedFile);
   }
 
-  private notifyBackendCVUpload(): void {
-    if (!this.selectedFile) {
-      console.warn('⚠️ Aucun fichier pour la notification backend');
-      return;
-    }
-    const uploadData = {
-      username: localStorage.getItem('username'),
-      usermail: localStorage.getItem('email'),
-      fileName: this.selectedFile.name,
-      fileType: this.selectedFile.type,
-      fileSize: this.selectedFile.size
-    };
-    // Utilise http direct ici, ou crée un service dédié si besoin
- /*   this.http.post('http://localhost:8081/api/receive_data', uploadData).subscribe({
-      next: (response) => {
-        console.log('✅ Backend notifié avec succès:', response);
-      },
-      error: (error) => {
-        console.error('❌ Erreur lors de la notification au backend:', error);
-        this.errorMessage = 'Erreur lors de la communication avec le serveur.';
-        this.cdr.detectChanges();
-      }
-    });*/
-  }
-
   getMyNote(): void {
-    //console.log('✅ get my note called');
     this.getNoteProgress = 0;
     this.isGettingNote = true;
     this.showResults = false;
+
     const interval = setInterval(() => {
       if (this.getNoteProgress < 100) {
         this.getNoteProgress += 10;
+        this.cdr.detectChanges();
       } else {
         clearInterval(interval);
-        this.parserService.getScores().subscribe({
-          next: (scores) => {
-            this.customScore = scores.custom;
-            this.recommendations = scores.recommendations || [];
-            this.showResults = true;
 
-            // Ajout de la mise à jour du score utilisateur
-            const email = localStorage.getItem('email');
-            if (
-              email &&
-              this.customScore &&
-              this.customScore.total_score !== undefined &&
-              this.customScore.detailed_scores &&
-              this.customScore.experience_metrics
-            ) {
-              this.http.get<any[]>(`http://localhost:8081/users?email=${email}`).subscribe({
-                next: (users) => {
-                  if (users.length > 0) {
-                    const user = users[0];
-                    // Récupère le nom du CV actuel si disponible
-                    const lastcvName = this.selectedFile ? this.selectedFile.name : user.lastcvName;
-                    // Récupère le nom du post depuis le localStorage
-                    const lastPosts = localStorage.getItem('postName') || user.lastPosts;
-                    this.http.patch(`http://localhost:8081/users/${user.id}`, {
-                      Cv_Note: this.pyresScore ? this.pyresScore.total_score : null,
-                      customScore: {
-                        total_score: this.customScore.total_score,
-                        detailed_scores: this.customScore.detailed_scores,
-                        experience_metrics: this.customScore.experience_metrics,
-                        feedback: this.customScore.feedback
-                      },
-                      lastcvName, // Met à jour le nom du CV
-                      lastPosts // Met à jour le nom du post
-                    }).subscribe({
-                      next: () => {
-                        console.log('✅ User scores, CV name, and endtwoPosts updated in backend');
-                      },
-                      error: (err) => {
-                        console.error('❌ Failed to update user scores, CV name, or endtwoPosts:', err);
-                      }
-                    });
-                  }
-                },
-                error: (err) => {
-                  console.error('❌ Failed to fetch user for score update:', err);
-                }
-              });
+        const userId: number = parseInt(localStorage.getItem('id') || '0', 10);
+
+        this.parserService.getCvsByUser(userId).subscribe({
+          next: (cvList) => {
+            if (cvList.length > 0) {
+              const latestCv = cvList[cvList.length - 1];
+
+              console.log('Latest CV:', latestCv);
+
+              this.customScore = latestCv.scores?.custom || null;
+              this.recommendations = latestCv.skill_recommendations || [];
+              this.showResults = true;
             } else {
-              console.warn('customScore or its properties are null:', this.customScore);
+              this.errorMessage = 'No CV found for this user.';
+              this.customScore = null;
+              this.recommendations = [];
+              this.showResults = false;
             }
+            this.isGettingNote = false;
+            this.cdr.detectChanges();
           },
           error: (err) => {
-            this.errorMessage = 'Failed to fetch scores.';
+            this.errorMessage = 'Failed to retrieve CV data.';
             this.customScore = null;
-            this.isGettingNote = false;
             this.recommendations = [];
+            this.isGettingNote = false;
             this.showResults = false;
+            this.cdr.detectChanges();
           }
         });
       }
     }, 100);
   }
 
+  goToChat(): void {
+    if (this.pdfisupdated && localStorage.getItem('canIncrementCV') === 'true') {
+      this.incrementNbrPosts();
+      localStorage.removeItem('canIncrementCV');
+    }
+    this.router.navigate(['/chat-bot']);
+  }
+
   private incrementNbrPosts(): void {
     const email = localStorage.getItem('email');
-    if (!email) {
-      console.warn('No email in localStorage');
-      return;
-    }
+    if (!email) return;
+
     this.userService.getUserByEmail(email).subscribe({
-      next: (users) => {
-        if (users.length > 0) {
-          const user = users[0];
-          const newNbrPosts = (user.Nbr_Posts || 0) + 1;
-          const lastcvName = this.selectedFile ? this.selectedFile.name : user.lastcvName;
-          this.userService.updateUser(user.id, { Nbr_Posts: newNbrPosts, lastcvName }).subscribe({
-            next: (res) => {
-              console.log('✅ Nbr_Posts incremented:', newNbrPosts);
-              console.log('✅ lastcvName updated:', lastcvName);
-            },
-            error: (err) => {
-              console.error('❌ Failed to update Nbr_Posts or lastcvName:', err);
-            }
-          });
-        } else {
-          console.warn('No user found with email:', email);
+      next: (response) => {
+        if (response.exists) {
+          const userId = localStorage.getItem('id');
+          if (!userId) return;
+
+          const currentNbrPosts = parseInt(localStorage.getItem('Nbr_Posts') || '0', 10);
+          const newNbrPosts = currentNbrPosts + 1;
+          const lastcvName = this.selectedFile?.name || '';
+
+          this.userService.updateUser(userId, {
+            Nbr_Posts: newNbrPosts,
+            lastcvName
+          }).subscribe();
         }
       },
-      error: (err) => {
-        console.error('❌ Failed to fetch user:', err);
-      }
+      error: (err) => console.error('Failed to fetch user:', err)
     });
   }
 
-  ngOnInit() {
-    this.fetchLearningPath();
-    this.fetchSkillRecommendations();
-  }
-
-  fetchLearningPath() {
-    this.parserService.getLearningPath().subscribe({
-      next: (data) => {
-        this.learningPath = data;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('❌ Failed to fetch learning path:', err);
-        this.learningPath = null;
-      }
-    });
-  }
-
-  fetchSkillRecommendations() {
-    this.parserService.getSkillRecommendations().subscribe({
-      next: (data) => {
-        this.skillRecommendations = data.recommendations;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('❌ Failed to fetch skill recommendations:', err);
-        this.skillRecommendations = null;
-      }
-    });
+  getBadgeClass(score: number): string {
+    if (score < 50) return 'bg-danger text-light';
+    if (score < 70) return 'bg-warning text-dark';
+    return 'bg-success text-light';
   }
 
   getKeys(obj: any): string[] {

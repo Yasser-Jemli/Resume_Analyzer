@@ -1,28 +1,60 @@
-<div class="chat-bot-container">
-  <h2>chat interview</h2>
-  <div class="chat-window">
-    <div *ngFor="let m of messages"
-         [ngClass]="{
-           'user-message': m.sender === 'Vous',
-           'bot-message': m.sender === 'Bot'
-         }">
-      <strong>{{ m.sender }}:</strong> {{ m.text }}
-      <span *ngIf="m.score !== undefined" class="score-icon">
-        {{ getStars(m.score) }}
-      </span>
+<div class="container-fluid min-vh-100 bg-light py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8">
+      <div class="card shadow rounded-4 p-4 d-flex flex-column" style="height: 85vh;">
+
+        <!-- Header -->
+        <div class="text-center mb-3">
+          <h2 class="fw-bold text-primary">
+            💬 Chat Interview
+          </h2>
+        </div>
+
+        <!-- Chat Window -->
+        <div #chatWindow
+             class="flex-grow-1 overflow-auto mb-3 p-3 border rounded bg-white"
+             style="max-height: 60vh;">
+          <div *ngFor="let m of messages"
+               class="d-flex mb-2"
+               [ngClass]="{
+                 'justify-content-end': m.sender === 'Vous',
+                 'justify-content-start': m.sender === 'Bot'
+               }">
+            <div [ngClass]="{
+                  'bg-primary text-bleu rounded-start rounded-pill': m.sender === 'Vous',
+                  'bg-light text-dark rounded-end rounded-pill': m.sender === 'Bot'
+                }"
+                class="p-3 shadow-sm"
+                style="max-width: 70%;">
+              <div *ngIf="m.sender === 'Bot'" class="small text-muted mb-1">🤖 Bot</div>
+              <div *ngIf="m.sender === 'Vous'" class="small text-white-50 mb-1">🧑 You</div>
+              <span>{{ m.text }}</span>
+              <div *ngIf="m.score !== undefined" class="mt-1 text-warning small">
+                {{ getStars(m.score) }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Countdown -->
+        <div *ngIf="sessionActive && timeLeft > 0" class="text-center text-secondary mb-3">
+          ⏳ Next question in {{ timeLeft }} s
+        </div>
+
+        <!-- Input Area -->
+        <div *ngIf="sessionActive" class="input-group mt-auto">
+          <input [(ngModel)]="userInput"
+                 (keyup.enter)="sendMessage()"
+                 type="text"
+                 class="form-control form-control-lg rounded-start-pill"
+                 placeholder="Type your message...">
+          <button (click)="sendMessage()"
+                  class="btn btn-primary btn-lg rounded-end-pill d-flex align-items-center">
+            <i class="bi bi-send-fill me-1"></i> Send
+          </button>
+        </div>
+
+      </div>
     </div>
-  </div>
-
-  <!-- Compte à rebours -->
-  <div class="countdown" *ngIf="sessionActive && timeLeft > 0">
-    Prochaine question dans {{ timeLeft }} s
-  </div>
-
-  <!-- Zone de saisie -->
-  <div class="chat-input" *ngIf="sessionActive">
-    <input [(ngModel)]="userInput"
-           (keyup.enter)="sendMessage()"
-           placeholder="Tapez votre message..." />
-    <button (click)="sendMessage()">Envoyer</button>
   </div>
 </div>

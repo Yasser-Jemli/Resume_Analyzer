@@ -37,11 +37,6 @@ def check_prerequisites():
         print("Angular CLI is not installed. Installing globally...")
         run_command("npm install -g @angular/cli")
 
-    # Check json-server
-    if not shutil.which("json-server"):
-        print("json-server is not installed. Installing globally...")
-        run_command("npm install -g json-server")
-
 def main():
     # Check prerequisites
     check_prerequisites()
@@ -63,8 +58,8 @@ def main():
     run_command("npm install bootstrap-icons --legacy-peer-deps")
 
     # Step 3: Start json-server in the background
-    print("Starting json-server on port 8081...")
-    json_server_process = run_background_command("npx json-server --watch src/db.json --port 8081")
+   # print("Starting json-server on port 8081...")
+   # json_server_process = run_background_command("npx json-server --watch src/db.json --port 8081")
 
     # Give json-server a moment to start
     time.sleep(2)

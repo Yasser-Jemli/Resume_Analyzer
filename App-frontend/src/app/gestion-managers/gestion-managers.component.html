@@ -1,4 +1,4 @@
-<p class="title">Manager Management</p>
+<p class="title">Users Management</p>
 <button *ngIf="isAdmin && !showAddForm" class="add-btn" (click)="toggleAddForm()">Add Manager</button>
 
 <!-- Add Manager Form -->
@@ -27,32 +27,33 @@
 <table *ngIf="isAdmin" class="modern-table">
   <thead>
     <tr>
-      <th>Name</th>
+      <th>Username</th>
       <th>Email</th>
-      <th>Password</th>
-      <th>Action</th>
+      <th>Role</th>
+      <th>
+        <label for="roleFilter"><strong>Filter by role:</strong></label>
+        <select id="roleFilter" [(ngModel)]="selectedRole" (change)="onRoleFilterChange(selectedRole)">
+          <option value="ALL">All</option>
+          <option value="MANAGER">Managers</option>
+          <option value="CANDIDATE">Candidats</option>
+        </select>
+      </th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let manager of managers; let i = index">
-      <td>{{ manager.username }}</td>
-      <td>{{ manager.email }}</td>
+    <tr *ngFor="let user of filteredUsers">
+      <td>{{ user.username }}</td>
+      <td>{{ user.email }}</td>
+      <td>{{ user.role }}</td>
       <td>
-        <span *ngIf="!manager.showPassword">••••••
-          <button class="eye-btn" (click)="manager.showPassword = true" type="button">
-            <i class="bi bi-eye"></i>
-          </button>
-        </span>
-        <span *ngIf="manager.showPassword">
-          {{ manager.password }}
-          <button class="eye-btn" (click)="manager.showPassword = false" type="button">
-            <i class="bi bi-eye-slash"></i>
-          </button>
-        </span>
+        <span *ngIf="showPassword[user.username]">{{ user.password }}</span>
+        <button type="button" (click)="togglePassword(user.username)" style="background:none;border:none;cursor:pointer;">
+        </button>
       </td>
       <td>
-        <button class="delete-btn" (click)="deleteManager(manager)">Delete</button>
+        <button class="delete-btn" (click)="deleteUser(user)">Delete</button>
       </td>
+      <td></td>
     </tr>
   </tbody>
 </table>

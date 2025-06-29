@@ -1,85 +1,26 @@
 {
   "users": [
     {
-      "id": "d81c",
-      "username": "test",
-      "email": "test@gmail.com",
-      "password": "test12",
-      "Nbr_Posts": null,
-      "lastPosts": "QA Engineer",
-      "lastcvName": "mon-cv (7).pdf",
-      "customScore": {
-        "total_score": 55.48,
-        "detailed_scores": {
-          "skills": 50,
-          "experience": 65.67,
-          "education": 50
-        },
-        "experience_metrics": {
-          "years": 3,
-          "positions": 3,
-          "details": "3 years, 3 positions"
-        },
-        "feedback": [
-          "Skills: Satisfactory",
-          "Experience: Satisfactory",
-          "Education: Satisfactory"
-        ]
-      },
-      "total_score": null,
-      "detailed_scores": null,
-      "experience_metrics": null,
-      "feedback": null,
-      "Cv_Note": null
+      "id": "73db",
+      "username": "admin",
+      "password": "admin123",
+      "email": "admin@actia-engineering.tn",
+      "role": "SYSADMIN"
     },
     {
-      "id": "b195",
-      "username": "user",
-      "email": "imedchakhari@esprit.tn",
+      "id": "73db",
+      "username": "imedchakhari",
       "password": "000000",
-      "lastPosts": null,
-      "lastcvName": null,
-      "customScore": null,
-      "total_score": null,
-      "detailed_scores": null,
-      "experience_metrics": null,
-      "feedback": null
-    },
-    {
-      "id": "ebb8",
-      "username": "nadera",
-      "email": "nader@gmail.com",
-      "password": "123456",
-      "endPost": null,
-      "lastcvName": null,
-      "customScore": null,
-      "total_score": null,
-      "detailed_scores": null,
-      "experience_metrics": null,
-      "feedback": null
-    }
-  ],
-  "managers": [
-    {
-      "id": "616d",
-      "role": "manager",
-      "username": "nader",
-      "password": "000000",
-      "email": "nader@actia-engineering.tn"
-    },
-    {
-      "id": "9bd1",
-      "username": "imed",
-      "password": "sffede4h",
       "email": "imed@actia-engineering.tn",
-      "role": "manager"
+      "role": "MANAGER",
+      "mustChangePassword": false
     },
     {
-      "id": "f800",
-      "username": "nadera",
+      "id": "4d52",
+      "username": "imed",
+      "email": "imed@gmail.com",
       "password": "123456",
-      "email": "nadera@actia-engineering.tn",
-      "role": "manager"
+      "role": "CANDIDATE"
     }
   ],
   "extraction_methods": {

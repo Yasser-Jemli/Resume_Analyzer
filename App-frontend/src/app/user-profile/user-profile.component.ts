@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { UserServiceService } from '../service/user-service.service';
+import { ParserServiceService } from '../service/parser-service.service';
+import { CvUploadService } from '../service/cv-upload-service.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -9,123 +11,135 @@ import { HttpClient } from '@angular/common/http';
 export class UserProfileComponent implements OnInit {
   username: string | null = '';
   email: string | null = '';
-  id: number | null = null;
-  Nbr_Posts: number | null = null;
+  id: string | null = null;
+  lastpostName: string | null = null;
   lastPosts: string | null = null;
   CV_Note: number | null = null;
   showPosts = false;
-  lastTwoPosts: string[] = [];
+  //lastTwoPosts: string[] = [];
   lastcvName: string | null = '';
   customScore: any = null;
+  fileName: string | null = null;
 
-  // New: visibility toggles for score sections
   showDetails = {
     detailedScores: false,
     experienceMetrics: false,
     feedback: false
   };
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private userService: UserServiceService,
+    private parserService: ParserServiceService,
+    private cvuploadService: CvUploadService
+  ) {}
 
   ngOnInit(): void {
+    this.reloadUserData();
+  }
+
+  showTab(tabName: 'detailedScores' | 'experienceMetrics' | 'feedback') {
+    this.showDetails = {
+      detailedScores: false,
+      experienceMetrics: false,
+      feedback: false
+    };
+    this.showDetails[tabName] = true;
+  }
+
+  getBadgeClass(score: number): string {
+    if (score < 50) {
+      return 'bg-danger text-light';
+    } else if (score < 70) {
+      return 'bg-warning text-dark';
+    } else {
+      return 'bg-success text-light';
+    }
+  }
+
+  reloadUserData() {
+    console.log('Reloading user data...reloadUserData');
+
     this.username = localStorage.getItem('username');
-    if (this.username) {
-      this.http.get<any[]>(`http://localhost:8081/users?username=${this.username}`).subscribe({
-        next: (users) => {
-          if (users.length > 0) {
-            const user = users[0];
-            this.email = user.email;
-            this.id = user.id;
-            this.username = user.username;
-            this.Nbr_Posts = user.Nbr_Posts || 0;
-            this.lastPosts = user.lastPosts || null;
-            this.customScore = user.customScore || { total_score: 0 };
-            this.lastcvName = user.lastcvName || '';
+    this.email = localStorage.getItem('email');
+    this.id = localStorage.getItem('id');
+    const userId = parseInt(this.id || '0', 10);
+    if (userId > 0) {
+      this.cvuploadService.getAllCVInfosByUsername(this.username || '').subscribe({
+        next: (cvData) => {
+          console.log('CV data from backend:', cvData);
+          if (cvData && cvData.length > 0) {
+            const latestCV = cvData[0]; // Latest CV (assuming sorted by id DESC)
+            this.lastcvName = latestCV?.fileName || 'N/A';
+            this.fileName = latestCV?.fileName || 'N/A'; // Set fileName consistently
+            this.lastpostName = latestCV?.postname;
+          } else {
+            this.lastcvName = 'N/A';
+            this.lastpostName = '0';
+            this.fileName = 'N/A';
           }
         },
         error: (err) => {
-          // handle error
+          console.error('Failed to fetch CV data:', err);
+          this.lastcvName = 'N/A';
+          this.lastpostName = '0';
+          this.fileName = 'N/A';
+        }
+      });
+
+      this.parserService.getCvsByUser(userId).subscribe({
+        next: (data) => {
+          console.log('User data from backend:', data);
+          this.customScore = data.scores?.custom ?? null;
+        },
+        error: (err) => {
+          console.error('Error fetching CVs:', err);
         }
       });
     }
   }
-  showTab(tabName: 'detailedScores' | 'experienceMetrics' | 'feedback') {
-  this.showDetails = {
-    detailedScores: false,
-    experienceMetrics: false,
-    feedback: false
-  };
-  this.showDetails[tabName] = true;
-}
 
-
-  deleteMyProfile(): void {
-    const password = prompt('Please enter your password to confirm profile deletion:');
-    if (!password) {
-      alert('Profile deletion cancelled.');
+  updatePassword(): void {
+    const oldPassword = prompt('Entrez votre mot de passe actuel :');
+    if (!oldPassword) {
+      alert('Changement annulé.');
       return;
     }
 
-    this.http.get<any[]>(`http://localhost:8081/users?username=${this.username}`).subscribe({
-      next: (users) => {
-        if (users.length > 0) {
-          const user = users[0];
-          if (user.password === password) {
-            if (confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
-              // Suppression du profil
-              this.http.delete(`http://localhost:8081/users/${user.id}`).subscribe({
-                next: () => {
-                  alert('Profile deleted successfully.');
-                  localStorage.clear();
-                  // Appel logout (redirige vers /log-in)
-                  window.location.href = '/log-in';
-                },
-                error: (err) => {
-                  alert('Failed to delete profile.');
-                  console.error('Delete error:', err);
-                }
-              });
-            }
-          } else {
-            alert('Incorrect password. Profile not deleted.');
+    const newPassword = prompt('Entrez le nouveau mot de passe (min 6 caractères) :');
+    if (!newPassword || newPassword.length < 6) {
+      alert('Le nouveau mot de passe doit contenir au moins 6 caractères.');
+      return;
+    }
+
+    if (this.username) {
+      const userId = localStorage.getItem('id');
+      if (!userId) {
+        alert('Utilisateur introuvable.');
+        return;
+      }
+
+      this.userService.getPassword(userId).subscribe({
+        next: (response) => {
+          const storedPassword = response.password;
+          if (storedPassword !== oldPassword) {
+            alert('Mot de passe actuel incorrect.');
+            return;
           }
-        } else {
-          alert('User not found.');
+          this.userService.updatePassword(userId, newPassword).subscribe({
+            next: () => {
+              alert('Mot de passe mis à jour avec succès.');
+            },
+            error: (err) => {
+              alert('Erreur lors de la mise à jour du mot de passe.');
+              console.error('Update error:', err);
+            }
+          });
+        },
+        error: (err) => {
+          alert('Erreur lors de la récupération du mot de passe.');
+          console.error('Get password error:', err);
         }
-      },
-      error: (err) => {
-        alert('Error verifying password.');
-        console.error('Fetch user error:', err);
-      }
-    });
+      });
+    }
   }
-  getBadgeClass(score: number): string {
-  if (score < 50) {
-    return 'bg-danger text-light'; // Rouge
-  } else if (score < 70) {
-    return 'bg-warning text-dark'; // Jaune
-  } else {
-    return 'bg-success text-light'; // Vert
-  }
-}
-
-reloadUserData() {
-  if (this.username) {
-    this.http.get<any[]>(`http://localhost:8081/users?username=${this.username}`).subscribe({
-      next: (users) => {
-        if (users.length > 0) {
-          const user = users[0];
-          this.email = user.email;
-          this.id = user.id;
-          this.username = user.username;
-          this.Nbr_Posts = user.Nbr_Posts || 0;
-          this.lastPosts = user.lastPosts || null;
-          this.customScore = user.customScore || { total_score: 0 };
-          this.lastcvName = user.lastcvName || '';
-        }
-      }
-    });
-  }
-}
-
 }

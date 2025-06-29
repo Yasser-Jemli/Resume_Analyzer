@@ -2,7 +2,7 @@
   <div class="logo-section">
     <div class="logo">
       <a routerLink="/home">
-        <img src="../../assets/logo.png" alt="ESPRIT Logo" class="logo-img">
+        <img src="../../assets/1logo.png" alt="ESPRIT Logo" class="logo-img">
       </a>
     </div>
   </div>
@@ -11,41 +11,68 @@
     <!-- Show login button only when NOT logged in -->
     <button *ngIf="!isLoggedIn()" class="nav-button" routerLink="/log-in">Log in</button>
 
-    <!-- Manager view: only show Users Posted, View Profile, and Log out -->
-    <ng-container *ngIf="isLoggedIn() && isManager(); else nonManagerNav">
-      <div class="profile-dropdown">
-        <button class="nav-button" (click)="showMenu = !showMenu" type="button">{{ getUsername() }}
-        </button>
+    <!-- SYSADMIN navigation -->
+    <ng-container *ngIf="isLoggedIn() && isAdmin(); else notAdminNav">
+      <div class="profile-dropdown"
+           (mouseenter)="showMenu = true"
+           (mouseleave)="showMenu = false">
+        <button class="nav-button" type="button">{{ getUsername() }}</button>
         <ul class="dropdown-list" *ngIf="showMenu">
           <li>
-            <a routerLink="/manager-profile" (click)="showMenu = false">View Profile</a>
+            <a [routerLink]="['/profile', getUserId()]" (click)="showMenu = false">View Profile</a>
           </li>
           <li>
             <a (click)="logout(); showMenu = false">Log out</a>
           </li>
         </ul>
       </div>
-      <button class="nav-button" routerLink="/showCVuser">Users Posted</button>
-      <button class="nav-button" routerLink="/Mypost">My post</button>
+      <button class="nav-button" routerLink="/gestion-managers">USERS MANAGEMENT</button>
     </ng-container>
 
-    <!-- Non-manager navigation -->
-    <ng-template #nonManagerNav>
-      <div class="profile-dropdown" *ngIf="isLoggedIn()">
-        <button class="nav-button" (click)="showMenu = !showMenu" type="button">log in : {{ getUsername() }}
-        </button>
-        <ul class="dropdown-list" *ngIf="showMenu">
-          <li><a routerLink="/profile" (click)="showMenu = false">View Profile</a></li>
-          <li><a (click)="logout(); showMenu = false">Log out</a></li>
-        </ul>
-      </div>
-      <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/home">HOME</button>
-      <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/nouveauter">NEW JOBS</button>
-      <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/test-mon-cv">CV score</button>
-      <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/creation-cv">CREATE CV</button>
-      <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/chat-bot">Chat interview</button>
-      <button *ngIf="isLoggedIn() && isAdmin()" class="nav-button" routerLink="/gestion-managers">MANAGER MANAGMENT</button>
-      <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/about-nous">US</button>
+    <!-- Non-admin navigation -->
+    <ng-template #notAdminNav>
+      <!-- MANAGER navigation -->
+      <ng-container *ngIf="isLoggedIn() && isManager(); else candidateNav">
+        <div class="profile-dropdown"
+             (mouseenter)="showMenu = true"
+             (mouseleave)="showMenu = false">
+          <button class="nav-button" type="button">{{ getUsername() }}</button>
+          <ul class="dropdown-list" *ngIf="showMenu">
+            <li>
+              <a [routerLink]="['/manager-profile', getUserId()]" (click)="showMenu = false">View Profile</a>
+            </li>
+            <li>
+              <a (click)="logout(); showMenu = false">Log out</a>
+            </li>
+          </ul>
+        </div>
+        <button class="nav-button" routerLink="/home">HOME</button>
+        <button class="nav-button" routerLink="/showCVuser">Users Posted</button>
+        <button class="nav-button" routerLink="/Mypost">My post</button>
+      </ng-container>
+
+      <!-- CANDIDATE navigation -->
+      <ng-template #candidateNav>
+        <div class="profile-dropdown"
+             *ngIf="isLoggedIn()"
+             (mouseenter)="showMenu = true"
+             (mouseleave)="showMenu = false">
+          <button class="nav-button" type="button">{{ getUsername() }}</button>
+          <ul class="dropdown-list" *ngIf="showMenu">
+            <li>
+              <a [routerLink]="['/profile', getUserId()]" (click)="showMenu = false">View Profile</a>
+            </li>
+            <li>
+              <a (click)="logout(); showMenu = false">Log out</a>
+            </li>
+          </ul>
+        </div>
+        <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/home">HOME</button>
+        <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/nouveauter">NEW JOBS</button>
+        <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/test-mon-cv">CV score</button>
+        <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/chat-bot">Chat interview</button>
+        <button *ngIf="isLoggedIn()" class="nav-button" routerLink="/about-nous">US</button>
+      </ng-template>
     </ng-template>
   </nav>
 </header>

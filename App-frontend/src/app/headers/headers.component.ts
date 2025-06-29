@@ -12,22 +12,39 @@ export class HeadersComponent {
   constructor(private router: Router) {}
 
   isLoggedIn(): boolean {
-    return localStorage.getItem('token') !== null;
+    return (
+      localStorage.getItem('token') !== null &&
+      localStorage.getItem('username') !== null &&
+      localStorage.getItem('id') !== null &&
+      localStorage.getItem('role') !== null&&
+      localStorage.getItem('mustChangePassword') !== null &&
+      localStorage.getItem('email') !== null 
+    );  
   }
 
   isAdmin(): boolean {
     return localStorage.getItem('username') === 'admin';
   }
   isManager(): boolean {
-    return localStorage.getItem('userRole') === 'manager';
+    return localStorage.getItem('role') === 'MANAGER';
   }
 
   logout(): void {
     localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('id');
+    localStorage.removeItem('role');
+    localStorage.removeItem('mustChangePassword');
+    localStorage.removeItem('email');
+    //localStorage.removeItem('password');
     this.router.navigate(['/log-in']);
   }
 
   getUsername(): string | null {
     return localStorage.getItem('username');
+  }
+
+  getUserId(): string | null {
+    return localStorage.getItem('id');
   }
 }

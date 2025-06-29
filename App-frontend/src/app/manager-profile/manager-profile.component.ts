@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-manager-profile',
@@ -7,18 +6,11 @@ import { Router } from '@angular/router';
   styleUrls: ['./manager-profile.component.css']
 })
 export class ManagerProfileComponent implements OnInit {
-  username: string | null = '';
-  email: string | null = '';
-
-  constructor(private router: Router) {}
+  username = '';
+  email = '';
 
   ngOnInit(): void {
-    const role = localStorage.getItem('userRole');
-    if (role !== 'manager') {
-      // Not a manager, redirect to home or login
-      this.router.navigate(['/home']);
-    }
-    this.username = localStorage.getItem('username');
-    this.email = localStorage.getItem('email');
+    this.username = localStorage.getItem('username') || '';
+    this.email = localStorage.getItem('email') || '';
   }
 }
