@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -24,46 +25,48 @@ public class UserService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
-
-    public Optional<User> authenticateUser(String username, String email, String password) {
-        return userRepository.findByUsernameOrEmailAndPassword(username, email, password);
-    }
-
-    public boolean existsByEmail(String email) {
-        return userRepository.findByEmail(email).isPresent();
-    }
-
-    public boolean existsByUsername(String username) {
-        return userRepository.findByUsername(username).isPresent();
-    }
-
     public User saveUser(User user) {
+        // Validate uniqueness
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("Email already registered");
+        }
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new RuntimeException("Username already taken");
+        }
+
         // Generate salt and hash the password
         if (!user.getPassword().contains(":")) { // Ensure it's not already hashed
             String salt = PasswordUtils.generateSalt();
             String hashedPassword = PasswordUtils.hashPassword(user.getPassword(), salt);
             user.setPassword(hashedPassword);
         }
-
+        user.setUsername(user.getUsername());
+        user.setRole(user.getRole());
         user.setEnabled(false);
-        user.setVerificationCode(UUID.randomUUID().toString());
         user.setMustChangePassword(false);
 
+        // Save user first (without verification code in DB)
         User savedUser = userRepository.save(user);
-        emailService.sendVerificationEmail(savedUser, savedUser.getVerificationCode());
+        String verificationCode = confirmationCodeService.generateAndStoreCode(user.getEmail());
+        emailService.sendConfirmationCode(user.getEmail(), verificationCode);
 
         return savedUser;
     }
 
 
-    public void verifyUser(String verificationCode) {
-        User user = findByVerificationCode(verificationCode);
-        if (user.getEnabled()) {
-            throw new RuntimeException("Account already verified");
+    public void verifyUser(String email, String code) {
+        // Verify code from memory store
+        if (!confirmationCodeService.verifyCode(email, code)) {
+            throw new RuntimeException("Invalid or expired verification code");
         }
-        user.setVerificationCode(null);
+
+        // If code valid, enable the user
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         user.setEnabled(true);
         userRepository.save(user);
+
     }
     public Optional<User> findByUsername(String username) {
         // Add logging to verify the lookup

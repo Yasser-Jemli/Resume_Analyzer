@@ -1,7 +1,9 @@
 package org.example.backend_test.Controller;
 
 import org.example.backend_test.Dto.UserDTO;
+import org.example.backend_test.Dto.VerificationRequest;
 import org.example.backend_test.Entity.User;
+import org.example.backend_test.Repository.UserRepository;
 import org.example.backend_test.Security.JwtTokenUtil;
 import org.example.backend_test.Security.PasswordUtils;
 import org.example.backend_test.Service.ConfirmationCodeService;
@@ -33,6 +35,8 @@ public class UserController {
 
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private UserRepository userRepository;
     // Injecter via constructeur (plus propre)
 
     @Autowired
@@ -85,60 +89,31 @@ public class UserController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signupUser(@RequestBody @Valid User newUser) {
+    public ResponseEntity<?> signup(@RequestBody @Valid User request) {
         try {
-            // 1. Validate password isn't already hashed
-            if (newUser.getPassword().startsWith("$2a$")) {
-                return ResponseEntity.badRequest().body(
-                        Map.of(
-                                "success", false,
-                                "message", "Password appears to be already hashed"
-                        )
-                );
-            }
 
-            // 2. Check email availability
-            if (userService.existsByEmail(newUser.getEmail())) {
-                return ResponseEntity.badRequest().body(
-                        Map.of(
-                                "success", false,
-                                "message", "Email is already registered"
-                        )
-                );
-            }
+            User user = new User();
+            user.setEmail(request.getEmail());
+            user.setPassword(request.getPassword());
+            user.setUsername(request.getUsername());
+            user.setRole(request.getRole());
+            // Set other fields as needed
 
-            // Hash and save user
-            String rawPassword = newUser.getPassword().trim();
-            String salt = PasswordUtils.generateSalt();
-            String hashedPassword = PasswordUtils.hashPassword(rawPassword, salt);
-            newUser.setPassword(hashedPassword);
-            newUser.setEnabled(false);
-            newUser.setVerificationCode(UUID.randomUUID().toString());
+            User registeredUser = userService.saveUser(user);
 
-            User savedUser = userService.saveUser(newUser);
-
-            // 5. Verify storage
-
-            // 6. Send verification email
-            emailService.sendVerificationEmail(savedUser, savedUser.getVerificationCode());
-
-            return ResponseEntity.ok(
-                    Map.of(
-                            "success", true,
-                            "message", "Registration successful",
-                            "userId", savedUser.getId()
-                    )
-            );
-
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Verification code sent to your email",
+                    "userId", registeredUser.getId()
+            ));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(
-                    Map.of(
-                            "success", false,
-                            "message", "Registration failed: " + e.getMessage()
-                    )
-            );
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
         }
     }
+
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody User loginRequest) {
 
@@ -272,9 +247,10 @@ public class UserController {
     public ResponseEntity<?> resendConfirmationCode(@RequestBody Map<String, String> data) {
         String email = data.get("email");
         Optional<User> optionalUser = userService.findByEmail(email);
+        String code = String.format("%06d", new Random().nextInt(999999));
 
         if (optionalUser.isPresent()) {
-            String code = codeService.generateAndStoreCode(email);
+            emailService.sendConfirmationCode(email, code);
             emailService.sendConfirmationCode(email, code);
             System.out.println("code de confirmation" + code);
             return ResponseEntity.ok(Map.of("message", "Code envoyé"));
@@ -284,31 +260,65 @@ public class UserController {
         }
     }
 
-    @GetMapping("/verify-code")
-    public ResponseEntity<String> verifyUser(@RequestParam String code) {
+    @PostMapping("/verify-code")
+    public ResponseEntity<?> verify(@RequestBody VerificationRequest request) {
         try {
-            userService.verifyUser(code);
-            return ResponseEntity.ok("Account verified successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            userService.verifyUser(request.getEmail(), request.getCode());
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Account verified successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+            ));
         }
     }
 
     @PostMapping("/send-login-code")
-    public ResponseEntity<?> sendLoginCode(@RequestBody Map<String, String> data) {
-        String email = data.get("email");
+    public ResponseEntity<?> sendVerificationCode(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            String mode = request.get("mode"); // "signup" or "login"
 
-        if (email == null || email.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Email is required"));
+            if (email == null || email.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "success", false,
+                        "message", "Email is required"
+                ));
+            }
+
+            // For signup mode, verify email isn't registered
+            if ("signup".equalsIgnoreCase(mode)) {
+                if (userRepository.existsByEmail(email)) {
+                    return ResponseEntity.badRequest().body(Map.of(
+                            "success", false,
+                            "message", "Email already registered"
+                    ));
+                }
+            }
+            // For login mode, verify email exists
+            else if ("login".equalsIgnoreCase(mode)) {
+                if (!userRepository.existsByEmail(email)) {
+                    return ResponseEntity.ok(Map.of(
+                            "success", true,
+                            "message", "If account exists, code was sent"
+                    ));
+                }
+            }
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Verification code sent"
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of(
+                    "success", false,
+                    "message", "Failed to send code"
+            ));
         }
-
-        // Directly send code — no DB check
-        String code = codeService.generateAndStoreCode(email);
-        emailService.sendConfirmationCode(email, code);
-        System.out.println("Temporary login code sent to: " + email);
-
-        return ResponseEntity.ok(Map.of("message", "Code envoyé"));
     }
-
 }
 
