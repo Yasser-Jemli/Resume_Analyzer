@@ -7,7 +7,13 @@
     "target": "http://localhost:5000",
     "secure": false
   },
-  "/ask": {
+ "/askquest": {
+    "target": "http://localhost:5000",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+    "/ask": {
     "target": "http://localhost:5000",
     "secure": false
   }
