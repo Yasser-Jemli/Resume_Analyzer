@@ -5,7 +5,11 @@ from dotenv import load_dotenv
 
 # Charger la clé API depuis un fichier .env (recommandé pour la sécurité)
 load_dotenv()
-API_KEY = os.getenv("GROQ_API_KEY")
+try:
+    with open("groq.txt", "r", encoding="utf-8") as f:
+        API_KEY = f.read().strip()
+except FileNotFoundError:
+    raise FileNotFoundError("❌ Erreur : Le fichier groq.txt est introuvable.")
 
 # Option pour utiliser la clé directement (NON recommandé pour la production)
 
