@@ -6,8 +6,42 @@ on:
     branches: [ main ]
 
 jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install flake8 and black
+        run: |
+          pip install flake8 black
+
+      - name: Run flake8
+        continue-on-error: true
+        run: |
+          flake8 CV_PARSER_MODEL/ > flake8_report.txt || true
+
+      - name: Run black check
+        continue-on-error: true
+        run: |
+          black --check CV_PARSER_MODEL/ > black_report.txt || true
+
+      - name: Upload lint reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-reports
+          path: |
+            flake8_report.txt
+            black_report.txt
+
   run-parser:
     runs-on: ubuntu-latest
+    needs: checks
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -37,7 +71,7 @@ jobs:
           path: CV_PARSER_MODEL/results/parsed_resume_*.json
 
   send-emails:
-    needs: run-parser
+    needs: [run-parser]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -53,6 +87,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: result-json
+
+      - name: Download lint reports
+        uses: actions/download-artifact@v4
+        with:
+          name: lint-reports
+
+      - name: Show lint results
+        id: show-lint-results
+        run: |
+          echo "Flake8:"
+          cat flake8_report.txt || true
+          echo "Black:"
+          cat black_report.txt || true
 
       - name: Send result email to ${{ matrix.recipient }}
         uses: dawidd6/action-send-mail@v3
@@ -76,7 +123,19 @@ jobs:
 
             Please find the result.json attached.
 
+            **Python Linting Results:**
+
+            Flake8:
+            ${{ steps.show-lint-results.outputs.flake8 }}
+
+            Black:
+            ${{ steps.show-lint-results.outputs.black }}
+
             Regards,
             GitHub Actions - CV_PARSER_MODEL
             For any questions, please contact YASSER JEMLI
-          attachments: result-json/parsed_resume_*.json
+
+            Sorry for the inconvenience, but the CV parser is still in development and may not work as expected.
+
+            the emails will be desactivated soon after few testing .. thanks for your understanding.
+          attachments: result-json/*.json
