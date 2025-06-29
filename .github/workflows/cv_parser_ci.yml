@@ -100,7 +100,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install -r Jarvis/requirements.txt
 
       - name: Run flake8
         continue-on-error: true
