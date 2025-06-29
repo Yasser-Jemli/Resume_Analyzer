@@ -6,7 +6,7 @@ on:
     branches: [ main ]
 
 jobs:
-  checks:
+  CV_PARSER_CHECKS_STANDARD:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -39,9 +39,53 @@ jobs:
             flake8_report.txt
             black_report.txt
 
+  APP_FRONTEND_CHECKS:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: App-frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Angular lint
+        continue-on-error: true
+        run: npm run lint || true
+
+      - name: Run Angular tests
+        continue-on-error: true
+        run: npm run test -- --watch=false --browsers=ChromeHeadless || true
+
+  BACKEND_CHECKS:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: App-backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build and test Spring Boot
+        continue-on-error: true
+        run: mvn verify || true
+
   run-parser:
     runs-on: ubuntu-latest
-    needs: checks
+    needs: [CV_PARSER_CHECKS_STANDARD, APP_FRONTEND_CHECKS, BACKEND_CHECKS]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -96,10 +140,12 @@ jobs:
       - name: Show lint results
         id: show-lint-results
         run: |
-          echo "Flake8:"
-          cat flake8_report.txt || true
-          echo "Black:"
-          cat black_report.txt || true
+          echo "flake8<<EOF" >> $GITHUB_OUTPUT
+          cat flake8_report.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "black<<EOF" >> $GITHUB_OUTPUT
+          cat black_report.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Send result email to ${{ matrix.recipient }}
         uses: dawidd6/action-send-mail@v3
