@@ -1,283 +1,143 @@
-[
+{
+  "questions_c++": [
     {
-      "question": "Pouvez-vous expliquer ce qu'est le polymorphisme en Python et donner un exemple de son utilisation ?",
-      "keywords": ["polymorphisme", "héritage", "surcharge", "exemple", "méthode"]
+      "question": "Comment implémenteriez-vous un patron de conception Singleton en C++ ?",
+      "keywords": [
+        "Patron",
+        "Singleton",
+        "C++",
+        "Conception"
+      ]
     },
     {
-      "question": "Qu'est-ce qu'un conteneur Docker et pourquoi l'utiliser ?",
-      "keywords": ["conteneur", "isolation", "portable", "environnement", "légèreté"]
+      "question": "Quelle est la différence entre les pointeurs intelligents unique_ptr et shared_ptr en C++ ?",
+      "keywords": [
+        "Pointeurs",
+        "Intelligents",
+        "Unique",
+        "Partagé"
+      ]
     },
     {
-      "question": "Quelle est la différence entre Git pull et Git fetch ?",
-      "keywords": ["pull", "fetch", "fusion", "mise à jour", "différence"]
+      "question": "Comment géreriez-vous les exceptions en C++ pour assurer la robustesse d’un programme ?",
+      "keywords": [
+        "Exceptions",
+        "Gestion",
+        "Robustesse",
+        "C++"
+      ]
     },
     {
-      "question": "Comment gérez-vous la mémoire dynamique en langage C ?",
-      "keywords": ["malloc", "free", "allocation", "libération", "mémoire"]
+      "question": "Expliquez le concept de surcharge d’opérateurs en C++ et donnez un exemple d’utilisation.",
+      "keywords": [
+        "Surcharge",
+        "Opérateurs",
+        "C++",
+        "Programmation"
+      ]
     },
     {
-      "question": "Expliquez la différence entre une classe abstraite et une interface en C++.",
-      "keywords": ["classe abstraite", "interface", "héritage", "méthode virtuelle", "implémentation"]
+      "question": "Quels sont les avantages et les inconvénients de l’utilisation de l’héritage multiple en C++ ?",
+      "keywords": [
+        "Héritage",
+        "Multiple",
+        "Avantages",
+        "Inconvénients"
+      ]
+    }
+  ],
+  "questions_c": [
+    {
+      "question": "Comment alloueriez-vous de la mémoire dynamique en C pour un tableau de structures ?",
+      "keywords": [
+        "Mémoire",
+        "Dynamique",
+        "C",
+        "Tableau"
+      ]
     },
     {
-      "question": "Comment utiliser les branches dans Git pour gérer différentes versions d'un projet ?",
-      "keywords": ["branche", "merge", "checkout", "version", "gestion"]
+      "question": "Quelle est la différence entre les types de données signed et unsigned en C ?",
+      "keywords": [
+        "Types",
+        "Données",
+        "Signed",
+        "Unsigned"
+      ]
     },
     {
-      "question": "Qu'est-ce qu'un Dockerfile et comment est-il utilisé ?",
-      "keywords": ["Dockerfile", "image", "instructions", "build", "conteneur"]
+      "question": "Expliquez le fonctionnement des pointeurs en C et donnez un exemple d’utilisation.",
+      "keywords": [
+        "Pointeurs",
+        "C",
+        "Fonctionnement",
+        "Exemple"
+      ]
     },
     {
-      "question": "Comment gérez-vous les exceptions en Python ?",
-      "keywords": ["try", "except", "finally", "erreur", "gestion"]
+      "question": "Comment géreriez-vous les erreurs lors de l’ouverture et de la lecture de fichiers en C ?",
+      "keywords": [
+        "Erreurs",
+        "Fichiers",
+        "Gestion",
+        "C"
+      ]
     },
     {
-      "question": "Quelles sont les différences entre un système embarqué et un système d'exploitation généraliste ?",
-      "keywords": ["embarqué", "temps réel", "ressources", "optimisation", "spécifique"]
+      "question": "Quels sont les principes de base pour écrire du code C sécurisé et robuste ?",
+      "keywords": [
+        "Sécurité",
+        "Robustesse",
+        "C",
+        "Principes"
+      ]
+    }
+  ],
+  "questions_jira": [
+    {
+      "question": "Comment configurez-vous un nouveau projet dans Jira pour suivre les problèmes et les tâches ?",
+      "keywords": [
+        "Jira",
+        "Projet",
+        "Configuration",
+        "Suivi"
+      ]
     },
     {
-      "question": "Comment fonctionne le système de fichiers sous Linux ?",
-      "keywords": ["inode", "répertoire", "montage", "partition", "ext4"]
+      "question": "Quels sont les avantages de l’utilisation des tableaux de bord personnalisés dans Jira pour le suivi de projet ?",
+      "keywords": [
+        "Tableaux",
+        "Bord",
+        "Personnalisés",
+        "Suivi"
+      ]
     },
     {
-        "question": "Quelle est la différence entre malloc() et calloc() en langage C ?",
-        "keywords": ["malloc", "calloc", "allocation mémoire", "initialisation", "différence"]
-      },
-      {
-        "question": "Expliquez le concept de pointeur en C et donnez un exemple d'utilisation.",
-        "keywords": ["pointeur", "adresse", "mémoire", "déréférencement", "exemple"]
-      },
-      {
-        "question": "Qu'est-ce qu'une classe en C++ et comment est-elle utilisée ?",
-        "keywords": ["classe", "objet", "encapsulation", "constructeur", "méthode"]
-      },
-      {
-        "question": "Quelle est la différence entre une classe et une structure en C++ ?",
-        "keywords": ["classe", "structure", "visibilité", "membres", "héritage"]
-      },
-      {
-        "question": "Comment créer une branche dans Git et pourquoi est-ce utile ?",
-        "keywords": ["git", "branche", "version", "développement", "fusion"]
-      },
-      {
-        "question": "Expliquez la commande 'git rebase' et ses avantages.",
-        "keywords": ["git", "rebase", "historique", "fusion", "avantages"]
-      },
-      {
-        "question": "Qu'est-ce qu'une image Docker et comment en créer une ?",
-        "keywords": ["docker", "image", "conteneur", "Dockerfile", "build"]
-      },
-      {
-        "question": "Comment fonctionne le système de volumes dans Docker ?",
-        "keywords": ["docker", "volume", "stockage", "persistance", "données"]
-      },
-      {
-        "question": "Qu'est-ce qu'une fonction lambda en Python et quand l'utiliser ?",
-        "keywords": ["python", "lambda", "fonction anonyme", "utilisation", "exemple"]
-      },
-      {
-        "question": "Expliquez la différence entre une liste et un tuple en Python.",
-        "keywords": ["python", "liste", "tuple", "mutable", "différence"]
-      },
-      {
-        "question": "Qu'est-ce qu'un système embarqué et quelles sont ses caractéristiques ?",
-        "keywords": ["système embarqué", "temps réel", "ressources limitées", "microcontrôleur", "fiabilité"]
-      },
-      {
-        "question": "Comment fonctionne un système d'exploitation temps réel (RTOS) ?",
-        "keywords": ["RTOS", "temps réel", "ordonnancement", "priorité", "interruptions"]
-      },
-      {
-        "question": "Expliquez le rôle du noyau Linux dans un système d'exploitation.",
-        "keywords": ["linux", "noyau", "gestion des ressources", "processus", "système de fichiers"]
-      },
-      {
-        "question": "Comment gérer les permissions des fichiers sous Linux ?",
-        "keywords": ["linux", "permissions", "chmod", "propriétaire", "groupe"]
-      },
-      {
-        "question": "Quelle est la différence entre une interruption matérielle et logicielle ?",
-        "keywords": ["interruption", "matérielle", "logicielle", "priorité", "gestion"]
-      },
-      {
-        "question": "Comment fonctionne la communication I2C dans les systèmes embarqués ?",
-        "keywords": ["I2C", "communication", "bus", "maître", "esclave"]
-      },
-      {
-        "question": "Qu'est-ce que le multitâche coopératif et préemptif ?",
-        "keywords": ["multitâche", "coopératif", "préemptif", "ordonnancement", "concurrence"]
-      },
-      {
-        "question": "Expliquez le concept de mutex et son utilisation.",
-        "keywords": ["mutex", "synchronisation", "exclusion mutuelle", "thread", "concurrence"]
-      },
-      {
-        "question": "Comment fonctionne la gestion de la mémoire dans un système embarqué ?",
-        "keywords": ["mémoire", "allocation", "pile", "tas", "fragmentation"]
-      },
-      {
-        "question": "Qu'est-ce qu'un watchdog timer et pourquoi est-il utilisé ?",
-        "keywords": ["watchdog", "timer", "sécurité", "redémarrage", "surveillance"]
-      },
-      {
-        "question": "Quelle est la différence entre malloc() et calloc() en langage C ?",
-        "keywords": ["malloc", "calloc", "allocation mémoire", "initialisation", "différence"]
+      "question": "Expliquez le concept de workflow dans Jira et comment il peut être utilisé pour gérer les processus métier.",
+      "keywords": [
+        "Workflow",
+        "Jira",
+        "Processus",
+        "Métier"
+      ]
     },
     {
-        "question": "Expliquez le concept de pointeur en C et donnez un exemple d'utilisation.",
-        "keywords": ["pointeur", "adresse", "mémoire", "déréférencement", "exemple"]
+      "question": "Comment utilisez-vous les requêtes JQL pour filtrer et analyser les données dans Jira ?",
+      "keywords": [
+        "JQL",
+        "Requêtes",
+        "Filtrer",
+        "Analyser"
+      ]
     },
     {
-        "question": "Qu'est-ce qu'une classe en C++ et comment est-elle utilisée ?",
-        "keywords": ["classe", "objet", "encapsulation", "constructeur", "méthode"]
-    },
-    {
-        "question": "Quelle est la différence entre une classe et une structure en C++ ?",
-        "keywords": ["classe", "structure", "visibilité", "membres", "héritage"]
-    },
-    {
-        "question": "Comment créer une branche dans Git et pourquoi est-ce utile ?",
-        "keywords": ["git", "branche", "version", "développement", "fusion"]
-    },
-    {
-        "question": "Expliquez la commande 'git rebase' et ses avantages.",
-        "keywords": ["git", "rebase", "historique", "fusion", "avantages"]
-    },
-    {
-        "question": "Qu'est-ce qu'une image Docker et comment en créer une ?",
-        "keywords": ["docker", "image", "conteneur", "Dockerfile", "build"]
-    },
-    {
-        "question": "Comment fonctionne le système de volumes dans Docker ?",
-        "keywords": ["docker", "volume", "stockage", "persistance", "données"]
-    },
-    {
-        "question": "Qu'est-ce qu'une fonction lambda en Python et quand l'utiliser ?",
-        "keywords": ["python", "lambda", "fonction anonyme", "utilisation", "exemple"]
-    },
-    {
-        "question": "Expliquez la différence entre une liste et un tuple en Python.",
-        "keywords": ["python", "liste", "tuple", "mutable", "différence"]
-    },
-    {
-        "question": "Qu'est-ce qu'un système embarqué et quelles sont ses caractéristiques ?",
-        "keywords": ["système embarqué", "temps réel", "ressources limitées", "microcontrôleur", "fiabilité"]
-    },
-    {
-        "question": "Comment fonctionne un système d'exploitation temps réel (RTOS) ?",
-        "keywords": ["RTOS", "temps réel", "ordonnancement", "priorité", "interruptions"]
-    },
-    {
-        "question": "Expliquez le rôle du noyau Linux dans un système d'exploitation.",
-        "keywords": ["linux", "noyau", "gestion des ressources", "processus", "système de fichiers"]
-    },
-    {
-        "question": "Comment gérer les permissions des fichiers sous Linux ?",
-        "keywords": ["linux", "permissions", "chmod", "propriétaire", "groupe"]
-    },
-    {
-        "question": "Quelle est la différence entre une interruption matérielle et logicielle ?",
-        "keywords": ["interruption", "matérielle", "logicielle", "priorité", "gestion"]
-    },
-    {
-        "question": "Comment fonctionne la communication I2C dans les systèmes embarqués ?",
-        "keywords": ["I2C", "communication", "bus", "maître", "esclave"]
-    },
-    {
-        "question": "Qu'est-ce que le multitâche coopératif et préemptif ?",
-        "keywords": ["multitâche", "coopératif", "préemptif", "ordonnancement", "concurrence"]
-    },
-    {
-        "question": "Expliquez le concept de mutex et son utilisation.",
-        "keywords": ["mutex", "synchronisation", "exclusion mutuelle", "thread", "concurrence"]
-    },
-    {
-        "question": "Comment fonctionne la gestion de la mémoire dans un système embarqué ?",
-        "keywords": ["mémoire", "allocation", "pile", "tas", "fragmentation"]
-    },
-    {
-        "question": "Qu'est-ce qu'un watchdog timer et pourquoi est-il utilisé ?",
-        "keywords": ["watchdog", "timer", "sécurité", "redémarrage", "surveillance"]
-    },
-    {
-        "question": "Quelle est la différence entre malloc() et calloc() en langage C ?",
-        "keywords": ["malloc", "calloc", "allocation mémoire", "initialisation", "différence"]
-      },
-      {
-        "question": "Expliquez le concept de pointeur en C et donnez un exemple d'utilisation.",
-        "keywords": ["pointeur", "adresse", "mémoire", "déréférencement", "exemple"]
-      },
-      {
-        "question": "Qu'est-ce qu'une classe en C++ et comment est-elle utilisée ?",
-        "keywords": ["classe", "objet", "encapsulation", "constructeur", "méthode"]
-      },
-      {
-        "question": "Quelle est la différence entre une classe et une structure en C++ ?",
-        "keywords": ["classe", "structure", "visibilité", "membres", "héritage"]
-      },
-      {
-        "question": "Comment créer une branche dans Git et pourquoi est-ce utile ?",
-        "keywords": ["git", "branche", "version", "développement", "fusion"]
-      },
-      {
-        "question": "Expliquez la commande 'git rebase' et ses avantages.",
-        "keywords": ["git", "rebase", "historique", "fusion", "avantages"]
-      },
-      {
-        "question": "Qu'est-ce qu'une image Docker et comment en créer une ?",
-        "keywords": ["docker", "image", "conteneur", "Dockerfile", "build"]
-      },
-      {
-        "question": "Comment fonctionne le système de volumes dans Docker ?",
-        "keywords": ["docker", "volume", "stockage", "persistance", "données"]
-      },
-      {
-        "question": "Qu'est-ce qu'une fonction lambda en Python et quand l'utiliser ?",
-        "keywords": ["python", "lambda", "fonction anonyme", "utilisation", "exemple"]
-      },
-      {
-        "question": "Expliquez la différence entre une liste et un tuple en Python.",
-        "keywords": ["python", "liste", "tuple", "mutable", "différence"]
-      },
-      {
-        "question": "Qu'est-ce qu'un système embarqué et quelles sont ses caractéristiques ?",
-        "keywords": ["système embarqué", "temps réel", "ressources limitées", "microcontrôleur", "fiabilité"]
-      },
-      {
-        "question": "Comment fonctionne un système d'exploitation temps réel (RTOS) ?",
-        "keywords": ["RTOS", "temps réel", "ordonnancement", "priorité", "interruptions"]
-      },
-      {
-        "question": "Expliquez le rôle du noyau Linux dans un système d'exploitation.",
-        "keywords": ["linux", "noyau", "gestion des ressources", "processus", "système de fichiers"]
-      },
-      {
-        "question": "Comment gérer les permissions des fichiers sous Linux ?",
-        "keywords": ["linux", "permissions", "chmod", "propriétaire", "groupe"]
-      },
-      {
-        "question": "Quelle est la différence entre une interruption matérielle et logicielle ?",
-        "keywords": ["interruption", "matérielle", "logicielle", "priorité", "gestion"]
-      },
-      {
-        "question": "Comment fonctionne la communication I2C dans les systèmes embarqués ?",
-        "keywords": ["I2C", "communication", "bus", "maître", "esclave"]
-      },
-      {
-        "question": "Qu'est-ce que le multitâche coopératif et préemptif ?",
-        "keywords": ["multitâche", "coopératif", "préemptif", "ordonnancement", "concurrence"]
-      },
-      {
-        "question": "Expliquez le concept de mutex et son utilisation.",
-        "keywords": ["mutex", "synchronisation", "exclusion mutuelle", "thread", "concurrence"]
-      },
-      {
-        "question": "Comment fonctionne la gestion de la mémoire dans un système embarqué ?",
-        "keywords": ["mémoire", "allocation", "pile", "tas", "fragmentation"]
-      },
-      {
-        "question": "Qu'est-ce qu'un watchdog timer et pourquoi est-il utilisé ?",
-        "keywords": ["watchdog", "timer", "sécurité", "redémarrage", "surveillance"]
-      }
+      "question": "Quels sont les outils et les méthodes pour intégrer Jira avec d’autres outils de développement et de collaboration ?",
+      "keywords": [
+        "Intégration",
+        "Outils",
+        "Méthodes",
+        "Collaboration"
+      ]
+    }
   ]
-  
+}

@@ -1,6 +1,6 @@
 [
-    {
-        "role": "assistant",
-        "content": "Pouvez-vous expliquer ce qu'est le polymorphisme en Python et donner un exemple de son utilisation ?"
-    }
+  {
+    "role": "assistant",
+    "content": "Comment implémenteriez-vous un patron de conception Singleton en C++ ?"
+  }
 ]
