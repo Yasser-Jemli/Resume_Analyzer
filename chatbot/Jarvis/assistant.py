@@ -9,7 +9,7 @@ from flask_cors import CORS
 # ───────────────────────── 1. Config générale ───────────────────────── #
 
 load_dotenv()
-API_KEY = os.getenv("GROQ_API_KEY") or "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"
+API_KEY = os.getenv("GROQ_API_KEY")
 if not API_KEY:
     raise RuntimeError("❌ Clé API GROQ_API_KEY manquante.")
 

@@ -5,10 +5,9 @@ from dotenv import load_dotenv
 
 # Charger la clé API depuis un fichier .env (recommandé pour la sécurité)
 load_dotenv()
-API_KEY = "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"  # Assure-toi que la clé est définie dans un fichier .env
+API_KEY = os.getenv("GROQ_API_KEY")
 
 # Option pour utiliser la clé directement (NON recommandé pour la production)
-# API_KEY = "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"
 
 API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
