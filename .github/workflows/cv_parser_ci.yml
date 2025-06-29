@@ -8,17 +8,6 @@ on:
 jobs:
   run-parser:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        recipient:
-          - sami.boukesra@esprit.tn
-          - Imed.Chakhari@esprit.tn
-          - bouslimi.Azaiez@esprit.tn
-          - Nadine.MAAZOUN@Esprit.tn
-          - nader.benhammouda@esprit.tn
-          - yaaser.jemli@esprit.tn
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
