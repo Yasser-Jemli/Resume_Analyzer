@@ -9,6 +9,16 @@ jobs:
   run-parser:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        recipient:
+          - sami.boukesra@esprit.tn
+          - Imed.Chakhari@esprit.tn
+          - bouslimi.Azaiez@esprit.tn
+          - Nadine.MAAZOUN@Esprit.tn
+          - nader.benhammouda@esprit.tn
+          - yaaser.jemli@esprit.tn
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -37,7 +47,7 @@ jobs:
           name: result-json
           path: CV_PARSER_MODEL/results/parsed_resume_*.json
 
-      - name: Send result email
+      - name: Send result email to ${{ matrix.recipient }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -45,13 +55,7 @@ jobs:
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "CV Parser CI Result"
-          to: |
-            sami.boukesra@esprit.tn
-            imed.chakhari@esprit.tn
-            bouslimi.azaiez@esprit.tn
-            nadine.maazoun@esprit.tn
-            nader.benhammouda@esprit.tn
-            yaaser.jemli@esprit.tn
+          to: ${{ matrix.recipient }}
           from: ${{ secrets.EMAIL_USER }}
           body: |
             Hello,
@@ -62,7 +66,6 @@ jobs:
             **Test file:** .github/test-data/test_cv.pdf
             **Workflow run:** ${{ github.run_id }}
             **Commit:** ${{ github.sha }}
-            **Execution time:** ${{ steps.timer.outputs.duration }}
 
             Please find the result.json attached.
 
