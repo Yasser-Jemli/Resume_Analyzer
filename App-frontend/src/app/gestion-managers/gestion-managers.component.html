@@ -1,5 +1,9 @@
 <p class="title">Users Management</p>
-<button *ngIf="isAdmin && !showAddForm" class="add-btn" (click)="toggleAddForm()">Add Manager</button>
+
+<!-- Bouton Add Manager -->
+<button *ngIf="isAdmin && !showAddForm" class="add-btn" (click)="toggleAddForm()">
+  ➕ Add Manager
+</button>
 
 <!-- Add Manager Form -->
 <div *ngIf="showAddForm" class="add-manager-form">
@@ -20,14 +24,29 @@
     class="input-field"
     style="margin-top: 10px;"
   />
-  <button class="add-btn" (click)="addManager()">Save</button>
+  <button class="add-btn" (click)="addManager()">💾 Save</button>
   <button class="cancel-btn" (click)="toggleAddForm()">Cancel</button>
 </div>
 
-<table *ngIf="isAdmin" class="modern-table">
+<!-- Search -->
+<input
+  type="text"
+  placeholder="🔍 Search by username or email"
+  [(ngModel)]="searchQuery"
+  (ngModelChange)="onSearchChange()"
+  class="input-field"
+  style="margin-top: 15px; width: 40%;"
+/>
+
+<!-- Table -->
+<table *ngIf="isAdmin" class="modern-table" style="margin-top: 15px;">
   <thead>
     <tr>
-      <th>Username</th>
+      <th (click)="toggleSortOrder()" style="cursor: pointer;">
+        Username
+        <span *ngIf="sortOrder === 'asc'">⬆️⬇️</span>
+        <span *ngIf="sortOrder === 'desc'">⬇️⬆️</span>
+      </th>
       <th>Email</th>
       <th>Role</th>
       <th>
@@ -36,24 +55,53 @@
           <option value="ALL">All</option>
           <option value="MANAGER">Managers</option>
           <option value="CANDIDATE">Candidats</option>
+          <option value="SYSADMIN">Admin</option>
         </select>
       </th>
+      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let user of filteredUsers">
+    <tr *ngFor="let user of paginatedUsers">
       <td>{{ user.username }}</td>
       <td>{{ user.email }}</td>
       <td>{{ user.role }}</td>
       <td>
         <span *ngIf="showPassword[user.username]">{{ user.password }}</span>
         <button type="button" (click)="togglePassword(user.username)" style="background:none;border:none;cursor:pointer;">
+          🔒
         </button>
       </td>
       <td>
-        <button class="delete-btn" (click)="deleteUser(user)">Delete</button>
+        <button class="delete-btn" (click)="deleteUser(user)">🗑️ Delete</button>
       </td>
-      <td></td>
     </tr>
   </tbody>
 </table>
+
+<!-- Pagination Controls -->
+<div
+  class="pagination-controls"
+  style="text-align: center; margin-top: 10px;"
+  *ngIf="totalPages > 1"
+>
+  <button
+    class="btn btn-secondary"
+    (click)="goToPreviousPage()"
+    [disabled]="currentPage === 1"
+    style="margin-right: 10px;"
+  >
+    ⬅️ Previous
+  </button>
+
+  <span>Page {{ currentPage }} / {{ totalPages }}</span>
+
+  <button
+    class="btn btn-secondary"
+    (click)="goToNextPage()"
+    [disabled]="currentPage === totalPages"
+    style="margin-left: 10px;"
+  >
+    Next ➡️
+  </button>
+</div>

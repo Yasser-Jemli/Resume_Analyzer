@@ -4,7 +4,7 @@ import { UserServiceService } from '../service/user-service.service';
 import { HttpClient, HttpEventType } from '@angular/common/http';
 import { CvUploadService } from '../service/cv-upload-service.service';
 import { ParserServiceService } from '../service/parser-service.service';
-
+import { ChatInterviewServiceService } from '../service/chat-interview-service.service';
 @Component({
   selector: 'app-test-mon-cv',
   templateUrl: './test-mon-cv.component.html',
@@ -33,6 +33,7 @@ export class TestMonCvComponent implements OnInit {
     private userService: UserServiceService,
     private cdr: ChangeDetectorRef,
     private router: Router,
+    private chatInterviewService: ChatInterviewServiceService,
     private http: HttpClient
   ) {}
 
@@ -149,22 +150,23 @@ export class TestMonCvComponent implements OnInit {
 
         this.parserService.getCvsByUser(userId).subscribe({
           next: (cvList) => {
-            if (cvList.length > 0) {
+            console.log('CV List:', cvList);
+           // if (cvList.length > 0) {
               const latestCv = cvList[cvList.length - 1];
 
               console.log('Latest CV:', latestCv);
 
-              this.customScore = latestCv.scores?.custom || null;
-              this.recommendations = latestCv.skill_recommendations || [];
+              //this.customScore = latestCv.scores?.custom || null;
+              //this.recommendations = latestCv.skill_recommendations || [];
               this.showResults = true;
-            } else {
-              this.errorMessage = 'No CV found for this user.';
-              this.customScore = null;
-              this.recommendations = [];
-              this.showResults = false;
-            }
-            this.isGettingNote = false;
-            this.cdr.detectChanges();
+            //} else {
+            //  this.errorMessage = 'No CV found for this user.';
+            //  this.customScore = null;
+            //  this.recommendations = [];
+             // this.showResults = false;
+         //   }
+          //  this.isGettingNote = false;
+          //  this.cdr.detectChanges();
           },
           error: (err) => {
             this.errorMessage = 'Failed to retrieve CV data.';
@@ -180,36 +182,28 @@ export class TestMonCvComponent implements OnInit {
   }
 
   goToChat(): void {
-    if (this.pdfisupdated && localStorage.getItem('canIncrementCV') === 'true') {
-      this.incrementNbrPosts();
-      localStorage.removeItem('canIncrementCV');
-    }
-    this.router.navigate(['/chat-bot']);
-  }
+    // Récupérer le post depuis localStorage
+    const postString = localStorage.getItem('post');
+    if (postString) {
+      const post = JSON.parse(postString);
+      console.log('Post a envoyer au chatbot:', post);
 
-  private incrementNbrPosts(): void {
-    const email = localStorage.getItem('email');
-    if (!email) return;
-
-    this.userService.getUserByEmail(email).subscribe({
-      next: (response) => {
-        if (response.exists) {
-          const userId = localStorage.getItem('id');
-          if (!userId) return;
-
-          const currentNbrPosts = parseInt(localStorage.getItem('Nbr_Posts') || '0', 10);
-          const newNbrPosts = currentNbrPosts + 1;
-          const lastcvName = this.selectedFile?.name || '';
-
-          this.userService.updateUser(userId, {
-            Nbr_Posts: newNbrPosts,
-            lastcvName
-          }).subscribe();
+      this.chatInterviewService.sendposttochatbot(post).subscribe({
+        next: (response) => {
+          console.log('Post envoyé au chatbot:', response);
+          // Rediriger vers la page de chatbot
+          this.router.navigate(['/chat-bot']);
+        },
+        error: (error) => {
+          console.error('Erreur lors de l\'envoi au chatbot:', error);
         }
-      },
-      error: (err) => console.error('Failed to fetch user:', err)
-    });
-  }
+      });
+    } else {
+      console.warn('Aucun post trouvé dans le localStorage.');
+    }
+    // Si le PDF n'est pas mis à jour ou que l'incrément n'est pas autorisé, naviguer directement
+    this.router.navigate(['/chat-bot']);
+}
 
   getBadgeClass(score: number): string {
     if (score < 50) return 'bg-danger text-light';

@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ParserServiceService {
   private apiUrl = 'http://localhost:8081/cv-parser';
+  private apiUrl2 = 'http://localhost:8081/cv/scores';
 
   constructor(private http: HttpClient) {}
 
@@ -16,8 +17,8 @@ export class ParserServiceService {
   }
 
   // GET: Fetch all CVs for a specific user
-  getCvsByUser(userId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/user/${userId}`);
+  getCvsByUser(ueserid : number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl2}`);
   }
 
   // GET: Fetch a specific CV by its ID
