@@ -1,15 +1,5 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
-import { finalize } from 'rxjs/operators';
-
-interface ChatMessage {
-  sender: 'Vous' | 'Bot';
-  text: string;
-}
-
-interface AskResponse {
-  answer: string;
-}
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-chat-assistant',
@@ -17,73 +7,52 @@ interface AskResponse {
   styleUrls: ['./chat-assistant.component.css']
 })
 export class ChatAssistantComponent {
-  messages: ChatMessage[] = [];
-  userInput = '';
-  loading = false;
-  isOpen = false;
+  messages: { sender: string; text: string; audioUrl?: string }[] = [];
+  userInput: string = '';
+  loading: boolean = false;
+  isOpen: boolean = false;  
 
-  /** URL du backend (centralisé) */
-  private readonly API_URL = '/askquest';
-
-  @ViewChild('chatBody') chatBodyRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('chatBody') chatBodyRef!: ElementRef;
 
   constructor(private http: HttpClient) {}
 
   toggleChat(): void {
     this.isOpen = !this.isOpen;
-    this.scrollToBottom();
+    setTimeout(() => this.scrollToBottom(), 100);
   }
 
   sendMessage(): void {
-    const question = this.userInput.trim();
-    if (!question) {
-      return;
-    }
+    const input = this.userInput.trim();
+    if (!input) return;
 
-    // Ajoute le message utilisateur
-    this.messages.push({ sender: 'Vous', text: question });
+    this.messages.push({ sender: 'Vous', text: input });
     this.userInput = '';
-    this.loading = true;
     this.scrollToBottom();
+    this.loading = true;
 
-    // Prépare le corps en x-www-form-urlencoded
-    const body = new HttpParams().set('question', question);
-
-    console.log('Envoi question à:', this.API_URL, 'avec body:', body.toString());
-
-    this.http.post<AskResponse>(this.API_URL, body.toString(), {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    })
-    .pipe(finalize(() => {
-      this.loading = false;
-      this.scrollToBottom();
-    }))
-    .subscribe({
+    this.http.post<{ text: string; audio_url?: string }>('/ask', { user_input: input }).subscribe({
       next: res => {
-        this.messages.push({ sender: 'Bot', text: res.answer });
-      },
-      error: (err: HttpErrorResponse) => {
-        let errMsg = 'Erreur inconnue.';
-        if (typeof err.error === 'string') {
-          errMsg = err.error;
-        } else if (err.error?.error) {
-          errMsg = err.error.error;
-        } else if (err.statusText) {
-          errMsg = err.statusText;
+        this.messages.push({ sender: 'Bot', text: res.text, audioUrl: res.audio_url });
+        this.loading = false;
+        this.scrollToBottom();
+        if (res.audio_url) {
+          const audio = new Audio(res.audio_url);
+          audio.play();
         }
-        this.messages.push({ sender: 'Bot', text: `❌ ${errMsg}` });
+      },
+      error: () => {
+        this.messages.push({ sender: 'Bot', text: '❌ Erreur serveur.' });
+        this.loading = false;
+        this.scrollToBottom();
       }
     });
   }
 
-  /** Fait défiler la fenêtre de chat vers le bas */
   private scrollToBottom(): void {
     setTimeout(() => {
-      this.chatBodyRef?.nativeElement.scrollTo({
-        top: this.chatBodyRef.nativeElement.scrollHeight,
-        behavior: 'smooth'
-      });
-    }, 0);
+      if (this.chatBodyRef?.nativeElement) {
+        this.chatBodyRef.nativeElement.scrollTop = this.chatBodyRef.nativeElement.scrollHeight;
+      }
+    }, 100);
   }
 }
-

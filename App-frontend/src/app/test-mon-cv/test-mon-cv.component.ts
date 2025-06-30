@@ -183,7 +183,7 @@ export class TestMonCvComponent implements OnInit {
 
   goToChat(): void {
     // Récupérer le post depuis localStorage
-    const postString = localStorage.getItem('post');
+    const postString = localStorage.getItem('skills');
     if (postString) {
       const post = JSON.parse(postString);
       console.log('Post a envoyer au chatbot:', post);
