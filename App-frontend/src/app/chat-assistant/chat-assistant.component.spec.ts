@@ -19,6 +19,3 @@ describe('ChatAssistantComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-
-
-

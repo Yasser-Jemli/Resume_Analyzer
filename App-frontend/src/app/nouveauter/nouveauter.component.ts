@@ -52,7 +52,8 @@ export class NouveauterComponent implements OnInit {
     localStorage.setItem('postname', this.selectedPost.title);
     const postId = this.selectedPost?.id?.toString() ?? '';
     localStorage.setItem('postid', postId);
-    localStorage.setItem('post', JSON.stringify(this.selectedPost));
+    localStorage.setItem('skills', JSON.stringify(this.selectedPost.skills?.split(',').map(s => s.trim()) || []));
+    //localStorage.setItem('post', JSON.stringify(this.selectedPost));
 
 
 

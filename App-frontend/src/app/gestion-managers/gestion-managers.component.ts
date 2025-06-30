@@ -22,7 +22,7 @@ export class GestionManagersComponent implements OnInit {
 
   // Pagination properties
   currentPage: number = 1;
-  itemsPerPage: number = 8;
+  itemsPerPage: number = 7;
   totalPages: number = 1;
 
   constructor(private userService: UserServiceService) {
