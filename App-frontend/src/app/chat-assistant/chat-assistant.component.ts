@@ -10,7 +10,7 @@ export class ChatAssistantComponent {
   messages: { sender: string; text: string; audioUrl?: string }[] = [];
   userInput: string = '';
   loading: boolean = false;
-  isOpen: boolean = false;  
+  isOpen: boolean = false;
 
   @ViewChild('chatBody') chatBodyRef!: ElementRef;
 
@@ -30,9 +30,10 @@ export class ChatAssistantComponent {
     this.scrollToBottom();
     this.loading = true;
 
-    this.http.post<{ text: string; audio_url?: string }>('/ask', { user_input: input }).subscribe({
+    this.http.post<{ answer: string; audio_url?: string }>('/ask-assis', { question: input }).subscribe({
       next: res => {
-        this.messages.push({ sender: 'Bot', text: res.text, audioUrl: res.audio_url });
+        console.log('Réponse reçue:', res);
+        this.messages.push({ sender: 'Bot', text: res.answer, audioUrl: res.audio_url });
         this.loading = false;
         this.scrollToBottom();
         if (res.audio_url) {
@@ -40,7 +41,8 @@ export class ChatAssistantComponent {
           audio.play();
         }
       },
-      error: () => {
+      error: err => {
+        console.error('Erreur serveur:', err);
         this.messages.push({ sender: 'Bot', text: '❌ Erreur serveur.' });
         this.loading = false;
         this.scrollToBottom();
@@ -50,7 +52,7 @@ export class ChatAssistantComponent {
 
   private scrollToBottom(): void {
     setTimeout(() => {
-      if (this.chatBodyRef?.nativeElement) {
+      if (this.chatBodyRef && this.chatBodyRef.nativeElement) {
         this.chatBodyRef.nativeElement.scrollTop = this.chatBodyRef.nativeElement.scrollHeight;
       }
     }, 100);

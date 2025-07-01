@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
-# ───────────────────────── 1. Config générale ───────────────────────── #
+# ───────── 1. Config générale ───────── #
 
 load_dotenv()
 try:
@@ -22,21 +22,20 @@ HEADERS = {
     "Content-Type": "application/json",
 }
 
-# Dossier pour stocker l’historique
 DATA_DIR = Path(__file__).resolve().parent / "data"
 DATA_DIR.mkdir(exist_ok=True)
 HISTORY_FILE = DATA_DIR / "actia_answers.json"
 
-# ───────────────────────── 2. Flask + CORS ──────────────────────────── #
+# ───────── 2. Flask + CORS ───────── #
 
 app = Flask(__name__, static_folder="static")
-CORS(app, origins=["http://localhost:4200"])   # autorise Angular en dev
 
-# ───────────────────────── 3. Connaissances ─────────────────────────── #
+
+# ───────── 3. Connaissances ───────── #
 
 KNOWLEDGE_BASE = """
 Actia Engineering Services est une division du groupe ACTIA spécialisée dans la conception...
-(texte raccourci pour l’exemple)
+(texte raccourci)
 """
 
 PROMPT_TEMPLATE = (
@@ -48,11 +47,10 @@ PROMPT_TEMPLATE = (
     "Question : {question}"
 )
 
-# ───────────────────────── 4. Utilitaire Groq ───────────────────────── #
+# ───────── 4. Fonction appel API Groq ───────── #
 
 def _ask_groq(question: str) -> str:
     prompt = PROMPT_TEMPLATE.format(knowledge=KNOWLEDGE_BASE, question=question)
-
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [{"role": "user", "content": prompt}],
@@ -60,7 +58,6 @@ def _ask_groq(question: str) -> str:
         "max_tokens": 400,
         "response_format": {"type": "json_object"},
     }
-
     resp = requests.post(
         "https://api.groq.com/openai/v1/chat/completions",
         headers=HEADERS,
@@ -70,26 +67,25 @@ def _ask_groq(question: str) -> str:
     resp.raise_for_status()
 
     raw = resp.json()["choices"][0]["message"]["content"]
-    data = json.loads(raw)          # lève JSONDecodeError si invalide
+    data = json.loads(raw)
     if "answer" not in data:
         raise KeyError("Champ 'answer' manquant dans la réponse Groq.")
     return data["answer"]
 
-# ───────────────────────── 5. Routes ────────────────────────────────── #
+# ───────── 5. Routes ───────── #
+
 @app.route("/test", methods=["GET"])
 def test():
     return "Test OK", 200
 
-@app.route("/askquest", methods=["POST"])
+@app.route("/ask-assis", methods=["POST"])
 def ask():
-    print("Route /askquest appelée") 
-    # Récupère la question depuis form‑urlencoded ou JSON
+    print("Route /ask-assis appelée")
     question = (
         request.form.get("question")
         or (request.get_json(silent=True) or {}).get("question")
         or ""
     ).strip()
-
     if not question:
         return jsonify(error="La question ne peut pas être vide."), 400
 
@@ -98,8 +94,8 @@ def ask():
     except (requests.RequestException, json.JSONDecodeError, KeyError) as e:
         return jsonify(error=f"Erreur appel API : {e}"), 502
 
-    # Sauvegarde historique
-    history: list = []
+    # Historique
+    history = []
     if HISTORY_FILE.exists():
         try:
             history = json.loads(HISTORY_FILE.read_text(encoding="utf-8"))
@@ -113,13 +109,11 @@ def ask():
 
     return jsonify(answer=answer), 200
 
-# Route pour servir ton index HTML (optionnel si tu serres Angular à part)
 @app.route("/", methods=["GET"])
 def root():
     return send_from_directory(app.static_folder, "index.html")
 
-# ───────────────────────── 6. Main ──────────────────────────────────── #
+# ───────── 6. Main ───────── #
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5001)
-

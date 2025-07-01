@@ -78,8 +78,7 @@ const routes: Routes = [
   { 
     path: 'chat-bot', 
     component: ChatBotComponent, 
-    canActivate: [AuthGuard],
-    data: { roles: ['CANDIDATE'] }
+
    },
 
 
