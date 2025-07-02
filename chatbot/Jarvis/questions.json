@@ -1,142 +1,138 @@
 {
-  "questions_c++": [
+  "questions_Python": [
     {
-      "question": "Comment implémenteriez-vous un patron de conception Singleton en C++ ?",
+      "question": "Comment implémenteriez-vous une fonction de recherche dichotomique dans une liste triée en Python ?",
       "keywords": [
-        "Patron",
-        "Singleton",
-        "C++",
-        "Conception"
+        "recherche dichotomique",
+        "liste triée",
+        "complexité"
       ]
     },
     {
-      "question": "Quelle est la différence entre les pointeurs intelligents unique_ptr et shared_ptr en C++ ?",
+      "question": "Quelle est la différence entre les mots-clés 'is' et '==' en Python ?",
       "keywords": [
-        "Pointeurs",
-        "Intelligents",
-        "Unique",
-        "Partagé"
+        "is",
+        "==",
+        "identité",
+        "égalité"
       ]
     },
     {
-      "question": "Comment géreriez-vous les exceptions en C++ pour assurer la robustesse d’un programme ?",
+      "question": "Comment gérez-vous les erreurs d'exécution dans un programme Python ?",
       "keywords": [
-        "Exceptions",
-        "Gestion",
-        "Robustesse",
-        "C++"
+        "try",
+        "except",
+        "erreur",
+        "exception"
       ]
     },
     {
-      "question": "Expliquez le concept de surcharge d’opérateurs en C++ et donnez un exemple d’utilisation.",
+      "question": "Quel est le rôle de la méthode '__init__' dans une classe Python ?",
       "keywords": [
-        "Surcharge",
-        "Opérateurs",
-        "C++",
-        "Programmation"
+        "__init__",
+        "constructeur",
+        "classe",
+        "objet"
       ]
     },
     {
-      "question": "Quels sont les avantages et les inconvénients de l’utilisation de l’héritage multiple en C++ ?",
+      "question": "Comment utilisez-vous les décorateurs en Python ?",
       "keywords": [
-        "Héritage",
-        "Multiple",
-        "Avantages",
-        "Inconvénients"
+        "décorateur",
+        "fonction",
+        "classe",
+        "méthode"
       ]
     }
   ],
-  "questions_c": [
+  "questions_Yocto": [
     {
-      "question": "Comment alloueriez-vous de la mémoire dynamique en C pour un tableau de structures ?",
+      "question": "Quel est le rôle du fichier 'local.conf' dans un projet Yocto ?",
       "keywords": [
-        "Mémoire",
-        "Dynamique",
-        "C",
-        "Tableau"
+        "local.conf",
+        "configuration",
+        "build"
       ]
     },
     {
-      "question": "Quelle est la différence entre les types de données signed et unsigned en C ?",
+      "question": "Comment configurez-vous une image Linux embarquée avec Yocto ?",
       "keywords": [
-        "Types",
-        "Données",
-        "Signed",
-        "Unsigned"
+        "image",
+        "Linux",
+        "embarqué",
+        "configuration"
       ]
     },
     {
-      "question": "Expliquez le fonctionnement des pointeurs en C et donnez un exemple d’utilisation.",
+      "question": "Quelle est la différence entre les couches 'meta' et 'meta-yocto' dans Yocto ?",
       "keywords": [
-        "Pointeurs",
-        "C",
-        "Fonctionnement",
-        "Exemple"
+        "meta",
+        "meta-yocto",
+        "couches",
+        "Yocto"
       ]
     },
     {
-      "question": "Comment géreriez-vous les erreurs lors de l’ouverture et de la lecture de fichiers en C ?",
+      "question": "Comment gérez-vous les dépendances entre les paquets dans un projet Yocto ?",
       "keywords": [
-        "Erreurs",
-        "Fichiers",
-        "Gestion",
-        "C"
+        "dépendances",
+        "paquets",
+        "build",
+        "Yocto"
       ]
     },
     {
-      "question": "Quels sont les principes de base pour écrire du code C sécurisé et robuste ?",
+      "question": "Quel est le rôle de la commande 'bitbake' dans Yocto ?",
       "keywords": [
-        "Sécurité",
-        "Robustesse",
-        "C",
-        "Principes"
+        "bitbake",
+        "build",
+        "image",
+        "Yocto"
       ]
     }
   ],
-  "questions_jira": [
+  "questions_C": [
     {
-      "question": "Comment configurez-vous un nouveau projet dans Jira pour suivre les problèmes et les tâches ?",
+      "question": "Quelle est la différence entre les opérateurs '==' et '=' en C ?",
       "keywords": [
-        "Jira",
-        "Projet",
-        "Configuration",
-        "Suivi"
+        "==",
+        "=",
+        "affectation",
+        "comparaison"
       ]
     },
     {
-      "question": "Quels sont les avantages de l’utilisation des tableaux de bord personnalisés dans Jira pour le suivi de projet ?",
+      "question": "Comment gérez-vous la mémoire dynamique en C ?",
       "keywords": [
-        "Tableaux",
-        "Bord",
-        "Personnalisés",
-        "Suivi"
+        "malloc",
+        "free",
+        "mémoire",
+        "dynamique"
       ]
     },
     {
-      "question": "Expliquez le concept de workflow dans Jira et comment il peut être utilisé pour gérer les processus métier.",
+      "question": "Quel est le rôle de la directive 'include' en C ?",
       "keywords": [
-        "Workflow",
-        "Jira",
-        "Processus",
-        "Métier"
+        "include",
+        "en-tête",
+        "bibliothèque"
       ]
     },
     {
-      "question": "Comment utilisez-vous les requêtes JQL pour filtrer et analyser les données dans Jira ?",
+      "question": "Comment implémenteriez-vous une fonction récursive en C ?",
       "keywords": [
-        "JQL",
-        "Requêtes",
-        "Filtrer",
-        "Analyser"
+        "récursivité",
+        "fonction",
+        "appel"
       ]
     },
     {
-      "question": "Quels sont les outils et les méthodes pour intégrer Jira avec d’autres outils de développement et de collaboration ?",
+      "question": "Quelle est la différence entre les types 'char' et 'wchar_t' en C ?",
       "keywords": [
-        "Intégration",
-        "Outils",
-        "Méthodes",
-        "Collaboration"
+        "char",
+        "wchar_t",
+        "caractère",
+        "unicode"
       ]
     }
   ]

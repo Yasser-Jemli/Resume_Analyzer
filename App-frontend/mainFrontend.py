@@ -67,7 +67,7 @@ def main():
     # Step 4: Serve the Angular application
     print("Starting Angular application...")
     try:
-        run_command("ng serve -o")
+        run_command("ng serve --proxy-config proxy.conf.json -o ")
     finally:
         print("Shutting down json-server...")
         json_server_process.terminate()

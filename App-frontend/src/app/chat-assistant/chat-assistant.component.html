@@ -8,7 +8,9 @@
   <div class="chatbot-header" (click)="toggleChat()">Assistant ✖</div>
 
   <div class="chatbot-body" #chatBody>
-    <div *ngFor="let msg of messages" [ngClass]="{ 'msg-left': msg.sender === 'Bot', 'msg-right': msg.sender === 'Vous' }" class="chat-bubble">
+       <div *ngFor="let msg of messages" 
+         [ngClass]="{ 'msg-left': msg.sender === 'Bot', 'msg-right': msg.sender === 'Vous' }" 
+         class="chat-bubble">
       <div class="bubble-content">
         <strong>{{ msg.sender }}</strong>
         <div>{{ msg.text }}</div>
@@ -22,7 +24,10 @@
   </div>
 
   <div class="chatbot-input d-flex">
-    <input [(ngModel)]="userInput" (keydown.enter)="sendMessage()" placeholder="Écrivez ici..." class="form-control me-2" />
+       <input [(ngModel)]="userInput" 
+           (keydown.enter)="sendMessage()" 
+           placeholder="Écrivez ici..." 
+           class="form-control me-2" />
     <button (click)="sendMessage()" class="btn btn-primary">send</button>
   </div>
 </div>

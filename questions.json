@@ -1,0 +1,132 @@
+{
+  "questions_Python": [
+    {
+      "question": "Quelle est la différence entre les mots-clés 'is' et '==' en Python ?",
+      "keywords": [
+        "is",
+        "==",
+        "égalité",
+        "identité"
+      ]
+    },
+    {
+      "question": "Comment implémenter une classe abstraite en Python ?",
+      "keywords": [
+        "classe abstraite",
+        "abc",
+        "méthode abstraite"
+      ]
+    },
+    {
+      "question": "Quel est le rôle de la méthode '__init__' dans une classe Python ?",
+      "keywords": [
+        "__init__",
+        "constructeur",
+        "initialisation"
+      ]
+    },
+    {
+      "question": "Comment gérer les erreurs et les exceptions en Python ?",
+      "keywords": [
+        "try",
+        "except",
+        "raise",
+        "erreur"
+      ]
+    },
+    {
+      "question": "Quelle est la différence entre les listes et les tuples en Python ?",
+      "keywords": [
+        "liste",
+        "tuple",
+        "mutable",
+        "immutable"
+      ]
+    }
+  ],
+  "questions_Yocto": [
+    {
+      "question": "Quel est le rôle du fichier 'local.conf' dans un projet Yocto ?",
+      "keywords": [
+        "local.conf",
+        "configuration",
+        "build"
+      ]
+    },
+    {
+      "question": "Comment ajouter un package personnalisé à une image Yocto ?",
+      "keywords": [
+        "package",
+        "image",
+        "personnalisé"
+      ]
+    },
+    {
+      "question": "Quelle est la différence entre les couches 'meta' et 'conf' dans Yocto ?",
+      "keywords": [
+        "meta",
+        "conf",
+        "couches"
+      ]
+    },
+    {
+      "question": "Comment définir une tâche personnalisée dans un fichier 'recipe' Yocto ?",
+      "keywords": [
+        "tâche",
+        "recipe",
+        "personnalisée"
+      ]
+    },
+    {
+      "question": "Quel est le rôle du fichier 'bblayers.conf' dans un projet Yocto ?",
+      "keywords": [
+        "bblayers.conf",
+        "couches",
+        "configuration"
+      ]
+    }
+  ],
+  "questions_C": [
+    {
+      "question": "Quelle est la différence entre les pointeurs et les références en C ?",
+      "keywords": [
+        "pointeur",
+        "référence",
+        "adresse mémoire"
+      ]
+    },
+    {
+      "question": "Comment éviter les fuites de mémoire en C ?",
+      "keywords": [
+        "fuite de mémoire",
+        "malloc",
+        "free"
+      ]
+    },
+    {
+      "question": "Quel est le rôle de la directive '#include' en C ?",
+      "keywords": [
+        "#include",
+        "en-tête",
+        "bibliothèque"
+      ]
+    },
+    {
+      "question": "Comment implémenter un tableau dynamique en C ?",
+      "keywords": [
+        "tableau dynamique",
+        "malloc",
+        "realloc"
+      ]
+    },
+    {
+      "question": "Quelle est la différence entre les types 'char' et 'wchar_t' en C ?",
+      "keywords": [
+        "char",
+        "wchar_t",
+        "caractère",
+        "unicode"
+      ]
+    }
+  ]
+}
