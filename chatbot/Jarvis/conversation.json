@@ -2,5 +2,17 @@
   {
     "role": "assistant",
     "content": "Comment implémenteriez-vous une fonction de recherche dichotomique dans une liste triée en Python ?"
+  },
+  {
+    "role": "user",
+    "content": "fsqdfqdsfdsqfdsqqfsdfsqdfsqdf"
+  },
+  {
+    "role": "assistant",
+    "content": "Merci pour votre réponse. Note : 0/20. Il manque plusieurs éléments importants."
+  },
+  {
+    "role": "assistant",
+    "content": "Quelle est la différence entre les mots-clés 'is' et '==' en Python ?"
   }
 ]
