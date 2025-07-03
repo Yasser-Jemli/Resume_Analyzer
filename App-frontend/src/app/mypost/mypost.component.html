@@ -135,7 +135,22 @@
               placeholder="Enter required skills"
             ></textarea>
           </div>
-          <!-- Status selection removed here as well -->
+          <div class="mb-2">
+            <label for="editStatus_{{ post.id }}" class="form-label">Status</label>
+            <select
+              id="editStatus_{{ post.id }}"
+              class="form-select mb-2"
+              [(ngModel)]="post.status"
+              name="status"
+              required
+              #editStatus="ngModel"
+            >
+              <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
+            </select>
+            <div *ngIf="editStatus.invalid && (editStatus.dirty || editStatus.touched)" class="text-danger">
+              Status is required.
+            </div>
+          </div>
           <button
             class="btn btn-success me-2"
             (click)="updatePost(post)"

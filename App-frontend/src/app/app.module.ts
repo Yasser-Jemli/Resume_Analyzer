@@ -26,6 +26,8 @@ import { MypostComponent } from './mypost/mypost.component';
 import { ChatAssistantComponent } from './chat-assistant/chat-assistant.component';
 import { ConfirmCodeComponent } from './confirm-code/confirm-code.component';
 import { UpdatepasswordManagerComponent } from './updatepassword-manager/updatepassword-manager.component';
+import { StatisticsComponent } from './statistics/statistics.component';
+
 
 
 @NgModule({
@@ -51,6 +53,7 @@ import { UpdatepasswordManagerComponent } from './updatepassword-manager/updatep
     ChatAssistantComponent,
     ConfirmCodeComponent,
     UpdatepasswordManagerComponent,
+    StatisticsComponent,
   ],
   imports: [
     BrowserModule,

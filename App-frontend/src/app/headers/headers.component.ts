@@ -40,6 +40,7 @@ export class HeadersComponent {
     localStorage.removeItem('postid');
     localStorage.removeItem('post');
     localStorage.removeItem('pdfjs.history');
+    localStorage.removeItem('skills');
     //localStorage.removeItem('password');
     this.router.navigate(['/log-in']);
   }

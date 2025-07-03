@@ -119,5 +119,13 @@ export class CvUploadService {
       return throwError(() => new Error('Failed to fetch all CVs: ' + (error.message || 'Unknown error')));
     })
   );
-}
+  }
+  getcvnote(): Observable<any> {
+    return this.http.get<any>(`${this.uploadUrl}/scores`).pipe(
+      catchError((error) => {
+        console.error('Failed to fetch CV note:', error);
+        return throwError(() => new Error('Failed to fetch CV note: ' + (error.message || 'Unknown error')));
+      })
+    );
+  }
 }

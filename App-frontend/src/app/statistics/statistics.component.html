@@ -1,0 +1,66 @@
+<div class="container mt-4">
+  <h3 class="mb-4">📊 Posts Statistics</h3>
+  <div class="row g-4 mb-4">
+    <div class="col-12 col-sm-6 col-md-4" *ngFor="let gadget of gadgets; let i = index">
+      <div
+        class="card h-100 border-0 shadow-lg gadget-card text-white bg-gradient bg-{{gadget.color}}"
+        [class.expanded]="selectedGadgetIndex === i"
+        (click)="toggleGadget(i)"
+        style="cursor:pointer;"
+      >
+        <div class="card-body d-flex flex-column align-items-center justify-content-center">
+          <div class="display-3 mb-2">{{gadget.icon}}</div>
+          <h5 class="card-title mb-1">{{gadget.title}}</h5>
+          <p class="card-text fs-2 fw-bold mb-0" *ngIf="!gadget.isStatusList">{{gadget.value}}</p>
+          <div *ngIf="selectedGadgetIndex === i" class="gadget-details mt-3 text-center">
+            <hr>
+            <div *ngIf="!gadget.isStatusList">{{gadget.details}}</div>
+            <div *ngIf="gadget.isStatusList">
+              <strong>Posts by Status:</strong>
+              <ul class="list-unstyled mb-0">
+                <li *ngFor="let status of statusCounts | keyvalue">
+                  {{ status.key }}: {{ status.value }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .gadget-card {
+    transition: transform 0.2s, box-shadow 0.2s, max-height 0.3s, background 0.3s;
+    background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+    border-radius: 1rem;
+    max-height: 250px;
+    overflow: hidden;
+  }
+  .gadget-card.expanded {
+    max-height: 400px;
+    background: linear-gradient(135deg, #fffbe7 0%, #f7cac9 100%);
+    color: #333 !important;
+    box-shadow: 0 12px 40px rgba(60,60,60,0.22);
+    z-index: 2;
+  }
+  .gadget-card.bg-primary { background: linear-gradient(135deg, #007bff 0%, #00c6ff 100%); }
+  .gadget-card.bg-success { background: linear-gradient(135deg, #28a745 0%, #a8e063 100%); }
+  .gadget-card.bg-info { background: linear-gradient(135deg, #17a2b8 0%, #43cea2 100%); }
+  .gadget-card.bg-warning { background: linear-gradient(135deg, #ffc107 0%, #ffb347 100%); }
+  .gadget-card.bg-secondary { background: linear-gradient(135deg, #6c757d 0%, #b2bec3 100%); }
+  .gadget-card.bg-light { background: linear-gradient(135deg, #f8f9fa 0%, #e0eafc 100%); color: #333 !important; }
+  .gadget-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 8px 32px rgba(60,60,60,0.18);
+  }
+  .gadget-details {
+    animation: fadeIn 0.3s;
+    font-size: 1.1rem;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px);}
+    to { opacity: 1; transform: translateY(0);}
+  }
+</style>

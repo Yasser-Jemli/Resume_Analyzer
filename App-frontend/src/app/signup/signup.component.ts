@@ -50,6 +50,7 @@ export class SignupComponent {
   // Check email existence first
   this.userService.getUserByEmail(email).subscribe({
     next: (emailResponse) => {
+      console.log('Réponse email:', emailResponse);
       if (emailResponse.exists) {
         this.errorMessage = 'This email is already used.';
         return;
@@ -85,7 +86,8 @@ export class SignupComponent {
         }
       });
     },
-    error: () => {
+    error: (err) => {
+      console.error('Erreur lors de la vérification de l\'email:', err);
       this.errorMessage = 'Error checking email uniqueness.';
     }
   });

@@ -20,6 +20,7 @@ import { ShowCvuserComponent } from './show-cvuser/show-cvuser.component';
 import { MypostComponent } from './mypost/mypost.component';
 import { ConfirmCodeComponent } from './confirm-code/confirm-code.component';
 import { UpdatepasswordManagerComponent } from './updatepassword-manager/updatepassword-manager.component';
+import { StatisticsComponent } from './statistics/statistics.component';
 
 const routes: Routes = [
     /*Acces for all */
@@ -33,6 +34,12 @@ const routes: Routes = [
 
   { path: '', redirectTo: '/log-in', pathMatch: 'full' },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
+   {
+    path: 'statistics',
+    component: StatisticsComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['SYSADMIN'] }
+  },
   {
     path: 'gestion-managers',
     component: GestionManagersComponent,
@@ -78,7 +85,8 @@ const routes: Routes = [
   { 
     path: 'chat-bot', 
     component: ChatBotComponent, 
-
+    canActivate: [AuthGuard],
+    data: { roles: ['CANDIDATE'] }
    },
 
 
