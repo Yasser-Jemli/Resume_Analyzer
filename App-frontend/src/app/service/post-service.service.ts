@@ -52,7 +52,7 @@ export class PostService {
    * @returns Observable<Post> containing the updated post.
    */
   updatePost(id: number, post: Post): Observable<Post> {
-    return this.http.put<Post>(`${this.apiUrl}/updatePost/${id}`, post).pipe(
+    return this.http.put<Post>(`${this.apiUrl}/update/${id}`, post).pipe(
       catchError(this.handleError('update post'))
     );
   }

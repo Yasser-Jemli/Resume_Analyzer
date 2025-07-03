@@ -55,8 +55,12 @@
             <!-- Ligne des boutons -->
             <div class="row g-2">
               <div class="col">
-                <button class="btn btn-success w-100" (click)="getMyNote()" [disabled]="!pdfisupdated">
+                <!-- Remplace getMyNote() par getcvnote() -->
+                <button class="btn btn-success w-100" (click)="getcvnote()" [disabled]="!pdfisupdated">
                   <i class="bi bi-graph-up-arrow"></i> Get My Note
+                </button>
+                <button class="btn btn-outline-primary w-100" (click)="goToChat()">
+                  <i class="bi bi-chat-dots"></i> Go to Chat Interview
                 </button>
               </div>
               <div class="col" *ngIf="customScore?.total_score > 50">

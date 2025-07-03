@@ -134,7 +134,7 @@ export class TestMonCvComponent implements OnInit {
     reader.readAsDataURL(this.selectedFile);
   }
 
-  getMyNote(): void {
+  getcvnote(): void {
     this.getNoteProgress = 0;
     this.isGettingNote = true;
     this.showResults = false;
@@ -146,27 +146,21 @@ export class TestMonCvComponent implements OnInit {
       } else {
         clearInterval(interval);
 
-        const userId: number = parseInt(localStorage.getItem('id') || '0', 10);
-
-        this.parserService.getCvsByUser(userId).subscribe({
-          next: (cvList) => {
-            console.log('CV List:', cvList);
-           // if (cvList.length > 0) {
-              const latestCv = cvList[cvList.length - 1];
-
-              console.log('Latest CV:', latestCv);
-
-              //this.customScore = latestCv.scores?.custom || null;
-              //this.recommendations = latestCv.skill_recommendations || [];
+        this.cvUploadService.getcvnote().subscribe({
+          next: (cvData) => {
+            console.log('CV Data:', cvData);
+            if (cvData && cvData.custom) {
+              this.customScore = cvData.custom;
+              this.recommendations = cvData.recommendations || [];
               this.showResults = true;
-            //} else {
-            //  this.errorMessage = 'No CV found for this user.';
-            //  this.customScore = null;
-            //  this.recommendations = [];
-             // this.showResults = false;
-         //   }
-          //  this.isGettingNote = false;
-          //  this.cdr.detectChanges();
+            } else {
+              this.errorMessage = 'No CV found for this user.';
+              this.customScore = null;
+              this.recommendations = [];
+              this.showResults = false;
+            }
+            this.isGettingNote = false;
+            this.cdr.detectChanges();
           },
           error: (err) => {
             this.errorMessage = 'Failed to retrieve CV data.';
@@ -190,7 +184,7 @@ export class TestMonCvComponent implements OnInit {
 
       this.chatInterviewService.sendposttochatbot(post).subscribe({
         next: (response) => {
-          console.log('Post envoyé au chatbot:', response);
+          console.log('skills envoyé au chatbot:', response);
           // Rediriger vers la page de chatbot
           this.router.navigate(['/chat-bot']);
         },
