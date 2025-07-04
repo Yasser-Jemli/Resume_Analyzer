@@ -51,19 +51,21 @@ export class ForgotPasswordComponent {
       next: (response: UserByEmailResponse) => {
         console.log('Email search response:', response);
         if (response.exists) {
+          const emailToUse = response.email || this.email?.value;
           localStorage.setItem('pendingForgetUser', JSON.stringify({
             id: response.id,
-            email: response.email,
+            email: emailToUse,
             username: response.username,
             role: response.role
           }));
 
-          this.userService.resendConfirmationCode(response.email!).subscribe({
-            next: () => {
+          console.log('Resending code to:', emailToUse);
+
+          this.userService.resendConfirmationCode(emailToUse).subscribe({
+            next: (res: any) => {
               this.loading = false;
-              this.successMessage = 'A confirmation code has been sent to your email address.';
-              // Navigate to confirmation code page
-              this.router.navigate(['/confirm-code'], { queryParams: { email: response.email, mode: 'forget' } });
+              this.successMessage = res.message || 'A confirmation code has been sent to your email address.';
+              this.router.navigate(['/confirm-code'], { queryParams: { email: emailToUse, mode: 'forget' } });
             },
             error: (err) => {
               this.loading = false;
