@@ -34,3 +34,9 @@ python3 main.py parse_cv --path ~/Downloads/CV_Yasser_Jamli.pdf --save --console
 
 # Full output (save JSON, log to file, show console)
 python3 main.py parse_cv --path ~/Downloads/CV_Yasser_Jamli.pdf --save --logging --console
+
+
+python3 api_sever.py 8080
+
+
+http://localhost:8080/parse_cv?path=/home/yjemli@actia.local/Downloads/CV_Yasser_Jamli.pdf 
