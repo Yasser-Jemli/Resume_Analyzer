@@ -28,10 +28,11 @@ export class UserServiceService {
   return this.http.get<{ exists: boolean }>(`${this.apiUrl}/check-username`, { params: { username } });
 }
 
-  // Récupérer un utilisateur par username
-  
-  getUserByEmail(email: string): Observable<{ exists: boolean }> {
-  return this.http.get<{ exists: boolean }>(`${this.apiUrl}/check-email`, { params: { email } });
+  // Récupérer un utilisateur par email (renvoie plus d'infos)
+  getUserByEmail(email: string): Observable<{ exists: boolean; id?: string; email?: string; username?: string; role?: string }> {
+    return this.http.get<{ exists: boolean; id?: string; email?: string; username?: string; role?: string }>(
+      `${this.apiUrl}/check-email`, { params: { email } }
+    );
 }
 
 
@@ -100,6 +101,11 @@ export class UserServiceService {
   getPassword(id: string): Observable<any> {
     return this.http.get<User>(`${this.apiUrl}/getPassword/${id}`);
   }
+
+  checkPassword(id: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/getPassword/${id}`, { password });
+}
+
    checkUsernameExists(username: string): Observable<{ exists: boolean }> {
     return this.http.get<{ exists: boolean }>(`${this.apiUrl}/check-username?username=${username}`);
   }

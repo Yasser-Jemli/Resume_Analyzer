@@ -98,48 +98,49 @@ export class UserProfileComponent implements OnInit {
     }
   }
 
-  updatePassword(): void {
-    const oldPassword = prompt('Entrez votre mot de passe actuel :');
-    if (!oldPassword) {
-      alert('Changement annulé.');
-      return;
-    }
-
-    const newPassword = prompt('Entrez le nouveau mot de passe (min 6 caractères) :');
-    if (!newPassword || newPassword.length < 6) {
-      alert('Le nouveau mot de passe doit contenir au moins 6 caractères.');
-      return;
-    }
-
-    if (this.username) {
-      const userId = localStorage.getItem('id');
-      if (!userId) {
-        alert('Utilisateur introuvable.');
-        return;
-      }
-
-      this.userService.getPassword(userId).subscribe({
-        next: (response) => {
-          const storedPassword = response.password;
-          if (storedPassword !== oldPassword) {
-            alert('Mot de passe actuel incorrect.');
-            return;
-          }
-          this.userService.updatePassword(userId, newPassword).subscribe({
-            next: () => {
-              alert('Mot de passe mis à jour avec succès.');
-            },
-            error: (err) => {
-              alert('Erreur lors de la mise à jour du mot de passe.');
-              console.error('Update error:', err);
-            }
-          });
-        },
-        error: (err) => {
-          alert('Erreur lors de la récupération du mot de passe.');
-          console.error('Get password error:', err);
-        }
-      });
-    }
+ updatePassword(): void {
+  const oldPassword = prompt('Entrez votre mot de passe actuel :');
+  if (!oldPassword) {
+    alert('Changement annulé.');
+    return;
   }
+
+  const newPassword = prompt('Entrez le nouveau mot de passe (min 6 caractères) :');
+  if (!newPassword || newPassword.length < 6) {
+    alert('Le nouveau mot de passe doit contenir au moins 6 caractères.');
+    return;
+  }
+
+  if (this.username) {
+    const userId = localStorage.getItem('id');
+    if (!userId) {
+      alert('Utilisateur introuvable.');
+      return;
+    }
+
+    this.userService.checkPassword(userId, oldPassword).subscribe({
+      next: (response) => {
+        if (!response.matches) {
+          alert('Mot de passe actuel incorrect.');
+          return;
+        }
+
+        this.userService.updatePassword(userId, newPassword).subscribe({
+          next: () => {
+            alert('Mot de passe mis à jour avec succès.');
+          },
+          error: (err) => {
+            alert('Erreur lors de la mise à jour du mot de passe.');
+            console.error('Update error:', err);
+          }
+        });
+      },
+      error: (err) => {
+        alert('Erreur lors de la vérification du mot de passe.');
+        console.error('Check password error:', err);
+      }
+    });
+  }
+}
+
 }

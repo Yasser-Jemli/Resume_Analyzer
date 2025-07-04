@@ -128,4 +128,7 @@ export class CvUploadService {
       })
     );
   }
+  getCandidateCVsForManagerPosts(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.uploadUrl}/candidate-cvs`);
+  }
 }

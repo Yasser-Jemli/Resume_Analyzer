@@ -48,6 +48,7 @@ export class UpdatePasswordComponent implements OnInit {
 
     const newPassword = this.updatePasswordForm.value.newPassword;
     console.log('Attempting to update password for:', this.email, 'New password:', newPassword);
+    console.log('User ID:', this.userId);
 
     // Utilise l'id pour mettre à jour l'utilisateur
     this.userService.updatePassword(this.userId, newPassword).subscribe({

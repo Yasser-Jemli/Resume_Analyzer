@@ -96,9 +96,14 @@ export class ConfirmCodeComponent implements OnInit {
           case 'forget':
             const forgetUser = JSON.parse(localStorage.getItem('pendingForgetUser') || '{}');
             this.loading = false;
-            this.router.navigate(['/update-password'], {
-              queryParams: { email: this.email, id: forgetUser.id }
-            });
+            if (forgetUser && forgetUser.id) {
+              this.router.navigate(['/update-password'], {
+                queryParams: { email: this.email, id: forgetUser.id }
+              });
+            } else {
+              console.error('No user ID found in pendingForgetUser:', forgetUser);
+              this.errorMessage = 'Impossible de récupérer l\'identifiant utilisateur pour la réinitialisation du mot de passe.';
+            }
             break;
 
           case 'login':
