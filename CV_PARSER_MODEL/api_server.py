@@ -55,7 +55,7 @@ async def parse_file(file: UploadFile = File(...)):
 
     return JSONResponse(content=jsonable_encoder(result))
 
-@app.post("/CV/upload")
+@app.post("/cv/upload")
 async def upload_and_parse(file: UploadFile = File(...)):
     # Save the uploaded file
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -77,7 +77,7 @@ async def upload_and_parse(file: UploadFile = File(...)):
 
 if __name__ == "__main__":
     import sys
-    port = int(os.environ.get("CV_API_PORT", 8000))
+    port = int(os.environ.get("CV_API_PORT", 8081))
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
     uvicorn.run(app, host="0.0.0.0", port=port)
