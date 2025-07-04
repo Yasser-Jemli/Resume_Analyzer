@@ -18,6 +18,7 @@ from pathlib import Path
 from datetime import datetime
 import json
 import time
+import traceback
 
 from utilis.watchdog import Watchdog
 from utilis.log_manager import LogManager
@@ -237,7 +238,7 @@ def measure_execution_time(func):
     return wrapper
 
 @measure_execution_time
-def CV_parsing_main(pdf_path, save_results=False):
+def CV_parsing_main(pdf_path, save_results=False, args=None):
     try:
         logger.info(f"Processing PDF: {pdf_path}")
         results = compare_parsers(pdf_path)
@@ -277,7 +278,7 @@ def CV_parsing_main(pdf_path, save_results=False):
                     json.dump(results, f, indent=4, ensure_ascii=False)
                 logger.info(f"Results saved to: {output_file}")
             
-            if args.console:
+            if args and getattr(args, "console", False):
                 print("\n=== CV Analysis Results ===")
                 print(f"\nCurrent Position: {position}")
                 print("\nSkill Recommendations:")
@@ -315,6 +316,7 @@ def CV_parsing_main(pdf_path, save_results=False):
             
     except Exception as e:
         logger.error(f"Exception occurred: {str(e)}")
+        traceback.print_exc()
         return None
 
 def setup_logging(enable_file_logging=False, enable_console=False):
@@ -354,7 +356,7 @@ if __name__ == "__main__":
     logger = log_manager.get_logger(__name__)
     
     if args.action == 'parse_cv':
-        result = CV_parsing_main(args.path, save_results=args.save)
+        result = CV_parsing_main(args.path, save_results=args.save, args=args)
     
     # Only show execution time if console output is enabled
     if args.console:
