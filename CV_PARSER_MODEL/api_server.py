@@ -55,6 +55,26 @@ async def parse_file(file: UploadFile = File(...)):
 
     return JSONResponse(content=jsonable_encoder(result))
 
+@app.post("/CV/upload")
+async def upload_and_parse(file: UploadFile = File(...)):
+    # Save the uploaded file
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    saved_filename = f"{timestamp}_{file.filename}"
+    saved_path = UPLOAD_DIR / saved_filename
+
+    with saved_path.open("wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    # Call your parser
+    result = CV_parsing_main(str(saved_path), save_results=False)
+    if result is None:
+        raise HTTPException(status_code=500, detail="Parsing failed")
+
+    # Optionally, delete the file after parsing
+    # saved_path.unlink()
+
+    return JSONResponse(content=jsonable_encoder(result))
+
 if __name__ == "__main__":
     import sys
     port = int(os.environ.get("CV_API_PORT", 8000))
