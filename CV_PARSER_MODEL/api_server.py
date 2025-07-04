@@ -77,7 +77,7 @@ async def upload_and_parse(file: UploadFile = File(...)):
 
 if __name__ == "__main__":
     import sys
-    port = int(os.environ.get("CV_API_PORT", 8081))
+    port = int(os.environ.get("CV_API_PORT", 8000))
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
     uvicorn.run(app, host="0.0.0.0", port=port)
