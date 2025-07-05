@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Query
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -73,6 +73,15 @@ async def upload_and_parse(file: UploadFile = File(...)):
     # Optionally, delete the file after parsing
     # saved_path.unlink()
 
+    return JSONResponse(content=jsonable_encoder(result))
+
+@app.get("/parse_cv")
+async def parse_cv(path: str = Query(..., description="Path to the resume PDF file")):
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="File not found")
+    result = CV_parsing_main(path, save_results=False)
+    if result is None:
+        raise HTTPException(status_code=500, detail="Parsing failed")
     return JSONResponse(content=jsonable_encoder(result))
 
 if __name__ == "__main__":
