@@ -27,6 +27,7 @@ export interface CVUploadMetadata {
 })
 export class CvUploadService {
   private readonly uploadUrl = 'http://localhost:8081/cv';
+  private readonly uploadParser = 'http://localhost:8000/cv';
 
   constructor(private http: HttpClient) {}
 
@@ -45,6 +46,32 @@ export class CvUploadService {
     formData.append('postid', metadata.postid);
 
     return this.http.post(`${this.uploadUrl}/upload`, formData, {
+      reportProgress: true,
+      observe: 'events',
+      responseType: 'text'
+    }).pipe(
+      catchError((error) => {
+        console.error('CV upload failed:', error);
+        return throwError(() => new Error('Failed to upload CV: ' + (error.message || 'Unknown error')));
+      })
+    );
+  }
+
+  /**
+   * Uploads a CV file with metadata to the backend.
+   * @param file The CV file to upload.
+   * @param metadata The metadata for the CV (username, usermail, postname, postid).
+   * @returns Observable<HttpEvent<string>> for tracking upload progress and response.
+   */
+  uploadCVParser(file: File, metadata: CVUploadMetadata): Observable<HttpEvent<string>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('username', metadata.username);
+    formData.append('usermail', metadata.usermail);
+    formData.append('postname', metadata.postname);
+    formData.append('postid', metadata.postid);
+
+    return this.http.post(`${this.uploadParser}/upload`, formData, {
       reportProgress: true,
       observe: 'events',
       responseType: 'text'
