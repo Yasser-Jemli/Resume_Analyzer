@@ -75,6 +75,24 @@ async def upload_and_parse(file: UploadFile = File(...)):
 
     return JSONResponse(content=jsonable_encoder(result))
 
+# For file upload
+@app.post("/cv/upload_score")
+async def upload_and_parse_score(file: UploadFile = File(...)):
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    saved_filename = f"{timestamp}_{file.filename}"
+    saved_path = UPLOAD_DIR / saved_filename
+
+    with saved_path.open("wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    result = CV_parsing_main(str(saved_path), save_results=False)
+    if result is None:
+        raise HTTPException(status_code=500, detail="Parsing failed")
+    custom = result.get("parsers", {}).get("custom", {})
+    # Example: score is the number of skills found
+    score = len(custom.get("Skills", []))
+    return {"score": score}
+
 @app.get("/parse_cv")
 async def parse_cv(path: str = Query(..., description="Path to the resume PDF file")):
     if not os.path.exists(path):
@@ -83,6 +101,19 @@ async def parse_cv(path: str = Query(..., description="Path to the resume PDF fi
     if result is None:
         raise HTTPException(status_code=500, detail="Parsing failed")
     return JSONResponse(content=jsonable_encoder(result))
+
+# For file path
+@app.get("/parse_cv_score")
+async def parse_cv_score(path: str = Query(..., description="Path to the resume PDF file")):
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="File not found")
+    result = CV_parsing_main(path, save_results=False)
+    if result is None:
+        raise HTTPException(status_code=500, detail="Parsing failed")
+    custom = result.get("parsers", {}).get("custom", {})
+    # Example: score is the number of skills found
+    score = len(custom.get("Skills", []))
+    return {"score": score}
 
 if __name__ == "__main__":
     import sys
